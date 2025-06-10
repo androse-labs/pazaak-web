@@ -1,1 +1,13 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+@plugin "daisyui" {
+  themes:
+    dracula --default,
+    dracula --prefersdark;
+}
+
+@theme {
+  --color-pzk-red: rgba(209, 38, 57);
+  --color-pzk-blue: rgba(59, 130, 246);
+  --color-pzk-green: rgba(50, 166, 63);
+  --color-pzk-yellow: rgba(227, 187, 57);
+}
