@@ -1,0 +1,12 @@
+{
+  "name": "pazaak-web",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:server": "bun --cwd apps/server dev",
+    "dev:web": "bun --cwd apps/web dev",
+    "dev": "bun --filter web --filter server dev"
+  }
+}
