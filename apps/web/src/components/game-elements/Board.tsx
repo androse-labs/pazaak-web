@@ -37,8 +37,8 @@ export const Board = ({ playerCards, opponentCards }: BoardProps) => {
           ))}
         </div>
         <div className="bg-base-200 grid w-fit grid-cols-4 grid-rows-1 gap-2 rounded-md p-2">
-          {opponentCards.map(() => (
-            <HiddenCard />
+          {opponentCards.map((_, index) => (
+            <HiddenCard key={index} />
           ))}
         </div>
       </div>
