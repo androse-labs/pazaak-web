@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Board } from '../components/gameElements/Board'
+import { Board } from '../components/game-elements/Board'
 
 export const Route = createFileRoute('/match')({
   component: About,

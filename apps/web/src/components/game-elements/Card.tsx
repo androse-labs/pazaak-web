@@ -6,16 +6,15 @@ type CardProps = {
 
 type PazaakColor = 'pzk-blue' | 'pzk-red' | 'pzk-green' | 'pzk-yellow'
 
-const colorMap: Record<
-  CardType,
-  {
-    top: PazaakColor
-    middle: PazaakColor
-    bottomLeft: PazaakColor
-    bottomRight: PazaakColor
-    isFlip: boolean
-  }
-> = {
+type CardStyle = {
+  top: PazaakColor
+  middle: PazaakColor
+  bottomLeft: PazaakColor
+  bottomRight: PazaakColor
+  isFlip: boolean
+}
+
+const colorMap: Record<CardType, CardStyle> = {
   none: {
     top: 'pzk-green',
     middle: 'pzk-green',
@@ -38,18 +37,18 @@ const colorMap: Record<
     isFlip: false,
   },
   invert: {
-    top: 'pzk-blue',
-    middle: 'pzk-red',
-    bottomLeft: 'pzk-red',
-    bottomRight: 'pzk-blue',
-    isFlip: true,
-  },
-  flip: {
     top: 'pzk-yellow',
     middle: 'pzk-yellow',
     bottomLeft: 'pzk-yellow',
     bottomRight: 'pzk-yellow',
     isFlip: false,
+  },
+  flip: {
+    top: 'pzk-blue',
+    middle: 'pzk-red',
+    bottomLeft: 'pzk-red',
+    bottomRight: 'pzk-blue',
+    isFlip: true,
   },
   double: {
     top: 'pzk-yellow',
