@@ -1,11 +1,19 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
+import { cors } from 'hono/cors'
 import { z } from 'zod'
 import { CardValueSchema } from './models'
 import { MatchManager } from './matches'
 
 export const createApp = (matchManager: MatchManager) => {
   const app = new Hono({})
+
+  app.use(
+    '*',
+    cors({
+      origin: ['http://localhost:5173'], // Allow all origins for simplicity, adjust as needed
+    }),
+  )
 
   app.post(
     '/match/create',
@@ -84,5 +92,8 @@ export const createApp = (matchManager: MatchManager) => {
   return app
 }
 
-export default createApp
+export default {
+  port: 3000,
+  fetch: createApp(new MatchManager()).fetch,
+}
 export type AppType = ReturnType<typeof createApp>
