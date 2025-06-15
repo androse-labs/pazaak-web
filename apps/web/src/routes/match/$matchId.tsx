@@ -12,7 +12,10 @@ export const Route = createFileRoute('/match/$matchId')({
 type PlayerView = {
   matchName: string
   games: {
-    boards: [Card[], Card[]]
+    boards: {
+      yourBoard: Card[]
+      opponentBoard: Card[]
+    }
     turn: number
     winnner: string | null
   }[]
@@ -50,10 +53,12 @@ function MatchPage() {
     <div>
       <h1 className="text-2xl font-bold">Match ID: {matchId}</h1>
       <Board
-        board={{
-          0: gameState?.games[gameState?.round - 1]?.boards[0] || [],
-          1: gameState?.games[gameState?.round - 1]?.boards[1] || [],
-        }}
+        boards={
+          gameState?.games[gameState?.round - 1].boards || {
+            yourBoard: [],
+            opponentBoard: [],
+          }
+        }
         playerCards={gameState?.yourHand || []}
         opponentCardCount={gameState?.opponentHandSize || 0}
       />

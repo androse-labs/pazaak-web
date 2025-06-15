@@ -125,7 +125,10 @@ export class Game {
 type PlayerView = {
   matchName: string
   games: {
-    boards: Record<string, Card[]>
+    boards: {
+      yourBoard: Card[]
+      opponentBoard: Card[]
+    }
     turn: number
     winnner: string | null
   }[]
@@ -180,6 +183,19 @@ export class Match {
     })
 
     this.addGame(new Game(this.players[0].id, this.players[1].id))
+
+    // draw card from board deck to first player's board
+    const currentGame = this.games[this.games.length - 1]
+    if (!currentGame) {
+      throw new Error('No current game to draw a card for')
+    }
+
+    const player1Board = currentGame.boards[this.players[0].id]
+    const drawnCard = currentGame.deck.cards.pop()
+    if (!drawnCard) {
+      throw new Error('No cards left in the deck to draw')
+    }
+    player1Board.push(drawnCard)
   }
 
   playCard(playerId: string, cardIndex: number): void {
@@ -256,12 +272,13 @@ export class Match {
 
     const opponent = this.players.find((p) => p?.id !== playerId)
 
-    // set board key to playerId for easier access
-
     return {
       matchName: this.matchName,
       games: this.games.map((game) => ({
-        boards: game.boards,
+        boards: {
+          yourBoard: game.boards[playerId] || [],
+          opponentBoard: game.boards[opponent?.id || ''] || [],
+        },
         turn: game.turn,
         winnner: game.winnner,
       })),

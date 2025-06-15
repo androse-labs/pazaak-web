@@ -5,7 +5,10 @@ import { HiddenCard } from './HiddenCard'
 import type { CardValue } from './types'
 
 type BoardProps = {
-  board: Record<string, CardValue[]>
+  boards: {
+    yourBoard: CardValue[]
+    opponentBoard: CardValue[]
+  }
   playerCards: CardValue[]
   opponentCardCount: number
 }
@@ -19,7 +22,7 @@ const fitToGrid = (cards: JSX.Element[], length: number): JSX.Element[] => {
 }
 
 export const Board = ({
-  board,
+  boards: { yourBoard, opponentBoard },
   playerCards,
   opponentCardCount,
 }: BoardProps) => {
@@ -28,13 +31,15 @@ export const Board = ({
       <div className="grid w-fit grid-cols-2 grid-rows-1 justify-items-center gap-2 p-5">
         <div className="bg-base-200 grid grid-cols-3 grid-rows-3 justify-items-center gap-2 rounded-md p-2">
           {fitToGrid(
-            board[0].map((card, index) => <Card key={index} card={card} />),
+            yourBoard.map((card, index) => <Card key={index} card={card} />),
             9,
           )}
         </div>
         <div className="bg-base-200 grid grid-cols-3 grid-rows-3 justify-items-center gap-2 rounded-md p-2">
           {fitToGrid(
-            board[1].map((card, index) => <Card key={index} card={card} />),
+            opponentBoard.map((card, index) => (
+              <Card key={index} card={card} />
+            )),
             9,
           )}
         </div>
