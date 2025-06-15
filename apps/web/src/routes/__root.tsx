@@ -9,9 +9,6 @@ export const Route = createRootRoute({
           <Link to="/" className="btn btn-ghost text-xl normal-case">
             Home
           </Link>
-          <Link to="/match" className="btn btn-ghost text-xl normal-case">
-            Match
-          </Link>
         </div>
         <Outlet />
       </div>

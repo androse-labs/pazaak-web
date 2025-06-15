@@ -1,10 +1,12 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { RefreshCcw } from 'lucide-react'
 import { Modal } from '../components/Modal'
 import { api } from '../webClient'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { CardValue } from '../components/game-elements/types'
 import { MatchList } from '../components/MatchList'
+import { usePlayer } from '../contexts/PlayerContext'
+import { useState } from 'react'
 
 export const Route = createFileRoute('/')({
   component: Index,
@@ -31,22 +33,68 @@ function useGetJoinableMatches() {
   return { data, isPending, error, refetch }
 }
 
+const joinMatch = (matchId: string, deck: CardValue[]) => {
+  return api.post<{ playerId: string; token: string }>(
+    `/match/${matchId}/join`,
+    {
+      deck,
+    },
+  )
+}
+
+const demoDeck: CardValue[] = [
+  { type: 'tiebreaker', value: 1 },
+  { type: 'double', value: 'D' },
+  { type: 'invert', value: '2&4' },
+  { type: 'add', value: 1 },
+  { type: 'subtract', value: 1 },
+  { type: 'invert', value: '3&6' },
+  { type: 'subtract', value: 3 },
+  { type: 'flip', value: 2 },
+  { type: 'tiebreaker', value: 2 },
+]
+
 const JoinMatchModal = () => {
   const { data: matches, isPending, error, refetch } = useGetJoinableMatches()
+  const { setMatchConnection } = usePlayer()
+  const navigate = useNavigate()
+  const [matchId, setMatchId] = useState<string>('')
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    const response = await joinMatch(matchId, demoDeck)
+    if (response.status !== 200) {
+      throw new Error('Failed to join match')
+    }
+
+    setMatchConnection({
+      matchId: matchId,
+      playerId: response.data.playerId,
+      playerDeck: demoDeck,
+      token: response.data.token,
+    })
+
+    navigate({ to: `/match/${matchId}` })
+  }
 
   return (
     <Modal id="join-match-modal">
       <h3 className="text-lg font-bold">Join Match</h3>
 
       <div className="flex w-full items-center justify-center gap-2">
-        <div className="join w-full">
+        <form className="join w-full" onSubmit={handleSubmit}>
           <input
             type="text"
+            value={matchId}
+            onChange={(e) => setMatchId(e.target.value)}
             placeholder="Enter a Match ID"
             className="input join-item input-bordered w-full"
           />
-          <button className="btn btn-primary join-item">Join</button>
-        </div>
+          <button className="btn btn-primary join-item" type="submit">
+            Join
+          </button>
+        </form>
       </div>
 
       <div className="divider">or</div>
@@ -63,8 +111,25 @@ const JoinMatchModal = () => {
           matches={matches ?? []}
           isLoading={isPending}
           error={error}
-          onJoin={() => {
-            // tryJoinGame(id)
+          onJoin={async () => {
+            if (!matches || matches.length === 0) {
+              return
+            }
+            const matchId = matches[0].matchId
+            const response = await joinMatch(matchId, demoDeck)
+
+            if (response.status !== 200) {
+              throw new Error('Failed to join match')
+            }
+
+            setMatchConnection({
+              matchId,
+              playerId: response.data.playerId,
+              playerDeck: demoDeck,
+              token: response.data.token,
+            })
+
+            navigate({ to: `/match/${matches?.[0]?.matchId}` })
           }}
         />
       </div>
@@ -100,6 +165,8 @@ function useCreateMatchMutation() {
 
 function Index() {
   const { mutate } = useCreateMatchMutation()
+  const navigate = useNavigate()
+  const { setMatchConnection } = usePlayer()
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-24">
@@ -107,15 +174,23 @@ function Index() {
       <div className="flex flex-col gap-4">
         <button
           onClick={() => {
-            mutate({
-              deck: [
-                { type: 'double', value: 'D' },
-                { type: 'flip', value: '2&4' },
-                { type: 'invert', value: 2 },
-                { type: 'subtract', value: 3 },
-              ],
-              matchName: 'Test Match',
-            })
+            mutate(
+              {
+                deck: demoDeck,
+                matchName: 'Test Match',
+              },
+              {
+                onSuccess: (data) => {
+                  setMatchConnection({
+                    matchId: data.matchId,
+                    playerId: crypto.randomUUID(),
+                    playerDeck: demoDeck,
+                    token: data.token,
+                  })
+                  navigate({ to: `/match/${data.matchId}` })
+                },
+              },
+            )
           }}
           className="btn btn-primary"
         >

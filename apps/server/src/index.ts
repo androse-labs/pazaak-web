@@ -4,6 +4,10 @@ import { cors } from 'hono/cors'
 import { z } from 'zod'
 import { CardValueSchema } from './models'
 import { MatchManager } from './matches'
+import { createBunWebSocket } from 'hono/bun'
+import { ServerWebSocket } from 'bun'
+
+const { upgradeWebSocket, websocket } = createBunWebSocket<ServerWebSocket>()
 
 export const createApp = (matchManager: MatchManager) => {
   const app = new Hono({})
@@ -89,11 +93,54 @@ export const createApp = (matchManager: MatchManager) => {
     )
   })
 
+  app.get(
+    '/match/:matchId/subscribe',
+    zValidator('query', z.object({ token: z.string().min(1) })),
+    upgradeWebSocket((c) => {
+      const matchId = c.req.param('matchId')
+      const playerToken = c.req.query('token')
+
+      return {
+        onOpen: (_event, ws) => {
+          console.log(`WebSocket connection opened for match: ${matchId}`)
+          const match = matchManager.getMatch(matchId)
+          if (!match) {
+            ws.close(1000, 'Match not found')
+            return
+          }
+
+          if (!playerToken) {
+            ws.close(1000, 'Token is required')
+            return
+          }
+
+          const player = match.getPlayerByToken(playerToken)
+          if (!player) {
+            ws.close(1000, 'Invalid player token')
+            return
+          }
+
+          match.updatePlayerConnection(player.id, ws)
+
+          console.log(`Player ${player.id} connected to match ${matchId}`)
+          ws.send(JSON.stringify(match.getPlayerView(player.id)))
+        },
+        onMessage(event, ws) {
+          console.log(`Message from client: ${event.data}`)
+        },
+        onClose: () => {
+          console.log('Connection closed')
+        },
+      }
+    }),
+  )
+
   return app
 }
 
 export default {
   port: 3000,
   fetch: createApp(new MatchManager()).fetch,
+  websocket,
 }
 export type AppType = ReturnType<typeof createApp>

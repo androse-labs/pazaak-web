@@ -72,7 +72,7 @@ const colorMap: Record<CardType, CardStyle> = {
 
 const formatValue = (value: number | string, type: CardType) => {
   switch (type) {
-    case 'invert':
+    case 'flip':
       return `±${value}`
     case 'double':
       return value.toString()
@@ -82,7 +82,7 @@ const formatValue = (value: number | string, type: CardType) => {
       return `+${value}`
     case 'subtract':
       return `-${value}`
-    case 'flip':
+    case 'invert':
       return value.toString()
     default:
       return value.toString()

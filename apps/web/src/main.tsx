@@ -5,6 +5,7 @@ import { RouterProvider, createRouter } from '@tanstack/react-router'
 // Import the generated route tree
 import { routeTree } from './routeTree.gen'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { PlayerProvider } from './contexts/PlayerContext'
 
 // Create a new router instance
 const router = createRouter({ routeTree })
@@ -25,7 +26,9 @@ if (!rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
+        <PlayerProvider>
+          <RouterProvider router={router} />
+        </PlayerProvider>
       </QueryClientProvider>
     </StrictMode>,
   )

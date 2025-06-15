@@ -6,7 +6,7 @@ export const CardValueSchema = z.discriminatedUnion('type', [
     value: z.literal('D'),
   }),
   z.object({
-    type: z.literal('flip'),
+    type: z.literal('invert'),
     value: z.string().regex(/^\d+&\d+$/), // Matches `${number}&${number}`
   }),
   z.object({
@@ -22,7 +22,7 @@ export const CardValueSchema = z.discriminatedUnion('type', [
     value: z.number(),
   }),
   z.object({
-    type: z.literal('invert'),
+    type: z.literal('flip'),
     value: z.number(),
   }),
   z.object({

@@ -1,45 +1,58 @@
+import type { JSX } from 'react'
 import { Card } from './Card'
+import { EmptyCard } from './EmptyCard'
 import { HiddenCard } from './HiddenCard'
 import type { CardValue } from './types'
 
 type BoardProps = {
+  board: Record<string, CardValue[]>
   playerCards: CardValue[]
-  opponentCards: CardValue[]
+  opponentCardCount: number
 }
 
-export const Board = ({ playerCards, opponentCards }: BoardProps) => {
+// Takes either card components or hidden card components and fills the rest with empty card components
+const fitToGrid = (cards: JSX.Element[], length: number): JSX.Element[] => {
+  const grid = Array.from({ length }, (_, index) => {
+    return cards[index] || <EmptyCard key={index} />
+  })
+  return grid
+}
+
+export const Board = ({
+  board,
+  playerCards,
+  opponentCardCount,
+}: BoardProps) => {
   return (
     <div className="flex flex-col items-center justify-center">
       <div className="grid w-fit grid-cols-2 grid-rows-1 justify-items-center gap-2 p-5">
         <div className="bg-base-200 grid grid-cols-3 grid-rows-3 justify-items-center gap-2 rounded-md p-2">
-          <Card card={{ type: 'double', value: 'D' }} />
-          <Card card={{ type: 'flip', value: '2&4' }} />
-          <Card card={{ type: 'invert', value: 2 }} />
-          <Card card={{ type: 'subtract', value: 3 }} />
-          <Card card={{ type: 'none', value: 5 }} />
-          <Card card={{ type: 'add', value: 1 }} />
-          <Card card={{ type: 'tiebreaker', value: 1 }} />
+          {fitToGrid(
+            board[0].map((card, index) => <Card key={index} card={card} />),
+            9,
+          )}
         </div>
         <div className="bg-base-200 grid grid-cols-3 grid-rows-3 justify-items-center gap-2 rounded-md p-2">
-          <Card card={{ type: 'double', value: 'D' }} />
-          <Card card={{ type: 'flip', value: '2&4' }} />
-          <Card card={{ type: 'invert', value: 2 }} />
-          <Card card={{ type: 'subtract', value: 3 }} />
-          <Card card={{ type: 'none', value: 5 }} />
-          <Card card={{ type: 'add', value: 1 }} />
-          <Card card={{ type: 'tiebreaker', value: 1 }} />
+          {fitToGrid(
+            board[1].map((card, index) => <Card key={index} card={card} />),
+            9,
+          )}
         </div>
       </div>
       <div className="grid grid-cols-2 grid-rows-1 gap-2 p-5">
         <div className="bg-base-200 grid w-fit grid-cols-4 grid-rows-1 gap-2 rounded-md p-2">
-          {playerCards.map((card, index) => (
-            <Card key={index} card={card} />
-          ))}
+          {fitToGrid(
+            playerCards.map((card, index) => <Card key={index} card={card} />),
+            4,
+          )}
         </div>
         <div className="bg-base-200 grid w-fit grid-cols-4 grid-rows-1 gap-2 rounded-md p-2">
-          {opponentCards.map((_, index) => (
-            <HiddenCard key={index} />
-          ))}
+          {fitToGrid(
+            Array.from({ length: opponentCardCount }, (_, index) => (
+              <HiddenCard key={index} />
+            )),
+            4,
+          )}
         </div>
       </div>
     </div>
