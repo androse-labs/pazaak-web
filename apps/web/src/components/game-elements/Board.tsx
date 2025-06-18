@@ -3,6 +3,7 @@ import { Card } from './Card'
 import { EmptyCard } from './EmptyCard'
 import { HiddenCard } from './HiddenCard'
 import type { CardValue } from './types'
+import { OctagonMinus, SkipForward } from 'lucide-react'
 
 type BoardProps = {
   boards: {
@@ -29,19 +30,25 @@ export const Board = ({
   return (
     <div className="flex flex-col items-center justify-center">
       <div className="grid w-fit grid-cols-2 grid-rows-1 justify-items-center gap-2 p-5">
-        <div className="bg-base-200 grid grid-cols-3 grid-rows-3 justify-items-center gap-2 rounded-md p-2">
-          {fitToGrid(
-            yourBoard.map((card, index) => <Card key={index} card={card} />),
-            9,
-          )}
+        <div className="flex flex-col items-start justify-center gap-2">
+          <div className="text-2xl font-bold">Your Board</div>
+          <div className="bg-base-200 grid grid-cols-3 grid-rows-3 justify-items-center gap-2 rounded-md p-2">
+            {fitToGrid(
+              yourBoard.map((card, index) => <Card key={index} card={card} />),
+              9,
+            )}
+          </div>
         </div>
-        <div className="bg-base-200 grid grid-cols-3 grid-rows-3 justify-items-center gap-2 rounded-md p-2">
-          {fitToGrid(
-            opponentBoard.map((card, index) => (
-              <Card key={index} card={card} />
-            )),
-            9,
-          )}
+        <div className="flex flex-col items-end justify-end gap-2">
+          <div className="text-2xl font-bold">Opponent's Board</div>
+          <div className="bg-base-200 grid grid-cols-3 grid-rows-3 justify-items-center gap-2 rounded-md p-2">
+            {fitToGrid(
+              opponentBoard.map((card, index) => (
+                <Card key={index} card={card} />
+              )),
+              9,
+            )}
+          </div>
         </div>
       </div>
       <div className="grid grid-cols-2 grid-rows-1 gap-2 p-5">
@@ -59,6 +66,16 @@ export const Board = ({
             4,
           )}
         </div>
+      </div>
+      <div className="flex gap-2">
+        <button className="btn btn-secondary flex w-32 items-center justify-center gap-1.5">
+          <OctagonMinus size={20} />
+          <span>Stand</span>
+        </button>
+        <button className="btn btn-primary flex w-32 items-center justify-center gap-1.5">
+          <SkipForward size={20} />
+          <span>End Turn</span>
+        </button>
       </div>
     </div>
   )

@@ -49,19 +49,30 @@ function MatchPage() {
     }
   }, [lastJsonMessage])
 
+  if (!gameState) {
+    return <div>Loading...</div>
+  }
+
+  const currentGame = gameState.games[gameState.round - 1]
+  const hasStarted = !!currentGame?.boards
+
   return (
-    <div>
+    <div className="flex flex-col items-center justify-center p-5">
       <h1 className="text-2xl font-bold">Match ID: {matchId}</h1>
-      <Board
-        boards={
-          gameState?.games[gameState?.round - 1].boards || {
-            yourBoard: [],
-            opponentBoard: [],
-          }
-        }
-        playerCards={gameState?.yourHand || []}
-        opponentCardCount={gameState?.opponentHandSize || 0}
-      />
+      {hasStarted ? (
+        <Board
+          boards={{
+            yourBoard: currentGame.boards.yourBoard,
+            opponentBoard: currentGame.boards.opponentBoard,
+          }}
+          playerCards={gameState.yourHand}
+          opponentCardCount={gameState.opponentHandSize}
+        />
+      ) : (
+        <div className="text-center text-lg">
+          Waiting for the game to start...
+        </div>
+      )}
     </div>
   )
 }
