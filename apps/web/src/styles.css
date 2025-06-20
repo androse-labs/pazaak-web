@@ -10,4 +10,23 @@
   --color-pzk-blue: rgb(59, 130, 246);
   --color-pzk-green: rgb(50, 166, 63);
   --color-pzk-yellow: rgb(227, 187, 57);
+  --animate-slow-shake: slow-shake 1s ease-in-out infinite;
+
+  @keyframes slow-shake {
+    0% {
+      transform: rotate(-1deg) translateX(-1px);
+    }
+    25% {
+      transform: rotate(1deg) translateX(1px);
+    }
+    50% {
+      transform: rotate(-1deg) translateX(-1px);
+    }
+    75% {
+      transform: rotate(1deg) translateX(1px);
+    }
+    100% {
+      transform: rotate(-1deg) translateX(-1px);
+    }
+  }
 }
