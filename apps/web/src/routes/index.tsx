@@ -3,7 +3,7 @@ import { RefreshCcw } from 'lucide-react'
 import { Modal } from '../components/Modal'
 import { api } from '../webClient'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import type { CardValue } from '../components/game-elements/types'
+import type { CardValue as Card } from '../components/game-elements/types'
 import { MatchList } from '../components/MatchList'
 import { usePlayer } from '../contexts/PlayerContext'
 import { useState } from 'react'
@@ -33,25 +33,25 @@ function useGetJoinableMatches() {
   return { data, isPending, error, refetch }
 }
 
-const joinMatch = (matchId: string, deck: CardValue[]) => {
+const joinMatch = (matchId: string, deck: Card[]) => {
   return api.post<{ playerId: string; token: string }>(
     `/match/${matchId}/join`,
     {
-      deck,
+      deck: deck.map((card) => ({ type: card.type, value: card.value })),
     },
   )
 }
 
-const demoDeck: CardValue[] = [
-  { type: 'tiebreaker', value: 1 },
-  { type: 'double', value: 'D' },
-  { type: 'invert', value: '2&4' },
-  { type: 'add', value: 1 },
-  { type: 'subtract', value: 1 },
-  { type: 'invert', value: '3&6' },
-  { type: 'subtract', value: 3 },
-  { type: 'flip', value: 2 },
-  { type: 'tiebreaker', value: 2 },
+const demoDeck: Card[] = [
+  { id: crypto.randomUUID(), type: 'tiebreaker', value: 1 },
+  { id: crypto.randomUUID(), type: 'double', value: 'D' },
+  { id: crypto.randomUUID(), type: 'invert', value: '2&4' },
+  { id: crypto.randomUUID(), type: 'add', value: 1 },
+  { id: crypto.randomUUID(), type: 'subtract', value: 1 },
+  { id: crypto.randomUUID(), type: 'invert', value: '3&6' },
+  { id: crypto.randomUUID(), type: 'subtract', value: 3 },
+  { id: crypto.randomUUID(), type: 'flip', value: 2 },
+  { id: crypto.randomUUID(), type: 'tiebreaker', value: 2 },
 ]
 
 const JoinMatchModal = () => {
@@ -145,11 +145,13 @@ type CreateMatchResponse = {
 function useCreateMatchMutation() {
   const queryClient = useQueryClient()
   const { mutate, isPending, error } = useMutation({
-    mutationFn: async (data: { deck: CardValue[]; matchName: string }) => {
-      const response = await api.post<CreateMatchResponse>(
-        '/match/create',
-        data,
-      )
+    // deck does not need card id. exclude it from the type
+    mutationFn: async (data: { deck: Card[]; matchName: string }) => {
+      // drop the id from each card in the deck
+      const response = await api.post<CreateMatchResponse>('/match/create', {
+        deck: data.deck.map((card) => ({ type: card.type, value: card.value })),
+        matchName: data.matchName,
+      })
       if (response.status !== 200) {
         throw new Error('Failed to create match')
       }
