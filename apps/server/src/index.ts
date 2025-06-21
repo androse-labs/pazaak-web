@@ -154,13 +154,11 @@ export const createApp = (matchManager: MatchManager) => {
         return c.json({ error: 'Invalid player token' }, 403)
       }
 
-      const actionResult = match.isActionValid(player.id, action)
+      const result = match.performAction(player.id, action)
 
-      if (!actionResult.valid) {
-        return c.json({ error: actionResult.reason }, 400)
+      if (!result) {
+        return c.json({ error: 'Invalid action' }, 400)
       }
-
-      match.performAction(player.id, action)
 
       return c.body(null, 204)
     },

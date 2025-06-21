@@ -67,15 +67,12 @@ export class Game {
   boardTotal(board: Card[]): number {
     return board.reduce((total, card) => {
       if (card.type === 'double') {
-        return total * 2
+        return total
       } else if (card.type === 'flip') {
         const sign = card.magnitude === 'subtract' ? -1 : 1
         return total + sign * card.value
       } else if (card.type === 'invert') {
-        return (
-          total +
-          card.value.split('&').reduce((sum, val) => sum + parseInt(val), 0)
-        )
+        return total
       } else if (card.type === 'subtract') {
         return total - card.value
       } else if (card.type === 'tiebreaker') {
@@ -256,6 +253,23 @@ export class Match {
         'Cannot play double card after another double or invert card',
       )
     }
+
+    if (cardToPlay.type === 'invert') {
+      // If the card is an invert, replace all cards on the board
+      // matching the 2 numbers with their inverted values
+      const invertedValues = cardToPlay.value.split('&').map(Number)
+
+      const cardsToModify = currentGame.boards[playerId]
+
+      cardsToModify.map((card) => {
+        if (card.type === 'double' || card.type === 'invert') {
+          return
+        }
+        if (invertedValues.includes(card.value)) {
+          card.value = card.value * -1
+        }
+      })
+    }
   }
 
   // Check which player won the match by reaching 3 points
@@ -386,10 +400,13 @@ export class Match {
     this.notifyPlayersAboutGameState()
   }
 
-  performAction(playerId: string, action: MatchAction): void {
+  performAction(
+    playerId: string,
+    action: MatchAction,
+  ): { success: true } | { success: false; reason: string } {
     const validation = this.isActionValid(playerId, action)
     if (!validation.valid) {
-      throw new Error(validation.reason)
+      return { success: false, reason: validation.reason }
     }
 
     const player = this.getPlayerById(playerId)
@@ -432,9 +449,11 @@ export class Match {
     currentGame.turn += 1
 
     this.notifyPlayersAboutGameState()
+
+    return { success: true }
   }
 
-  isActionValid(
+  private isActionValid(
     playerId: string,
     action: MatchAction,
   ): { valid: true } | { valid: false; reason: string } {
