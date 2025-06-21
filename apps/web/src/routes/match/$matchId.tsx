@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Board } from '../../components/game-elements/Board'
 import useWebSocket from 'react-use-websocket'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { usePlayer } from '../../contexts/PlayerContext'
 import type {
   CardValue as Card,
@@ -39,10 +39,17 @@ type PlayerView = {
   score: [number, number]
 }
 
+function hasMagnitude(
+  card: Card,
+): card is Extract<Card, { magnitude: 'subtract' | 'add' }> {
+  return 'magnitude' in card
+}
+
 function MatchPage() {
   const { matchId } = Route.useParams()
   const { matchConnection } = usePlayer()
   const [gameState, setGameState] = useState<PlayerView | null>(null)
+  const [playerHand, setPlayerHand] = useState<Card[]>([])
   const { mutate } = useMutation({
     mutationFn: async (action: MatchAction) =>
       api.patch(`http://localhost:3000/match/${matchId}/action`, action, {
@@ -55,24 +62,42 @@ function MatchPage() {
       }),
   })
 
-  const { lastJsonMessage } = useWebSocket(
+  useWebSocket(
     `ws://localhost:3000/match/${matchId}/subscribe?token=${matchConnection?.token}`,
     {
       retryOnError: true,
       onMessage: (event) => {
-        const message = JSON.parse(event.data)
-        console.log('WebSocket message received:', message)
+        const message: PlayerView = JSON.parse(event.data)
 
         setGameState(message)
+
+        setPlayerHand((prevHand) =>
+          message.yourHand.map((newCard) => {
+            const prevCard = prevHand.find((c) => c.id === newCard.id)
+            // update the player hand but don't overwrite magnitude for flip or tiebreaker cards
+            if (prevCard && hasMagnitude(prevCard) && hasMagnitude(newCard)) {
+              return { ...newCard, magnitude: prevCard.magnitude }
+            }
+
+            return newCard
+          }),
+        )
       },
     },
   )
 
-  useEffect(() => {
-    if (lastJsonMessage !== null) {
-      console.log('Received message:', lastJsonMessage)
-    }
-  }, [lastJsonMessage])
+  const onMagnitudeFlip = (cardId: string) => {
+    const card = playerHand.find((c) => c.id === cardId)
+    if (!card || !hasMagnitude(card)) return
+
+    const newMagnitude = card.magnitude === 'subtract' ? 'add' : 'subtract'
+
+    setPlayerHand((prevHand) =>
+      prevHand.map((card) =>
+        card.id === cardId ? { ...card, magnitude: newMagnitude } : card,
+      ),
+    )
+  }
 
   if (!gameState) {
     return <div>Loading...</div>
@@ -93,7 +118,7 @@ function MatchPage() {
           yourTurn={gameState.yourTurn}
           yourState={gameState.yourState}
           opponentState={gameState.opponentState}
-          playerCards={gameState.yourHand}
+          playerCards={playerHand}
           opponentCardCount={gameState.opponentHandSize}
           onEndTurn={() => {
             mutate({ type: 'end' })
@@ -107,6 +132,7 @@ function MatchPage() {
               card,
             } as MatchAction)
           }}
+          onMagnitudeFlip={onMagnitudeFlip}
         />
       ) : (
         <div className="text-center text-lg">

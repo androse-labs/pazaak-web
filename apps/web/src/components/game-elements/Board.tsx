@@ -1,40 +1,31 @@
-import { memo, useState, type JSX } from 'react'
+import { Children, memo, useState, type ReactNode } from 'react'
 import { Card } from './Card'
 import { EmptyCard } from './EmptyCard'
 import { HiddenCard } from './HiddenCard'
 import type { CardValue } from './types'
-import { OctagonMinus, SkipForward } from 'lucide-react'
+import { ArrowDownUp, OctagonMinus, SkipForward } from 'lucide-react'
 import { DndContext, useDndMonitor, useDroppable } from '@dnd-kit/core'
 import clsx from 'clsx'
 
-type BoardProps = {
-  boards: {
-    yourBoard: {
-      cards: CardValue[]
-      total: number
-    }
-    opponentBoard: {
-      cards: CardValue[]
-      total: number
-    }
-  }
-  yourTurn: boolean
-  yourState: 'playing' | 'standing' | 'busted'
-  opponentState: 'playing' | 'standing' | 'busted'
-  playerCards: CardValue[]
-  opponentCardCount: number
-  onEndTurn: () => void
-  onStand: () => void
-  onBoardDrop: (card: CardValue) => void
-}
-
 // Takes either card components or hidden card components and fills the rest
 // with empty card components
-const fitToGrid = (cards: JSX.Element[], length: number): JSX.Element[] => {
-  const grid = Array.from({ length }, (_, index) => {
-    return cards[index] || <EmptyCard key={index} />
-  })
-  return grid
+type GridOfItemsProps = {
+  length: number
+  children: ReactNode
+}
+
+export const GridOfItems: React.FC<GridOfItemsProps> = ({
+  length,
+  children,
+}) => {
+  const items = Children.toArray(children)
+  return (
+    <>
+      {Array.from({ length }, (_, index) => {
+        return items[index] ?? <EmptyCard key={index} />
+      })}
+    </>
+  )
 }
 
 const DropOverlay = ({ isOver }: { isOver: boolean }) => (
@@ -82,7 +73,7 @@ const YourBoardGrid = memo(
     yourTurn: boolean
     state: 'playing' | 'standing' | 'busted'
     title: string
-    cards: JSX.Element[]
+    cards: ReactNode[]
   }) => {
     const { setNodeRef, isOver } = useDroppable({ id: 'your-board' })
     const [isDragging, setIsDragging] = useState(false)
@@ -111,7 +102,13 @@ const YourBoardGrid = memo(
             { 'outline-neutral outline-4': isOver },
           )}
         >
-          {fitToGrid(cards, 9)}
+          <GridOfItems length={9}>
+            {cards.map((card, index) => (
+              <div key={index} className="h-full w-full">
+                {card}
+              </div>
+            ))}
+          </GridOfItems>
           {isDragging && <DropOverlay isOver={isOver} />}
         </div>
       </div>
@@ -129,7 +126,7 @@ const OpponentBoardGrid = ({
   theirTurn: boolean
   state: 'playing' | 'standing' | 'busted'
   total: number
-  cards: JSX.Element[]
+  cards: ReactNode[]
 }) => (
   <div className="flex flex-col items-end justify-end gap-2">
     <div className="flex w-full flex-row-reverse justify-between">
@@ -142,7 +139,13 @@ const OpponentBoardGrid = ({
       Total: <span className="font-bold">{total}</span>
     </div>
     <div className="bg-base-200 relative grid grid-cols-3 grid-rows-3 justify-items-center gap-2 rounded-md p-2">
-      {fitToGrid(cards, 9)}
+      <GridOfItems length={9}>
+        {cards.map((card, index) => (
+          <div key={index} className="h-full w-full">
+            {card}
+          </div>
+        ))}
+      </GridOfItems>
     </div>
   </div>
 )
@@ -157,7 +160,7 @@ const BoardGrid = ({
 }: {
   title: string
   state: 'playing' | 'standing' | 'busted'
-  cards: JSX.Element[]
+  cards: ReactNode[]
   total: number
   yourTurn: boolean
   isOpponent?: boolean
@@ -183,7 +186,13 @@ const BoardGrid = ({
   )
 }
 
-const HandGrid = ({ cards }: { cards: JSX.Element[] }) => {
+const HandGrid = ({
+  cards,
+  onMagnitudeFlip,
+}: {
+  cards: CardValue[]
+  onMagnitudeFlip: (cardId: string) => void
+}) => {
   const { setNodeRef } = useDroppable({
     id: 'hand',
   })
@@ -193,7 +202,40 @@ const HandGrid = ({ cards }: { cards: JSX.Element[] }) => {
       ref={setNodeRef}
       className="bg-base-200 grid w-fit grid-cols-4 grid-rows-1 gap-2 rounded-md p-2"
     >
-      {fitToGrid(cards, 4)}
+      <GridOfItems length={4}>
+        {cards.map((card, index) => {
+          const isConfigurable =
+            card.type === 'flip' || card.type === 'tiebreaker'
+          return (
+            <div key={index} className="flex h-full w-full flex-col gap-2">
+              <Card card={card} id={card.id} draggable />
+              {isConfigurable && (
+                <button
+                  className="btn btn-sm btn-neutral w-full"
+                  onClick={() => onMagnitudeFlip(card.id)}
+                >
+                  <ArrowDownUp size={16} />
+                  Flip
+                </button>
+              )}
+            </div>
+          )
+        })}
+      </GridOfItems>
+    </div>
+  )
+}
+
+const HiddenHandGrid = ({ cardCount }: { cardCount: number }) => {
+  return (
+    <div className="bg-base-200 grid w-fit grid-cols-4 grid-rows-1 gap-2 rounded-md p-2">
+      <GridOfItems length={4}>
+        {Array.from({ length: cardCount }, (_, index) => (
+          <div key={index} className="h-full w-full">
+            <HiddenCard />
+          </div>
+        ))}
+      </GridOfItems>
     </div>
   )
 }
@@ -223,6 +265,28 @@ const BoardControls = ({
   </div>
 )
 
+type BoardProps = {
+  boards: {
+    yourBoard: {
+      cards: CardValue[]
+      total: number
+    }
+    opponentBoard: {
+      cards: CardValue[]
+      total: number
+    }
+  }
+  yourTurn: boolean
+  yourState: 'playing' | 'standing' | 'busted'
+  opponentState: 'playing' | 'standing' | 'busted'
+  playerCards: CardValue[]
+  opponentCardCount: number
+  onEndTurn: () => void
+  onStand: () => void
+  onBoardDrop: (card: CardValue) => void
+  onMagnitudeFlip: (cardId: string) => void
+}
+
 export const Board = ({
   boards: { yourBoard, opponentBoard },
   yourTurn,
@@ -233,6 +297,7 @@ export const Board = ({
   onEndTurn,
   onStand,
   onBoardDrop,
+  onMagnitudeFlip,
 }: BoardProps) => {
   return (
     <div className="flex flex-col items-center justify-center">
@@ -253,8 +318,7 @@ export const Board = ({
             state={yourState}
             total={yourBoard.total}
             cards={yourBoard.cards.map((card) => {
-              const id = crypto.randomUUID()
-              return <Card key={id} card={card} id={id} />
+              return <Card key={card.id} card={card} id={card.id} />
             })}
           />
           <BoardGrid
@@ -264,23 +328,13 @@ export const Board = ({
             isOpponent
             total={opponentBoard.total}
             cards={opponentBoard.cards.map((card) => {
-              const id = crypto.randomUUID()
-              return <Card key={id} card={card} id={id} />
+              return <Card key={card.id} card={card} id={card.id} />
             })}
           />
         </div>
         <div className="grid grid-cols-2 grid-rows-1 gap-2 p-5">
-          <HandGrid
-            cards={playerCards.map((card) => {
-              const id = crypto.randomUUID()
-              return <Card key={id} card={card} id={id} draggable />
-            })}
-          />
-          <HandGrid
-            cards={Array.from({ length: opponentCardCount }, (_, index) => (
-              <HiddenCard key={index} />
-            ))}
-          />
+          <HandGrid cards={playerCards} onMagnitudeFlip={onMagnitudeFlip} />
+          <HiddenHandGrid cardCount={opponentCardCount} />
         </div>
       </DndContext>
       <BoardControls onStand={onStand} onEndTurn={onEndTurn} />

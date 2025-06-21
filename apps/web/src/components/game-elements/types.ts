@@ -7,8 +7,13 @@ export type CardValue =
   | { id: string; type: 'none'; value: number }
   | { id: string; type: 'add'; value: number }
   | { id: string; type: 'subtract'; value: number }
-  | { id: string; type: 'flip'; value: number }
-  | { id: string; type: 'tiebreaker'; value: number }
+  | { id: string; type: 'flip'; value: number; magnitude: 'subtract' | 'add' }
+  | {
+      id: string
+      type: 'tiebreaker'
+      value: number
+      magnitude: 'subtract' | 'add'
+    }
 
 export type MatchAction =
   | { type: 'play'; card: CardValue }

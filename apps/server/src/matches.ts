@@ -34,6 +34,7 @@ export class Deck {
         { length: 10 },
         (_, i) =>
           ({
+            id: crypto.randomUUID(),
             type: 'none',
             value: i + 1,
           }) satisfies Card,
@@ -68,7 +69,8 @@ export class Game {
       if (card.type === 'double') {
         return total * 2
       } else if (card.type === 'flip') {
-        return total - card.value
+        const sign = card.magnitude === 'subtract' ? -1 : 1
+        return total + sign * card.value
       } else if (card.type === 'invert') {
         return (
           total +
@@ -76,6 +78,9 @@ export class Game {
         )
       } else if (card.type === 'subtract') {
         return total - card.value
+      } else if (card.type === 'tiebreaker') {
+        const sign = card.magnitude === 'subtract' ? -1 : 1
+        return total + sign * card.value
       }
       return total + card.value
     }, 0)
@@ -202,7 +207,7 @@ export class Match {
     player1Board.push(drawnCard)
   }
 
-  playCard(playerId: string, cardIndex: number): void {
+  playCard(playerId: string, cardToPlay: Card): void {
     const player = this.players.find((p) => p?.id === playerId)
     if (!player) {
       throw new Error('Player not found')
@@ -212,9 +217,10 @@ export class Match {
       throw new Error('Match is not in progress')
     }
 
-    if (cardIndex < 0 || cardIndex >= player.hand.length) {
-      throw new Error('Invalid card index')
-    }
+    const cardIndex = player.hand.findIndex(
+      (card) =>
+        card.type === cardToPlay.type && card.value === cardToPlay.value,
+    )
 
     const card = player.hand.splice(cardIndex, 1)[0]
     if (!card) {
@@ -226,7 +232,7 @@ export class Match {
       throw new Error('No current game to play the card in')
     }
 
-    currentGame.boards[playerId].push(card)
+    currentGame.boards[playerId].push(cardToPlay)
   }
 
   // Check which player won the match by reaching 3 points
@@ -380,7 +386,7 @@ export class Match {
         if (cardIndex === -1) {
           throw new Error('Card not found in hand')
         }
-        this.playCard(playerId, cardIndex)
+        this.playCard(playerId, action.card)
         break
 
       case 'end':

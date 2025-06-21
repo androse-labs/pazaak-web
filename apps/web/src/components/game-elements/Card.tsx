@@ -20,7 +20,6 @@ type CardStyle = {
   middle: PazaakColor
   bottomLeft: PazaakColor
   bottomRight: PazaakColor
-  isFlip: boolean
 }
 
 const colorMap: Record<CardType, CardStyle> = {
@@ -29,60 +28,58 @@ const colorMap: Record<CardType, CardStyle> = {
     middle: 'bg-pzk-green',
     bottomLeft: 'bg-pzk-green',
     bottomRight: 'bg-pzk-green',
-    isFlip: false,
   },
   add: {
     top: 'bg-pzk-blue',
     middle: 'bg-pzk-blue',
     bottomLeft: 'bg-pzk-blue',
     bottomRight: 'bg-pzk-blue',
-    isFlip: false,
   },
   subtract: {
     top: 'bg-pzk-red',
     middle: 'bg-pzk-red',
     bottomLeft: 'bg-pzk-red',
     bottomRight: 'bg-pzk-red',
-    isFlip: false,
   },
   invert: {
     top: 'bg-pzk-yellow',
     middle: 'bg-pzk-yellow',
     bottomLeft: 'bg-pzk-yellow',
     bottomRight: 'bg-pzk-yellow',
-    isFlip: false,
   },
   flip: {
     top: 'bg-pzk-blue',
     middle: 'bg-pzk-red',
     bottomLeft: 'bg-pzk-red',
     bottomRight: 'bg-pzk-blue',
-    isFlip: true,
   },
   double: {
     top: 'bg-pzk-yellow',
     middle: 'bg-pzk-yellow',
     bottomLeft: 'bg-pzk-yellow',
     bottomRight: 'bg-pzk-yellow',
-    isFlip: false,
   },
   tiebreaker: {
     top: 'bg-pzk-yellow',
     middle: 'bg-pzk-yellow',
     bottomLeft: 'bg-pzk-yellow',
     bottomRight: 'bg-pzk-yellow',
-    isFlip: false,
   },
 }
 
-const formatValue = (value: number | string, type: CardType) => {
+const formatValue = (card: CardValue): string => {
+  const { type, value } = card
   switch (type) {
-    case 'flip':
-      return `±${value}`
+    case 'flip': {
+      const sign = card.magnitude === 'subtract' ? '-' : '+'
+      return `${sign}${value}`
+    }
     case 'double':
       return value.toString()
-    case 'tiebreaker':
-      return `±${value}T`
+    case 'tiebreaker': {
+      const sign = card.magnitude === 'subtract' ? '-' : '+'
+      return `${sign}${value}T`
+    }
     case 'add':
       return `+${value}`
     case 'subtract':
@@ -131,7 +128,16 @@ export const Card = ({ card, id, draggable }: CardProps) => {
 
 const InnerCard = memo(
   ({ card, isShaking }: { card: CardValue; isShaking: boolean }) => {
-    const cornerStyles = colorMap[card.type]
+    const { top, middle, bottomLeft, bottomRight } = colorMap[card.type]
+
+    const isFlipOrTiebreaker =
+      card.type === 'flip' || card.type === 'tiebreaker'
+
+    // swap top and middle based on the magnitude
+    const [topColor, middleColor] =
+      isFlipOrTiebreaker && card.magnitude === 'subtract'
+        ? [middle, top]
+        : [top, middle]
 
     return (
       <div
@@ -142,26 +148,26 @@ const InnerCard = memo(
       >
         <div className="flex">
           <div
-            className={`${cornerStyles.top} absolute left-1/2 top-0 h-1/6 w-3/4 -translate-x-1/2 translate-y-1/2 transform rounded-t-lg`}
+            className={`${topColor} absolute left-1/2 top-0 h-1/6 w-3/4 -translate-x-1/2 translate-y-1/2 transform rounded-t-lg`}
           />
           <div className="z-1 absolute flex w-3/4 -translate-x-1/2 -translate-y-10 items-center justify-center bg-gray-900 text-2xl font-bold text-white">
-            <p>{formatValue(card.value, card.type)}</p>
+            <p>{formatValue(card)}</p>
           </div>
           <div
-            className={`${cornerStyles.middle} absolute left-1/2 h-1/6 w-3/4 -translate-x-1/2 -translate-y-2 transform rounded-b-lg`}
+            className={`${middleColor} absolute left-1/2 h-1/6 w-3/4 -translate-x-1/2 -translate-y-2 transform rounded-b-lg`}
           />
         </div>
         <div
-          className={`${cornerStyles.bottomLeft} absolute bottom-0 left-1/4 h-1/5 w-9 -translate-x-1/3 transform items-center justify-center rounded-tl-lg`}
+          className={`${bottomLeft} absolute bottom-0 left-1/4 h-1/5 w-9 -translate-x-1/3 transform items-center justify-center rounded-tl-lg`}
         >
-          {cornerStyles.isFlip && (
+          {isFlipOrTiebreaker && (
             <p className="text-center text-2xl font-bold text-black/30">-</p>
           )}
         </div>
         <div
-          className={`${cornerStyles.bottomRight} absolute bottom-0 right-1/4 h-1/5 w-9 translate-x-1/3 transform items-center justify-center rounded-tr-lg`}
+          className={`${bottomRight} absolute bottom-0 right-1/4 h-1/5 w-9 translate-x-1/3 transform items-center justify-center rounded-tr-lg`}
         >
-          {cornerStyles.isFlip && (
+          {isFlipOrTiebreaker && (
             <p className="text-center text-2xl font-bold text-black/30">+</p>
           )}
         </div>

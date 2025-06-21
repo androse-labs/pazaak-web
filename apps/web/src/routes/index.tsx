@@ -37,21 +37,26 @@ const joinMatch = (matchId: string, deck: Card[]) => {
   return api.post<{ playerId: string; token: string }>(
     `/match/${matchId}/join`,
     {
-      deck: deck.map((card) => ({ type: card.type, value: card.value })),
+      deck: deck,
     },
   )
 }
 
 const demoDeck: Card[] = [
-  { id: crypto.randomUUID(), type: 'tiebreaker', value: 1 },
+  {
+    id: crypto.randomUUID(),
+    type: 'tiebreaker',
+    value: 1,
+    magnitude: 'subtract',
+  },
   { id: crypto.randomUUID(), type: 'double', value: 'D' },
   { id: crypto.randomUUID(), type: 'invert', value: '2&4' },
   { id: crypto.randomUUID(), type: 'add', value: 1 },
   { id: crypto.randomUUID(), type: 'subtract', value: 1 },
   { id: crypto.randomUUID(), type: 'invert', value: '3&6' },
   { id: crypto.randomUUID(), type: 'subtract', value: 3 },
-  { id: crypto.randomUUID(), type: 'flip', value: 2 },
-  { id: crypto.randomUUID(), type: 'tiebreaker', value: 2 },
+  { id: crypto.randomUUID(), type: 'flip', value: 2, magnitude: 'subtract' },
+  { id: crypto.randomUUID(), type: 'tiebreaker', value: 2, magnitude: 'add' },
 ]
 
 const JoinMatchModal = () => {
@@ -149,7 +154,7 @@ function useCreateMatchMutation() {
     mutationFn: async (data: { deck: Card[]; matchName: string }) => {
       // drop the id from each card in the deck
       const response = await api.post<CreateMatchResponse>('/match/create', {
-        deck: data.deck.map((card) => ({ type: card.type, value: card.value })),
+        deck: data.deck,
         matchName: data.matchName,
       })
       if (response.status !== 200) {
