@@ -32,3 +32,16 @@ export const CardValueSchema = z.discriminatedUnion('type', [
 ])
 
 export type CardValue = z.infer<typeof CardValueSchema>
+
+export const MatchActionSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('play'),
+    card: CardValueSchema,
+  }),
+  z.object({
+    type: z.literal('end'),
+  }),
+  z.object({
+    type: z.literal('stand'),
+  }),
+])

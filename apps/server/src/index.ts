@@ -2,7 +2,7 @@ import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { cors } from 'hono/cors'
 import { z } from 'zod'
-import { CardValueSchema } from './models'
+import { CardValueSchema, MatchActionSchema } from './models'
 import { MatchManager } from './matches'
 import { createBunWebSocket } from 'hono/bun'
 import { ServerWebSocket } from 'bun'
@@ -15,7 +15,7 @@ export const createApp = (matchManager: MatchManager) => {
   app.use(
     '*',
     cors({
-      origin: ['http://localhost:5173'], // Allow all origins for simplicity, adjust as needed
+      origin: ['http://localhost:5173'],
     }),
   )
 
@@ -133,6 +133,37 @@ export const createApp = (matchManager: MatchManager) => {
         },
       }
     }),
+  )
+
+  app.patch(
+    '/match/:matchId/action',
+    zValidator('json', MatchActionSchema),
+    zValidator('query', z.object({ token: z.string().min(1) })),
+    async (c) => {
+      const { matchId } = c.req.param()
+      const action = c.req.valid('json')
+      const { token } = c.req.valid('query')
+
+      const match = matchManager.getMatch(matchId)
+      if (!match) {
+        return c.json({ error: 'Match not found' }, 404)
+      }
+
+      const player = match.getPlayerByToken(token)
+      if (!player) {
+        return c.json({ error: 'Invalid player token' }, 403)
+      }
+
+      const actionResult = match.isActionValid(player.id, action)
+
+      if (!actionResult.valid) {
+        return c.json({ error: actionResult.reason }, 400)
+      }
+
+      match.performAction(player.id, action)
+
+      return c.body(null, 204)
+    },
   )
 
   return app

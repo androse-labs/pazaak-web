@@ -9,3 +9,8 @@ export type CardValue =
   | { id: string; type: 'subtract'; value: number }
   | { id: string; type: 'flip'; value: number }
   | { id: string; type: 'tiebreaker'; value: number }
+
+export type MatchAction =
+  | { type: 'play'; card: CardValue }
+  | { type: 'end' }
+  | { type: 'stand' }

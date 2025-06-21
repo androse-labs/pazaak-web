@@ -98,6 +98,7 @@ export const Card = ({ card, id, draggable }: CardProps) => {
   const { attributes, listeners, setNodeRef, transform, isDragging, over } =
     useDraggable({
       id,
+      data: { card },
     })
 
   const style = transform

@@ -1,4 +1,4 @@
-import type { CardValue as Card } from './models.ts'
+import type { CardValue as Card, MatchAction } from './models.ts'
 import { generateHexToken } from './utils.js'
 import { HTTPException } from 'hono/http-exception'
 import { ServerWebSocket } from 'bun'
@@ -126,14 +126,17 @@ type PlayerView = {
   matchName: string
   games: {
     boards: {
-      yourBoard: Card[]
-      opponentBoard: Card[]
+      yourBoard: { cards: Card[]; total: number }
+      opponentBoard: { cards: Card[]; total: number }
     }
     turn: number
     winnner: string | null
   }[]
   yourHand: Card[]
+  yourState: 'playing' | 'standing' | 'busted'
+  opponentState: 'playing' | 'standing' | 'busted'
   opponentHandSize: number
+  yourTurn: boolean
   round: number
   score: [number, number]
 }
@@ -144,6 +147,7 @@ export class Match {
   matchName: string
   games: Game[] = []
   players: [Player, Player]
+  playersTurn: 1 | 2 = 1
   round: number
   score: [number, number]
   status: 'waiting' | 'in-progress' | 'finished'
@@ -222,12 +226,7 @@ export class Match {
       throw new Error('No current game to play the card in')
     }
 
-    const playerIndex = this.players.indexOf(player)
-    if (playerIndex === -1) {
-      throw new Error('Player not found in match')
-    }
-
-    currentGame.boards[playerIndex].push(card)
+    currentGame.boards[playerId].push(card)
   }
 
   // Check which player won the match by reaching 3 points
@@ -264,6 +263,195 @@ export class Match {
     }
   }
 
+  notifyPlayersAboutGameState(): void {
+    this.players.forEach((player) => {
+      if (player?.connection) {
+        player.connection.send(JSON.stringify(this.getPlayerView(player.id)))
+      }
+    })
+  }
+
+  isPlayerTurn(playerId: string): boolean {
+    const player = this.getPlayerById(playerId)
+    if (!player) {
+      throw new Error('Player not found in match')
+    }
+    return this.playersTurn === this.players.indexOf(player) + 1
+  }
+
+  private checkEndOfGame(): void {
+    const currentGame = this.games[this.games.length - 1]
+    if (!currentGame) return
+
+    // Determine winner of this game
+    const winnerIndex = currentGame.checkWinner() // implement this
+
+    if (winnerIndex === null) {
+      // No winner, game is a tie
+      currentGame.winnner = null
+      this.notifyPlayersAboutGameState()
+      return
+    }
+
+    this.score[winnerIndex] += 1
+
+    // Check match winner
+    if (this.score[winnerIndex] >= 3) {
+      this.status = 'finished'
+      this.notifyPlayersAboutGameState()
+      return
+    }
+
+    // Prepare next game if not match end
+    this.addGame(new Game(this.players[0]!.id, this.players[1]!.id))
+
+    // Reset players' status and hands as appropriate
+    this.players.forEach((p) => {
+      if (p) {
+        p.status = 'playing'
+        p.hand.push(...p.deck.cards.splice(0, 4)) // draw 4 for new game
+      }
+    })
+
+    // Reset turn order
+    this.playersTurn = 1
+    this.notifyPlayersAboutGameState()
+  }
+
+  // Swap to the next players turn, unless the next player is standing
+  nextTurn(): void {
+    if (this.status !== 'in-progress') {
+      throw new Error('Match is not in progress')
+    }
+
+    const currentGame = this.games[this.games.length - 1]
+    if (!currentGame) {
+      throw new Error('No current game to proceed to the next turn')
+    }
+
+    // Advance to the next player who is not standing
+    do {
+      this.playersTurn = this.playersTurn === 1 ? 2 : 1
+    } while (this.players[this.playersTurn - 1]?.status === 'standing')
+
+    const currentPlayer = this.players[this.playersTurn - 1]
+    if (!currentPlayer) throw new Error('Current player not found in match')
+
+    // Draw a card if they're not standing
+    if (currentPlayer.status === 'playing') {
+      const drawnCard = currentGame.deck.cards.pop()
+      if (!drawnCard) {
+        throw new Error('No cards left in game deck')
+      }
+      currentGame.boards[currentPlayer.id].push(drawnCard)
+    }
+
+    // Check game end conditions after drawing
+    const allStandingOrBusted = this.players.every(
+      (p) => p && (p.status === 'standing' || p.status === 'busted'),
+    )
+    if (allStandingOrBusted) {
+      this.checkEndOfGame()
+    }
+
+    this.notifyPlayersAboutGameState()
+  }
+
+  performAction(playerId: string, action: MatchAction): void {
+    const validation = this.isActionValid(playerId, action)
+    if (!validation.valid) {
+      throw new Error(validation.reason)
+    }
+
+    const player = this.getPlayerById(playerId)
+    if (!player) {
+      throw new Error('Player not found in match')
+    }
+
+    switch (action.type) {
+      case 'play':
+        const cardIndex = player.hand.findIndex(
+          (card) =>
+            card.type === action.card.type && card.value === action.card.value,
+        )
+        console.log(
+          `Player ${playerId} is playing card: ${JSON.stringify(action.card)}`,
+        )
+        if (cardIndex === -1) {
+          throw new Error('Card not found in hand')
+        }
+        this.playCard(playerId, cardIndex)
+        break
+
+      case 'end':
+        this.nextTurn()
+        break
+
+      case 'stand':
+        player.status = 'standing'
+        this.nextTurn()
+        break
+
+      default:
+        throw new Error('Invalid action type')
+    }
+
+    const currentGame = this.games[this.games.length - 1]
+    if (!currentGame) {
+      throw new Error('No current game to perform action in')
+    }
+    currentGame.turn += 1
+
+    this.notifyPlayersAboutGameState()
+  }
+
+  isActionValid(
+    playerId: string,
+    action: MatchAction,
+  ): { valid: true } | { valid: false; reason: string } {
+    const player = this.getPlayerById(playerId)
+    if (!player) {
+      return { valid: false, reason: 'Player not found in match' }
+    }
+
+    if (this.status !== 'in-progress') {
+      return { valid: false, reason: 'Match is not in progress' }
+    }
+
+    switch (action.type) {
+      case 'play':
+        if (!this.isPlayerTurn(playerId)) {
+          return { valid: false, reason: 'It is not your turn' }
+        }
+
+        if (player.hand.length === 0) {
+          return { valid: false, reason: 'You have no cards in hand' }
+        }
+
+        // check if card exists in hand
+        const cardIndex = player.hand.findIndex(
+          (card) =>
+            card.type === action.card.type && card.value === action.card.value,
+        )
+
+        if (cardIndex === -1) {
+          return { valid: false, reason: 'Card not found in hand' }
+        }
+
+        return { valid: true }
+
+      case 'end':
+      case 'stand':
+        if (!this.isPlayerTurn(playerId)) {
+          return { valid: false, reason: 'It is not your turn' }
+        }
+        return { valid: true }
+
+      default:
+        return { valid: false, reason: 'Invalid action type' }
+    }
+  }
+
   getPlayerView(playerId: string): PlayerView {
     const player = this.getPlayerById(playerId)
     if (!player) {
@@ -276,13 +464,22 @@ export class Match {
       matchName: this.matchName,
       games: this.games.map((game) => ({
         boards: {
-          yourBoard: game.boards[playerId] || [],
-          opponentBoard: game.boards[opponent?.id || ''] || [],
+          yourBoard: {
+            cards: game.boards[player.id] || [],
+            total: game.boardTotal(game.boards[player.id] || []),
+          },
+          opponentBoard: {
+            cards: game.boards[opponent?.id || ''] || [],
+            total: game.boardTotal(game.boards[opponent?.id || ''] || []),
+          },
         },
         turn: game.turn,
         winnner: game.winnner,
       })),
+      yourTurn: this.isPlayerTurn(playerId),
+      yourState: player.status,
       yourHand: player.hand,
+      opponentState: opponent ? opponent.status : 'playing',
       opponentHandSize: opponent ? opponent.hand.length : 0,
       round: this.round,
       score: this.score,
