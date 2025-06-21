@@ -233,6 +233,29 @@ export class Match {
     }
 
     currentGame.boards[playerId].push(cardToPlay)
+
+    if (cardToPlay.type === 'double') {
+      // If the card is a double, replace the last card on the board
+      // with a new card that has double the value of the last card
+      const lastCard = currentGame.boards[playerId].slice(-2, -1)[0]
+      if (
+        lastCard &&
+        lastCard.type !== 'double' &&
+        lastCard.type !== 'invert'
+      ) {
+        const newCard: Card = {
+          ...lastCard,
+          value: lastCard.value * 2,
+        }
+        currentGame.boards[playerId].splice(-2, 1, newCard)
+
+        return
+      }
+
+      throw new Error(
+        'Cannot play double card after another double or invert card',
+      )
+    }
   }
 
   // Check which player won the match by reaching 3 points
@@ -442,6 +465,24 @@ export class Match {
 
         if (cardIndex === -1) {
           return { valid: false, reason: 'Card not found in hand' }
+        }
+
+        // Check if the card can be played
+        const currentGame = this.games[this.games.length - 1]
+
+        // Double cards can only be played if the last card on the board is not a double, invert cards
+        if (action.card.type === 'double') {
+          const lastCard = currentGame.boards[playerId].slice(-1)[0]
+          if (
+            lastCard &&
+            (lastCard.type === 'double' || lastCard.type === 'invert')
+          ) {
+            return {
+              valid: false,
+              reason:
+                'Cannot play double card after another double or invert card',
+            }
+          }
         }
 
         return { valid: true }
