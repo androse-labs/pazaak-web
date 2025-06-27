@@ -125,7 +125,7 @@ export const createApp = (matchManager: MatchManager) => {
           console.log(`Player ${player.id} connected to match ${matchId}`)
           ws.send(JSON.stringify(match.getPlayerView(player.id)))
         },
-        onMessage(event, ws) {
+        onMessage(event, _) {
           console.log(`Message from client: ${event.data}`)
         },
         onClose: () => {
