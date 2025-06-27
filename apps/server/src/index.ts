@@ -60,7 +60,7 @@ export const createApp = (matchManager: MatchManager) => {
 
       const result = matchManager.joinMatch(matchId, deck)
       if (!result) {
-        return c.json({ error: 'Match not found or invalid deck' }, 404)
+        return c.json({ error: 'Match not found or invalid deck' }, 400)
       }
       const { playerId, token } = result
 

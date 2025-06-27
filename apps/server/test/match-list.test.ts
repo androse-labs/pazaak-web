@@ -1,24 +1,25 @@
 import { describe, it, expect } from 'bun:test'
-import createApp from '../src'
+import { createApp } from '../src'
 import { testClient } from './helpers/axiosMimic'
 import { MatchManager } from '../src/matches'
+import { randomUUIDv7 } from 'bun'
 
 describe('Match List', () => {
   it('lists joinable matches', async () => {
     const matchManager = new MatchManager()
 
     const { matchId: matchId1 } = matchManager.createMatch('Test Match', [
-      { type: 'double', value: 'D' },
-      { type: 'flip', value: '2&4' },
-      { type: 'invert', value: 2 },
-      { type: 'subtract', value: 3 },
+      { id: randomUUIDv7(), type: 'double', value: 'D' },
+      { id: randomUUIDv7(), type: 'invert', value: '2&4' },
+      { id: randomUUIDv7(), type: 'flip', value: 2, magnitude: 'subtract' },
+      { id: randomUUIDv7(), type: 'subtract', value: 3 },
     ])
 
     const { matchId: matchId2 } = matchManager.createMatch('Other Test Match', [
-      { type: 'double', value: 'D' },
-      { type: 'flip', value: '2&4' },
-      { type: 'invert', value: 2 },
-      { type: 'subtract', value: 3 },
+      { id: randomUUIDv7(), type: 'double', value: 'D' },
+      { id: randomUUIDv7(), type: 'invert', value: '2&4' },
+      { id: randomUUIDv7(), type: 'flip', value: 2, magnitude: 'subtract' },
+      { id: randomUUIDv7(), type: 'subtract', value: 3 },
     ])
 
     const client = testClient(createApp(matchManager))
@@ -53,25 +54,25 @@ describe('Match List', () => {
     const matchManager = new MatchManager()
 
     const { matchId } = matchManager.createMatch('Full Match', [
-      { type: 'double', value: 'D' },
-      { type: 'flip', value: '2&4' },
-      { type: 'invert', value: 2 },
-      { type: 'subtract', value: 3 },
+      { id: randomUUIDv7(), type: 'double', value: 'D' },
+      { id: randomUUIDv7(), type: 'invert', value: '2&4' },
+      { id: randomUUIDv7(), type: 'flip', value: 2, magnitude: 'subtract' },
+      { id: randomUUIDv7(), type: 'subtract', value: 3 },
     ])
 
     // Simulate joining the match to make it full
     matchManager.joinMatch(matchId, [
-      { type: 'double', value: 'D' },
-      { type: 'flip', value: '2&4' },
-      { type: 'invert', value: 2 },
-      { type: 'subtract', value: 3 },
+      { id: randomUUIDv7(), type: 'double', value: 'D' },
+      { id: randomUUIDv7(), type: 'invert', value: '2&4' },
+      { id: randomUUIDv7(), type: 'flip', value: 2, magnitude: 'subtract' },
+      { id: randomUUIDv7(), type: 'subtract', value: 3 },
     ])
 
     const { matchId: matchId2 } = matchManager.createMatch('Another Match', [
-      { type: 'double', value: 'D' },
-      { type: 'flip', value: '2&4' },
-      { type: 'invert', value: 2 },
-      { type: 'subtract', value: 3 },
+      { id: randomUUIDv7(), type: 'double', value: 'D' },
+      { id: randomUUIDv7(), type: 'invert', value: '2&4' },
+      { id: randomUUIDv7(), type: 'flip', value: 2, magnitude: 'subtract' },
+      { id: randomUUIDv7(), type: 'subtract', value: 3 },
     ])
 
     const client = testClient(createApp(matchManager))

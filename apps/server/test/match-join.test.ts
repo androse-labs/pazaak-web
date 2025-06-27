@@ -1,27 +1,28 @@
 import { describe, it, expect } from 'bun:test'
-import createApp from '../src'
+import { createApp } from '../src'
 import { testClient } from './helpers/axiosMimic'
 import { MatchManager } from '../src/matches'
+import { randomUUIDv7 } from 'bun'
 
 describe('Match Joining', () => {
   it('joins a match successfully', async () => {
     const matchManager = new MatchManager()
 
     const { matchId } = matchManager.createMatch('Test Match', [
-      { type: 'double', value: 'D' },
-      { type: 'flip', value: '2&4' },
-      { type: 'invert', value: 2 },
-      { type: 'subtract', value: 3 },
+      { id: randomUUIDv7(), type: 'double', value: 'D' },
+      { id: randomUUIDv7(), type: 'invert', value: '2&4' },
+      { id: randomUUIDv7(), type: 'flip', value: 2, magnitude: 'subtract' },
+      { id: randomUUIDv7(), type: 'subtract', value: 3 },
     ])
 
     const client = testClient(createApp(matchManager))
 
     const response = await client.post(`/match/${matchId}/join`, {
       deck: [
-        { type: 'double', value: 'D' },
-        { type: 'flip', value: '2&4' },
-        { type: 'invert', value: 2 },
-        { type: 'subtract', value: 3 },
+        { id: randomUUIDv7(), type: 'double', value: 'D' },
+        { id: randomUUIDv7(), type: 'invert', value: '2&4' },
+        { id: randomUUIDv7(), type: 'flip', value: 2, magnitude: 'subtract' },
+        { id: randomUUIDv7(), type: 'subtract', value: 3 },
       ],
     })
 
@@ -42,10 +43,10 @@ describe('Match Joining', () => {
   it('rejects a match join with invalid deck', async () => {
     const matchManager = new MatchManager()
     const { matchId } = matchManager.createMatch('Test Match', [
-      { type: 'double', value: 'D' },
-      { type: 'flip', value: '2&4' },
-      { type: 'invert', value: 2 },
-      { type: 'subtract', value: 3 },
+      { id: randomUUIDv7(), type: 'double', value: 'D' },
+      { id: randomUUIDv7(), type: 'invert', value: '2&4' },
+      { id: randomUUIDv7(), type: 'flip', value: 2, magnitude: 'subtract' },
+      { id: randomUUIDv7(), type: 'subtract', value: 3 },
     ])
 
     const client = testClient(createApp(matchManager))
@@ -67,25 +68,25 @@ describe('Match Joining', () => {
 
     const response = await client.post('/match/nonexistent/join', {
       deck: [
-        { type: 'double', value: 'D' },
-        { type: 'flip', value: '2&4' },
-        { type: 'invert', value: 2 },
-        { type: 'subtract', value: 3 },
+        { id: randomUUIDv7(), type: 'double', value: 'D' },
+        { id: randomUUIDv7(), type: 'invert', value: '2&4' },
+        { id: randomUUIDv7(), type: 'flip', value: 2, magnitude: 'subtract' },
+        { id: randomUUIDv7(), type: 'subtract', value: 3 },
       ],
     })
 
     expect(response.status).toBe(404)
-    const data = await response.json()
-    expect(data).toHaveProperty('error', 'Match not found or invalid deck')
+    const data = await response.text()
+    expect(data).toBe('Match not found')
   })
 
   it('rejects joining a match with 2 players already', async () => {
     const matchManager = new MatchManager()
     const { matchId } = matchManager.createMatch('Test Match', [
-      { type: 'double', value: 'D' },
-      { type: 'flip', value: '2&4' },
-      { type: 'invert', value: 2 },
-      { type: 'subtract', value: 3 },
+      { id: randomUUIDv7(), type: 'double', value: 'D' },
+      { id: randomUUIDv7(), type: 'invert', value: '2&4' },
+      { id: randomUUIDv7(), type: 'flip', value: 2, magnitude: 'subtract' },
+      { id: randomUUIDv7(), type: 'subtract', value: 3 },
     ])
 
     const client = testClient(createApp(matchManager))
@@ -93,10 +94,10 @@ describe('Match Joining', () => {
     // Second player joins
     const firstResponse = await client.post(`/match/${matchId}/join`, {
       deck: [
-        { type: 'double', value: 'D' },
-        { type: 'flip', value: '2&4' },
-        { type: 'invert', value: 2 },
-        { type: 'subtract', value: 3 },
+        { id: randomUUIDv7(), type: 'double', value: 'D' },
+        { id: randomUUIDv7(), type: 'invert', value: '2&4' },
+        { id: randomUUIDv7(), type: 'flip', value: 2, magnitude: 'subtract' },
+        { id: randomUUIDv7(), type: 'subtract', value: 3 },
       ],
     })
 
@@ -105,10 +106,10 @@ describe('Match Joining', () => {
     // Third player tries to join
     const response = await client.post(`/match/${matchId}/join`, {
       deck: [
-        { type: 'double', value: 'D' },
-        { type: 'flip', value: '2&4' },
-        { type: 'invert', value: 2 },
-        { type: 'subtract', value: 3 },
+        { id: randomUUIDv7(), type: 'double', value: 'D' },
+        { id: randomUUIDv7(), type: 'invert', value: '3&6' },
+        { id: randomUUIDv7(), type: 'flip', value: 3, magnitude: 'add' },
+        { id: randomUUIDv7(), type: 'subtract', value: 4 },
       ],
     })
 
