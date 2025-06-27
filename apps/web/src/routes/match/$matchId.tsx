@@ -107,7 +107,7 @@ function MatchPage() {
   const hasStarted = !!currentGame?.boards
 
   return (
-    <div className="flex flex-col items-center justify-center p-5">
+    <div className="flex flex-col items-center justify-center p-5 text-gray-50">
       <h1 className="text-2xl font-bold">Match ID: {matchId}</h1>
       {hasStarted ? (
         <Board
