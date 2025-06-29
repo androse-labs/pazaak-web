@@ -1,4 +1,4 @@
-import { AppType } from '../../src'
+import { AppType } from '../../../src'
 
 export function testClient(app: AppType) {
   const axiosLike = {

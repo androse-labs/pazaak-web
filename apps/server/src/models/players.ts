@@ -12,7 +12,6 @@ type JoinedPlayer = {
   status: 'playing' | 'standing' | 'busted'
   deck: Deck
   hand: Card[]
-  accessToken: string
 }
 
 type PlayerView = {

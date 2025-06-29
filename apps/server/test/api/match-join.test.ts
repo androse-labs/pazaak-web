@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'bun:test'
-import { createApp } from '../src'
+import { createApp } from '../../src'
 import { testClient } from './helpers/axiosMimic'
-import { MatchManager } from '../src/matches'
 import { randomUUIDv7 } from 'bun'
+import { MatchManager } from '../../src/models/match'
 
 describe('Match Joining', () => {
   it('joins a match successfully', async () => {

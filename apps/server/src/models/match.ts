@@ -11,6 +11,10 @@ import { JoinedPlayer, Player, PlayerView } from './players'
 class MatchManager {
   private matches: Match[] = []
 
+  constructor(matches: Match[] = []) {
+    this.matches = matches
+  }
+
   createMatch(
     matchName: string,
     deck: Card[],
@@ -27,7 +31,6 @@ class MatchManager {
         status: 'playing',
         deck: new Deck().fillWithCustomCards(deck),
         hand: [],
-        accessToken: token,
       }),
     )
 
@@ -59,7 +62,6 @@ class MatchManager {
       status: 'playing',
       hand: [],
       deck: new Deck().fillWithCustomCards(deck),
-      accessToken: token,
     })
 
     // notify each player about game state
