@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'bun:test'
-import createApp from '../src'
+import { createApp } from '../src'
 import { testClient } from './helpers/axiosMimic'
 import { MatchManager } from '../src/matches'
+import { randomUUIDv7 } from 'bun'
 
 describe('Match Creation', () => {
   const client = testClient(createApp(new MatchManager()))
@@ -13,10 +14,10 @@ describe('Match Creation', () => {
 
     const response = await client.post('/match/create', {
       deck: [
-        { type: 'double', value: 'D' },
-        { type: 'flip', value: '2&4' },
-        { type: 'invert', value: 2 },
-        { type: 'subtract', value: 3 },
+        { id: randomUUIDv7(), type: 'double', value: 'D' },
+        { id: randomUUIDv7(), type: 'invert', value: '2&4' },
+        { id: randomUUIDv7(), type: 'flip', value: 2, magnitude: 'subtract' },
+        { id: randomUUIDv7(), type: 'subtract', value: 3 },
       ],
       matchName: 'Test Match',
     })
@@ -38,7 +39,7 @@ describe('Match Creation', () => {
   it('rejects match creation with invalid deck', async () => {
     const response = await client.post('/match/create', {
       deck: [
-        { type: 'invert', value: 'X' }, // Invalid card type
+        { id: randomUUIDv7(), type: 'invert', value: 'X' }, // Invalid card type
       ],
       matchName: 'Invalid Match',
     })
