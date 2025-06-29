@@ -2,7 +2,7 @@ import z from 'zod'
 
 const cardMagnitudeSchema = z.enum(['subtract', 'add'])
 
-export const CardValueSchema = z.discriminatedUnion('type', [
+const CardSchema = z.discriminatedUnion('type', [
   z.object({
     id: z.string().uuid(),
     type: z.literal('double'),
@@ -42,19 +42,6 @@ export const CardValueSchema = z.discriminatedUnion('type', [
   }),
 ])
 
-export type CardValue = z.infer<typeof CardValueSchema>
+type Card = z.infer<typeof CardSchema>
 
-export const MatchActionSchema = z.discriminatedUnion('type', [
-  z.object({
-    type: z.literal('play'),
-    card: CardValueSchema,
-  }),
-  z.object({
-    type: z.literal('end'),
-  }),
-  z.object({
-    type: z.literal('stand'),
-  }),
-])
-
-export type MatchAction = z.infer<typeof MatchActionSchema>
+export { Card, CardSchema }

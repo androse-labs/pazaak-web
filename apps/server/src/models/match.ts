@@ -1,149 +1,95 @@
-import type { CardValue as Card, MatchAction } from './models.ts'
-import { generateHexToken } from './utils.js'
-import { HTTPException } from 'hono/http-exception'
 import { ServerWebSocket } from 'bun'
+import { HTTPException } from 'hono/http-exception'
+import { Card } from './card'
+import { Game } from './game'
 import { WSContext } from 'hono/ws'
+import { generateHexToken } from '../utils'
+import { Deck } from './deck'
+import { MatchAction } from './actions'
+import { JoinedPlayer, Player, PlayerView } from './players'
 
-type Player = JoinedPlayer | null
+class MatchManager {
+  private matches: Match[] = []
 
-type JoinedPlayer = {
-  id: string
-  connection: WSContext<ServerWebSocket> | null
-  token: string
-  status: 'playing' | 'standing' | 'busted'
-  deck: Deck
-  hand: Card[]
-  accessToken: string
-}
+  createMatch(
+    matchName: string,
+    deck: Card[],
+  ): { matchId: string; playerId: string; token: string } {
+    const playerId = crypto.randomUUID()
+    const matchId = crypto.randomUUID()
+    const token = generateHexToken(16)
 
-export class Deck {
-  cards: Card[] = []
-
-  shuffle(): Deck {
-    for (let i = this.cards.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1))
-      ;[this.cards[i], this.cards[j]] = [this.cards[j], this.cards[i]]
-    }
-    return this
-  }
-
-  defaultFill(): Deck {
-    // Fill the deck with 40 cards, 10 of each type
-    this.cards = Array.from({ length: 4 }).flatMap(() =>
-      Array.from(
-        { length: 10 },
-        (_, i) =>
-          ({
-            id: crypto.randomUUID(),
-            type: 'none',
-            value: i + 1,
-          }) satisfies Card,
-      ),
+    this.matches.push(
+      new Match(matchId, matchName, {
+        id: playerId,
+        connection: null,
+        token,
+        status: 'playing',
+        deck: new Deck().fillWithCustomCards(deck),
+        hand: [],
+        accessToken: token,
+      }),
     )
 
-    return this
+    return { matchId, playerId, token }
   }
 
-  fillWithCustomCards(cards: Card[]): Deck {
-    this.cards = cards
-
-    return this
-  }
-}
-
-export class Game {
-  boards: Record<string, Card[]> = {}
-  deck: Deck = new Deck()
-  turn: number = 1
-  winnner: string | null = null
-
-  constructor(player1Id: string, player2Id: string) {
-    this.deck.defaultFill()
-    this.deck.shuffle()
-    this.boards[player1Id] = []
-    this.boards[player2Id] = []
-  }
-
-  boardTotal(board: Card[]): number {
-    return board.reduce((total, card) => {
-      if (card.type === 'double') {
-        return total
-      } else if (card.type === 'flip') {
-        const sign = card.magnitude === 'subtract' ? -1 : 1
-        return total + sign * card.value
-      } else if (card.type === 'invert') {
-        return total
-      } else if (card.type === 'subtract') {
-        return total - card.value
-      } else if (card.type === 'tiebreaker') {
-        const sign = card.magnitude === 'subtract' ? -1 : 1
-        return total + sign * card.value
-      }
-      return total + card.value
-    }, 0)
-  }
-
-  boardHasTiebreaker(board: Card[]): boolean {
-    return board.some((card) => card.type === 'tiebreaker')
-  }
-
-  checkWinner(): number | null {
-    const player1_total = this.boardTotal(this.boards[0])
-    const player2_total = this.boardTotal(this.boards[1])
-
-    const player1_distance = 20 - player1_total
-    const player2_distance = 20 - player2_total
-
-    if (player1_distance < 0) {
-      if (player2_distance < 0) {
-        // Both players busted
-        return null
-      } else {
-        // Player 1 busted
-        return 1
-      }
-    } else if (player2_distance < 0) {
-      // Player 2 busted
-      return 0
-    } else if (player2_distance == player1_distance) {
-      if (this.boardHasTiebreaker(this.boards[0])) {
-        // Player 1 has tiebreaker
-        return 0
-      } else if (this.boardHasTiebreaker(this.boards[1])) {
-        // Player 2 has tiebreaker
-        return 1
-      } else {
-        // No tiebreaker, it's a tie
-        return null
-      }
-    } else {
-      // Player 2 is closer to 20
-      return 1
+  joinMatch(
+    matchId: string,
+    deck: Card[],
+  ): { playerId: string; token: string } | null {
+    const match = this.matches.find((m) => m.id === matchId)
+    if (!match) {
+      // Match not found
+      throw new HTTPException(404, { message: 'Match not found' })
     }
+
+    if (match.players[1]) {
+      // Match already has two players
+      throw new HTTPException(409, { message: 'Match already has two players' })
+    }
+
+    const playerId = crypto.randomUUID()
+    const token = generateHexToken(16)
+
+    match.startMatch({
+      id: playerId,
+      connection: null,
+      token,
+      status: 'playing',
+      hand: [],
+      deck: new Deck().fillWithCustomCards(deck),
+      accessToken: token,
+    })
+
+    // notify each player about game state
+    match.players.forEach((player) => {
+      if (player?.connection) {
+        player.connection.send(JSON.stringify(match.getPlayerView(player.id)))
+      }
+    })
+
+    return { playerId, token }
+  }
+
+  getMatch(matchId: string): Match | null {
+    return this.matches.find((m) => m.id === matchId) || null
+  }
+
+  getAllMatches(): Match[] {
+    return this.matches
+  }
+
+  deleteMatch(matchId: string): boolean {
+    if (this.matches.some((m) => m.id === matchId)) {
+      this.matches = this.matches.filter((m) => m.id !== matchId)
+      return true
+    }
+    return false
   }
 }
 
-// Exclusively the info 1 player needs to see
-type PlayerView = {
-  matchName: string
-  games: {
-    boards: {
-      yourBoard: { cards: Card[]; total: number }
-      opponentBoard: { cards: Card[]; total: number }
-    }
-    turn: number
-    winnner: string | null
-  }[]
-  yourHand: Card[]
-  yourState: 'playing' | 'standing' | 'busted'
-  opponentState: 'playing' | 'standing' | 'busted'
-  opponentHandSize: number
-  yourTurn: boolean
-  round: number
-  score: [number, number]
-}
-
-export class Match {
+class Match {
   id: string
   connections: Map<string, WebSocket> = new Map()
   matchName: string
@@ -573,83 +519,4 @@ export class Match {
   }
 }
 
-export class MatchManager {
-  private matches: Match[] = []
-
-  createMatch(
-    matchName: string,
-    deck: Card[],
-  ): { matchId: string; playerId: string; token: string } {
-    const playerId = crypto.randomUUID()
-    const matchId = crypto.randomUUID()
-    const token = generateHexToken(16)
-
-    this.matches.push(
-      new Match(matchId, matchName, {
-        id: playerId,
-        connection: null,
-        token,
-        status: 'playing',
-        deck: new Deck().fillWithCustomCards(deck),
-        hand: [],
-        accessToken: token,
-      }),
-    )
-
-    return { matchId, playerId, token }
-  }
-
-  joinMatch(
-    matchId: string,
-    deck: Card[],
-  ): { playerId: string; token: string } | null {
-    const match = this.matches.find((m) => m.id === matchId)
-    if (!match) {
-      // Match not found
-      throw new HTTPException(404, { message: 'Match not found' })
-    }
-
-    if (match.players[1]) {
-      // Match already has two players
-      throw new HTTPException(409, { message: 'Match already has two players' })
-    }
-
-    const playerId = crypto.randomUUID()
-    const token = generateHexToken(16)
-
-    match.startMatch({
-      id: playerId,
-      connection: null,
-      token,
-      status: 'playing',
-      hand: [],
-      deck: new Deck().fillWithCustomCards(deck),
-      accessToken: token,
-    })
-
-    // notify each player about game state
-    match.players.forEach((player) => {
-      if (player?.connection) {
-        player.connection.send(JSON.stringify(match.getPlayerView(player.id)))
-      }
-    })
-
-    return { playerId, token }
-  }
-
-  getMatch(matchId: string): Match | null {
-    return this.matches.find((m) => m.id === matchId) || null
-  }
-
-  getAllMatches(): Match[] {
-    return this.matches
-  }
-
-  deleteMatch(matchId: string): boolean {
-    if (this.matches.some((m) => m.id === matchId)) {
-      this.matches = this.matches.filter((m) => m.id !== matchId)
-      return true
-    }
-    return false
-  }
-}
+export { MatchManager, Match }

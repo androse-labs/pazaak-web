@@ -2,10 +2,11 @@ import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { cors } from 'hono/cors'
 import { z } from 'zod'
-import { CardValueSchema, MatchActionSchema } from './models'
-import { MatchManager } from './matches'
 import { createBunWebSocket } from 'hono/bun'
 import { ServerWebSocket } from 'bun'
+import { MatchManager } from './models/match'
+import { CardSchema } from './models/card'
+import { MatchActionSchema } from './models/actions'
 
 const { upgradeWebSocket, websocket } = createBunWebSocket<ServerWebSocket>()
 
@@ -24,7 +25,7 @@ export const createApp = (matchManager: MatchManager) => {
     zValidator(
       'json',
       z.object({
-        deck: z.array(CardValueSchema),
+        deck: z.array(CardSchema),
         matchName: z.string().min(5),
       }),
     ),
@@ -51,7 +52,10 @@ export const createApp = (matchManager: MatchManager) => {
     zValidator(
       'json',
       z.object({
-        deck: z.array(CardValueSchema),
+        deck: z
+          .array(CardSchema)
+          .min(1, 'Deck must have at least one card')
+          .max(10, 'Deck can have a maximum of 10 cards'),
       }),
     ),
     async (c) => {
@@ -125,7 +129,7 @@ export const createApp = (matchManager: MatchManager) => {
           console.log(`Player ${player.id} connected to match ${matchId}`)
           ws.send(JSON.stringify(match.getPlayerView(player.id)))
         },
-        onMessage(event, ws) {
+        onMessage(event, _) {
           console.log(`Message from client: ${event.data}`)
         },
         onClose: () => {
@@ -172,4 +176,5 @@ export default {
   fetch: createApp(new MatchManager()).fetch,
   websocket,
 }
+
 export type AppType = ReturnType<typeof createApp>
