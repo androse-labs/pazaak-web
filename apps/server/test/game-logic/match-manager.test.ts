@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'bun:test'
 import { randomUUIDv7 } from 'bun'
-import { MatchManager } from '../../src/models/match'
+import { MatchManager } from '../../src/models/match-manager'
 import { createTestMatch, createTestPlayer } from './match-helper'
 
 describe('Match Manager', () => {

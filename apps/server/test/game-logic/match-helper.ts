@@ -21,15 +21,17 @@ const createTestPlayer = (): JoinedPlayer => ({
   hand: [],
 })
 
-const createTestMatch = (options: {
-  matchName?: string
-  players?: [Player, Player]
-  status?: 'in-progress' | 'waiting' | 'finished'
-  games?: Game[]
-  playerTurn?: 1 | 2
-  round?: number
-  score?: [number, number]
-}): Match => {
+const createTestMatch = (
+  options: {
+    matchName?: string
+    players?: [Player, Player]
+    status?: 'in-progress' | 'waiting' | 'finished'
+    games?: Game[]
+    playerTurn?: 1 | 2
+    round?: number
+    score?: [number, number]
+  } = {},
+): Match => {
   const match = new Match(randomUUIDv7(), 'Test Match', createTestPlayer())
 
   match.matchName = options.matchName || 'Test Match'

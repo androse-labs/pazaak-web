@@ -2,7 +2,7 @@ import { describe, it, expect } from 'bun:test'
 import { createApp } from '../../src'
 import { testClient } from './helpers/axiosMimic'
 import { randomUUIDv7 } from 'bun'
-import { MatchManager } from '../../src/models/match'
+import { MatchManager } from '../../src/models/match-manager'
 
 describe('Match Creation', () => {
   const client = testClient(createApp(new MatchManager()))

@@ -4,7 +4,7 @@ import { cors } from 'hono/cors'
 import { z } from 'zod'
 import { createBunWebSocket } from 'hono/bun'
 import { ServerWebSocket } from 'bun'
-import { MatchManager } from './models/match'
+import { MatchManager } from './models/match-manager'
 import { CardSchema } from './models/card'
 import { MatchActionSchema } from './models/actions'
 
