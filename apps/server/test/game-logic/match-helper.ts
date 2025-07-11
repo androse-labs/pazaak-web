@@ -56,7 +56,7 @@ const createTestMatch = (
   match.status = options.status || 'in-progress'
   match.games = options.games || []
   match.score = options.score || [0, 0]
-  match.round = options.round || 1
+  match.round = options.round || 0
   match.playersTurn = options.playerTurn || 1
 
   return match

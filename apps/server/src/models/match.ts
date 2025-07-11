@@ -1,6 +1,6 @@
 import { ServerWebSocket } from 'bun'
 import { Card } from './card'
-import { Game } from './game'
+import { Game, GameState } from './game'
 import { WSContext } from 'hono/ws'
 import { MatchAction } from './actions'
 import { JoinedPlayer, Player, PlayerView } from './players'
@@ -193,7 +193,7 @@ class Match {
 
     if (winnerIndex === null) {
       // No winner, game is a tie
-      currentGame.winnner = null
+      currentGame.winner = null
       this.notifyPlayersAboutGameState()
       return
     }
@@ -402,7 +402,7 @@ class Match {
           },
         },
         turn: game.turn,
-        winnner: game.winnner,
+        winner: game.winner,
       })),
       yourTurn: this.isPlayerTurn(playerId),
       yourState: player.status,
@@ -418,7 +418,7 @@ class Match {
     id: string
     matchName: string
     players: Player[]
-    games: Game[]
+    games: GameState[]
     round: number
     score: [number, number]
     status: 'waiting' | 'in-progress' | 'finished'
@@ -427,7 +427,12 @@ class Match {
       id: this.id,
       matchName: this.matchName,
       players: this.players,
-      games: this.games,
+      games: this.games.map((game) => ({
+        boards: game.boards,
+        deck: game.deck,
+        turn: game.turn,
+        winner: game.winner,
+      })),
       round: this.round,
       score: this.score,
       status: this.status,

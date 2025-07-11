@@ -1,11 +1,18 @@
 import { Card } from './card'
-import { Deck } from './deck'
+import { Deck, DeckState } from './deck'
+
+type GameState = {
+  boards: Record<string, Card[]>
+  deck: DeckState
+  turn: number
+  winner: string | null
+}
 
 class Game {
   boards: Record<string, Card[]> = {}
   deck: Deck = new Deck()
   turn: number = 1
-  winnner: string | null = null
+  winner: string | null = null
 
   constructor(player1Id: string, player2Id: string) {
     this.deck.defaultFill()
@@ -73,4 +80,4 @@ class Game {
   }
 }
 
-export { Game }
+export { Game, GameState }

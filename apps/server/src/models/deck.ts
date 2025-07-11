@@ -1,5 +1,9 @@
 import { Card } from './card'
 
+type DeckState = {
+  cards: Card[]
+}
+
 class Deck {
   cards: Card[] = []
 
@@ -35,4 +39,4 @@ class Deck {
   }
 }
 
-export { Deck }
+export { Deck, DeckState }

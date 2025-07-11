@@ -22,7 +22,7 @@ type PlayerView = {
       opponentBoard: { cards: Card[]; total: number }
     }
     turn: number
-    winnner: string | null
+    winner: string | null
   }[]
   yourHand: Card[]
   yourState: 'playing' | 'standing' | 'busted'
