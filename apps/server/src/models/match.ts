@@ -341,7 +341,9 @@ class Match {
         // check if card exists in hand
         const cardIndex = player.hand.findIndex(
           (card) =>
-            card.type === action.card.type && card.value === action.card.value,
+            card.id === action.card.id &&
+            card.type === action.card.type &&
+            card.value === action.card.value,
         )
 
         if (cardIndex === -1) {
