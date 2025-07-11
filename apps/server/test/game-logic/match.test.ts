@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'bun:test'
 import { createTestMatch, createTestPlayer } from './match-helper'
 import { Game } from '../../src/models/game'
+import { MatchAction } from '../../src/models/actions'
 
 describe('Match', () => {
   it('adds a new game to the match', () => {
@@ -174,5 +175,96 @@ describe('Match', () => {
       score: [0, 0],
     })
     expect(player1View).not.toEqual(player2View)
+  })
+
+  describe('isActionValid', () => {
+    it('returns true for a valid action', () => {
+      const match = createTestMatch({
+        players: [
+          {
+            ...createTestPlayer(),
+            id: 'player1',
+            hand: [
+              { id: '1', type: 'flip', value: 5, magnitude: 'subtract' },
+              {
+                id: '2',
+                type: 'add',
+                value: 3,
+              },
+            ],
+          },
+          {
+            ...createTestPlayer(),
+            id: 'player2',
+            hand: [
+              { id: '1', type: 'flip', value: 5, magnitude: 'add' },
+              {
+                id: '2',
+                type: 'subtract',
+                value: 3,
+              },
+            ],
+          },
+        ],
+        status: 'in-progress',
+      })
+
+      const game = new Game('player1', 'player2')
+      match.addGame(game)
+
+      const action: MatchAction = {
+        type: 'play',
+        card: { id: '1', type: 'flip', value: 5, magnitude: 'subtract' },
+      }
+
+      expect(match.isActionValid('player1', action)).toEqual({
+        valid: true,
+      })
+    })
+
+    it('returns false for an invalid action', () => {
+      const match = createTestMatch({
+        players: [
+          {
+            ...createTestPlayer(),
+            id: 'player1',
+            hand: [
+              { id: '1', type: 'flip', value: 5, magnitude: 'subtract' },
+              {
+                id: '2',
+                type: 'add',
+                value: 3,
+              },
+            ],
+          },
+          {
+            ...createTestPlayer(),
+            id: 'player2',
+            hand: [
+              { id: '1', type: 'flip', value: 5, magnitude: 'add' },
+              {
+                id: '2',
+                type: 'subtract',
+                value: 3,
+              },
+            ],
+          },
+        ],
+        status: 'in-progress',
+      })
+
+      const game = new Game('player1', 'player2')
+      match.addGame(game)
+
+      const action: MatchAction = {
+        type: 'play',
+        card: { id: '3', type: 'flip', value: 10, magnitude: 'add' }, // Card not in hand
+      }
+
+      expect(match.isActionValid('player1', action)).toEqual({
+        valid: false,
+        reason: 'Card not found in hand',
+      })
+    })
   })
 })

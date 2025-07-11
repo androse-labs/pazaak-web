@@ -315,7 +315,7 @@ class Match {
     return { success: true }
   }
 
-  private isActionValid(
+  isActionValid(
     playerId: string,
     action: MatchAction,
   ): { valid: true } | { valid: false; reason: string } {
