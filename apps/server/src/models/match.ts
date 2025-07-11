@@ -328,12 +328,12 @@ class Match {
       return { valid: false, reason: 'Match is not in progress' }
     }
 
+    if (!this.isPlayerTurn(playerId)) {
+      return { valid: false, reason: 'It is not your turn' }
+    }
+
     switch (action.type) {
       case 'play':
-        if (!this.isPlayerTurn(playerId)) {
-          return { valid: false, reason: 'It is not your turn' }
-        }
-
         if (player.hand.length === 0) {
           return { valid: false, reason: 'You have no cards in hand' }
         }
@@ -372,9 +372,6 @@ class Match {
 
       case 'end':
       case 'stand':
-        if (!this.isPlayerTurn(playerId)) {
-          return { valid: false, reason: 'It is not your turn' }
-        }
         return { valid: true }
 
       default:
