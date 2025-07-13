@@ -276,6 +276,11 @@ class Match {
       throw new Error('Player not found in match')
     }
 
+    const currentGame = this.games[this.games.length - 1]
+    if (!currentGame) {
+      throw new Error('No current game to perform action in')
+    }
+
     switch (action.type) {
       case 'play':
         const cardIndex = player.hand.findIndex(
@@ -292,23 +297,19 @@ class Match {
         break
 
       case 'end':
+        currentGame.turn += 1
         this.nextTurn()
         break
 
       case 'stand':
         player.status = 'standing'
+        currentGame.turn += 1
         this.nextTurn()
         break
 
       default:
         throw new Error('Invalid action type')
     }
-
-    const currentGame = this.games[this.games.length - 1]
-    if (!currentGame) {
-      throw new Error('No current game to perform action in')
-    }
-    currentGame.turn += 1
 
     this.notifyPlayersAboutGameState()
 

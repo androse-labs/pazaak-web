@@ -500,4 +500,301 @@ describe('Match', () => {
       },
     )
   })
+
+  describe('performAction', () => {
+    it("plays a card from the player's hand", () => {
+      const match = createTestMatch({
+        players: [
+          {
+            ...createTestPlayer(),
+            id: 'player1',
+            hand: [
+              { id: '1', type: 'flip', value: 5, magnitude: 'subtract' },
+              {
+                id: '2',
+                type: 'add',
+                value: 3,
+              },
+            ],
+          },
+          {
+            ...createTestPlayer(),
+            id: 'player2',
+            hand: [],
+          },
+        ],
+        status: 'in-progress',
+      })
+
+      const game = new Game('player1', 'player2')
+      match.addGame(game)
+
+      expect(game.boards['player1']).toHaveLength(0)
+
+      const action: MatchAction = {
+        type: 'play',
+        card: { id: '1', type: 'flip', value: 5, magnitude: 'subtract' },
+      }
+
+      expect(match.performAction('player1', action)).toEqual({
+        success: true,
+      })
+
+      expect(game.boards['player1']).toEqual([
+        {
+          id: '1',
+          type: 'flip',
+          value: 5,
+          magnitude: 'subtract',
+        },
+      ])
+    })
+
+    it('doubles the value of the last card when playing a double card', () => {
+      const match = createTestMatch({
+        players: [
+          {
+            ...createTestPlayer(),
+            id: 'player1',
+            hand: [
+              { id: '1', type: 'flip', value: 5, magnitude: 'subtract' },
+              {
+                id: '2',
+                type: 'double',
+                value: 'D',
+              },
+            ],
+          },
+          {
+            ...createTestPlayer(),
+            id: 'player2',
+            hand: [],
+          },
+        ],
+        status: 'in-progress',
+      })
+
+      const game = new Game('player1', 'player2')
+      game.boards['player1'] = [
+        { id: '1', type: 'flip', value: 5, magnitude: 'subtract' },
+      ]
+      match.addGame(game)
+
+      expect(game.boards['player1']).toHaveLength(1)
+
+      const action: MatchAction = {
+        type: 'play',
+        card: { id: '2', type: 'double', value: 'D' },
+      }
+
+      expect(match.performAction('player1', action)).toEqual({
+        success: true,
+      })
+
+      expect(game.boards['player1']).toEqual([
+        {
+          id: '1',
+          type: 'flip',
+          value: 10, // Value doubled
+          magnitude: 'subtract',
+        },
+        {
+          id: '2',
+          type: 'double',
+          value: 'D',
+        },
+      ])
+    })
+
+    it('inverts matching cards when playing an invert card', () => {
+      const match = createTestMatch({
+        players: [
+          {
+            ...createTestPlayer(),
+            id: 'player1',
+            hand: [
+              { id: '1', type: 'flip', value: 5, magnitude: 'subtract' },
+              {
+                id: '2',
+                type: 'invert',
+                value: '2&4',
+              },
+            ],
+          },
+          {
+            ...createTestPlayer(),
+            id: 'player2',
+            hand: [],
+          },
+        ],
+        status: 'in-progress',
+      })
+
+      const game = new Game('player1', 'player2')
+      game.boards['player1'] = [
+        { id: '6', type: 'none', value: 2 },
+        { id: '7', type: 'add', value: 4 },
+        { id: '8', type: 'none', value: 6 },
+      ]
+      match.addGame(game)
+
+      expect(game.boards['player1']).toHaveLength(3)
+
+      const action: MatchAction = {
+        type: 'play',
+        card: { id: '2', type: 'invert', value: '2&4' },
+      }
+
+      expect(match.performAction('player1', action)).toEqual({
+        success: true,
+      })
+
+      expect(game.boards['player1']).toEqual([
+        {
+          id: '6',
+          type: 'none',
+          value: -2, // Inverted value
+        },
+        {
+          id: '7',
+          type: 'add',
+          value: -4, // Inverted value
+        },
+        {
+          id: '8',
+          type: 'none',
+          value: 6,
+        },
+        {
+          id: '2',
+          type: 'invert',
+          value: '2&4',
+        },
+      ])
+    })
+
+    it.each<'end' | 'stand'>(['end', 'stand'])(
+      "changes the player's turn after a they perform an '%s' action and increments the turn",
+      (actionType) => {
+        const match = createTestMatch({
+          players: [
+            {
+              ...createTestPlayer(),
+              id: 'player1',
+              hand: [
+                { id: '1', type: 'flip', value: 5, magnitude: 'subtract' },
+                {
+                  id: '2',
+                  type: 'add',
+                  value: 3,
+                },
+              ],
+            },
+            {
+              ...createTestPlayer(),
+              id: 'player2',
+              hand: [],
+            },
+          ],
+          status: 'in-progress',
+        })
+
+        const game = new Game('player1', 'player2')
+        match.addGame(game)
+
+        expect(match.playersTurn).toBe(1)
+        expect(game.turn).toBe(1)
+
+        expect(match.players[0]!.status).toBe('playing')
+
+        const action: MatchAction = {
+          type: actionType,
+        }
+
+        expect(match.performAction('player1', action)).toEqual({
+          success: true,
+        })
+        expect(match.playersTurn).toBe(2)
+        expect(game.turn).toBe(2)
+      },
+    )
+
+    it('stays the players turn after they play a card and does not increment the turn', () => {
+      const match = createTestMatch({
+        players: [
+          {
+            ...createTestPlayer(),
+            id: 'player1',
+            hand: [
+              { id: '1', type: 'flip', value: 5, magnitude: 'subtract' },
+              {
+                id: '2',
+                type: 'add',
+                value: 3,
+              },
+            ],
+          },
+          {
+            ...createTestPlayer(),
+            id: 'player2',
+            hand: [],
+          },
+        ],
+        status: 'in-progress',
+      })
+
+      const game = new Game('player1', 'player2')
+      match.addGame(game)
+
+      expect(match.playersTurn).toBe(1)
+      expect(game.turn).toBe(1)
+
+      expect(match.players[0]!.status).toBe('playing')
+
+      const action: MatchAction = {
+        type: 'play',
+        card: { id: '1', type: 'flip', value: 5, magnitude: 'subtract' },
+      }
+
+      expect(match.performAction('player1', action)).toEqual({
+        success: true,
+      })
+      expect(match.playersTurn).toBe(1)
+      expect(game.turn).toBe(1)
+    })
+
+    it('throws exception when trying to perform an action on a game that does not exist', () => {
+      const match = createTestMatch({
+        players: [
+          {
+            ...createTestPlayer(),
+            id: 'player1',
+            hand: [
+              { id: '1', type: 'flip', value: 5, magnitude: 'subtract' },
+              {
+                id: '2',
+                type: 'add',
+                value: 3,
+              },
+            ],
+          },
+          {
+            ...createTestPlayer(),
+            id: 'player2',
+            hand: [],
+          },
+        ],
+        status: 'in-progress',
+      })
+
+      const action: MatchAction = {
+        type: 'play',
+        card: { id: '1', type: 'flip', value: 5, magnitude: 'subtract' },
+      }
+
+      expect(() => match.performAction('player1', action)).toThrow(
+        'No current game to perform action in',
+      )
+    })
+  })
 })
