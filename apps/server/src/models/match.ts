@@ -184,7 +184,7 @@ class Match {
     return this.playersTurn === this.players.indexOf(player) + 1
   }
 
-  private checkEndOfGame(): void {
+  checkEndOfGame(): void {
     const currentGame = this.games[this.games.length - 1]
     if (!currentGame) return
 

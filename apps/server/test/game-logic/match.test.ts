@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'bun:test'
+import { spyOn, describe, it, expect } from 'bun:test'
 import { createTestMatch, createTestPlayer } from './match-helper'
 import { Game } from '../../src/models/game'
 import { MatchAction } from '../../src/models/actions'
@@ -795,6 +795,125 @@ describe('Match', () => {
       expect(() => match.performAction('player1', action)).toThrow(
         'No current game to perform action in',
       )
+    })
+  })
+
+  describe('nextTurn', () => {
+    it('throws if match is not in progress', () => {
+      const match = createTestMatch({ status: 'waiting' })
+      expect(() => match.nextTurn()).toThrow('Match is not in progress')
+    })
+
+    it('throws if no current game exists', () => {
+      const match = createTestMatch({ status: 'in-progress' })
+      match.games = []
+      expect(() => match.nextTurn()).toThrow(
+        'No current game to proceed to the next turn',
+      )
+    })
+
+    it('advances to next player who is not standing', () => {
+      const match = createTestMatch({
+        players: [
+          { ...createTestPlayer(), id: 'player1', status: 'standing' },
+          { ...createTestPlayer(), id: 'player2', status: 'playing' },
+        ],
+        status: 'in-progress',
+        playerTurn: 1,
+      })
+
+      const game = new Game('player1', 'player2')
+      game.deck.cards = [{ id: 'c1', type: 'add', value: 3 }]
+      match.addGame(game)
+
+      match.nextTurn()
+
+      expect(match.playersTurn).toBe(2)
+      expect(game.boards['player2']).toEqual([
+        { id: 'c1', type: 'add', value: 3 },
+      ])
+    })
+
+    it('does not draw a card if next player is standing', () => {
+      const match = createTestMatch({
+        players: [
+          { ...createTestPlayer(), id: 'player1', status: 'playing' },
+          { ...createTestPlayer(), id: 'player2', status: 'standing' },
+        ],
+        status: 'in-progress',
+        playerTurn: 1,
+      })
+
+      const game = new Game('player1', 'player2')
+      game.deck.cards = [{ id: '1', type: 'add', value: 3 }]
+      match.addGame(game)
+
+      match.nextTurn()
+
+      // Should wrap around to player1, who draws the card
+      expect(match.playersTurn).toBe(1)
+      expect(game.boards['player1']).toEqual([
+        { id: '1', type: 'add', value: 3 },
+      ])
+    })
+
+    it('throws if no cards are left in the deck', () => {
+      const match = createTestMatch({
+        players: [
+          { ...createTestPlayer(), id: 'player1', status: 'playing' },
+          { ...createTestPlayer(), id: 'player2', status: 'standing' },
+        ],
+        status: 'in-progress',
+        playerTurn: 1,
+      })
+
+      const game = new Game('player1', 'player2')
+      game.deck.cards = []
+      match.addGame(game)
+
+      expect(() => match.nextTurn()).toThrow('No cards left in game deck')
+    })
+
+    it('calls checkEndOfGame when all players are standing or busted', () => {
+      const match = createTestMatch({
+        players: [
+          { ...createTestPlayer(), id: 'player1', status: 'standing' },
+          { ...createTestPlayer(), id: 'player2', status: 'busted' },
+        ],
+        status: 'in-progress',
+      })
+
+      const game = new Game('player1', 'player2')
+      game.deck.cards = [{ id: 'c1', type: 'add', value: 3 }]
+      match.addGame(game)
+      match.playersTurn = 1
+
+      const spy = spyOn(match, 'checkEndOfGame')
+
+      match.nextTurn()
+
+      expect(spy).toHaveBeenCalled()
+    })
+
+    it('calls notifyPlayersAboutGameState after turn', () => {
+      const match = createTestMatch({
+        players: [
+          { ...createTestPlayer(), id: 'player1', status: 'playing' },
+          { ...createTestPlayer(), id: 'player2', status: 'standing' },
+        ],
+        status: 'in-progress',
+      })
+
+      const game = new Game('player1', 'player2')
+      game.deck.cards = [{ id: 'c1', type: 'add', value: 3 }]
+      match.addGame(game)
+      match.playersTurn = 2
+
+      const notifySpy = spyOn(match, 'notifyPlayersAboutGameState')
+
+      match.nextTurn()
+
+      expect(notifySpy).toHaveBeenCalled()
     })
   })
 })
