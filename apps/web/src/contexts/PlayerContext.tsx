@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 import type { CardValue } from '../components/game-elements/types'
 
 type MatchConnection = {
@@ -16,8 +16,29 @@ type PlayerContextType = {
 const PlayerContext = createContext<PlayerContextType | undefined>(undefined)
 
 export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
-  const [matchConnection, setMatchConnection] =
+  const [matchConnection, setMatchConnectionState] =
     useState<MatchConnection | null>(null)
+
+  // Load from localStorage on first mount
+  useEffect(() => {
+    const saved = localStorage.getItem('matchConnection')
+    if (saved) {
+      try {
+        setMatchConnectionState(JSON.parse(saved))
+      } catch {
+        localStorage.removeItem('matchConnection') // corrupted data
+      }
+    }
+  }, [])
+
+  const setMatchConnection = (connection: MatchConnection | null) => {
+    setMatchConnectionState(connection)
+    if (connection) {
+      localStorage.setItem('matchConnection', JSON.stringify(connection))
+    } else {
+      localStorage.removeItem('matchConnection')
+    }
+  }
 
   return (
     <PlayerContext.Provider value={{ matchConnection, setMatchConnection }}>

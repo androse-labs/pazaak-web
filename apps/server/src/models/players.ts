@@ -28,7 +28,10 @@ type PlayerView = {
   opponentHandSize: number
   yourTurn: boolean
   round: number
-  score: [number, number]
+  score: {
+    yourScore: number
+    opponentScore: number
+  }
 }
 
 export type { Player, PlayerView }

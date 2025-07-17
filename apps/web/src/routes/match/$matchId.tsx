@@ -36,7 +36,10 @@ type PlayerView = {
   yourTurn: boolean
   opponentHandSize: number
   round: number
-  score: [number, number]
+  score: {
+    yourScore: number
+    opponentScore: number
+  }
 }
 
 function hasMagnitude(
@@ -115,6 +118,8 @@ function MatchPage() {
             yourBoard: currentGame.boards.yourBoard,
             opponentBoard: currentGame.boards.opponentBoard,
           }}
+          yourScore={gameState.score.yourScore}
+          opponentScore={gameState.score.opponentScore}
           yourTurn={gameState.yourTurn}
           yourState={gameState.yourState}
           opponentState={gameState.opponentState}

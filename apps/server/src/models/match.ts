@@ -232,18 +232,13 @@ class Match {
     // Determine winner of this game
     const winnerIndex = currentGame.checkWinner() // implement this
 
-    if (winnerIndex === null) {
-      // No winner, game is a tie
-      currentGame.winner = null
-      return
-    }
-
-    this.score[winnerIndex] += 1
-
-    // Check match winner
-    if (this.score[winnerIndex] >= 3) {
-      this.status = 'finished'
-      return
+    if (winnerIndex !== null) {
+      this.score[winnerIndex] += 1
+      // Check match winner
+      if (this.score[winnerIndex] >= 3) {
+        this.status = 'finished'
+        return
+      }
     }
 
     // Prepare next game if not match end
@@ -426,6 +421,9 @@ class Match {
 
     const opponent = this.players.find((p) => p?.id !== playerId)
 
+    const playerIndex = this.players.findIndex((p) => p?.id === playerId)
+    const opponentIndex = this.players.findIndex((p) => p?.id === opponent?.id)
+
     return {
       matchName: this.matchName,
       games: this.games.map((game) => ({
@@ -448,7 +446,10 @@ class Match {
       opponentState: opponent ? opponent.status : 'playing',
       opponentHandSize: opponent ? opponent.hand.length : 0,
       round: this.round,
-      score: this.score,
+      score: {
+        yourScore: this.score[playerIndex],
+        opponentScore: this.score[opponentIndex],
+      },
     }
   }
 

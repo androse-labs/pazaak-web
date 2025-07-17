@@ -171,6 +171,7 @@ function useCreateMatchMutation() {
 }
 
 function Index() {
+  const { refetch } = useGetJoinableMatches()
   const { mutate } = useCreateMatchMutation()
   const navigate = useNavigate()
   const { setMatchConnection } = usePlayer()
@@ -210,6 +211,7 @@ function Index() {
             if (modal instanceof HTMLDialogElement) {
               modal.showModal()
             }
+            refetch()
           }}
         >
           Join Match

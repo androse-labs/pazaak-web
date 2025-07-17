@@ -61,16 +61,36 @@ const turnStateString = (
   return !yourTurn ? 'Their Turn' : ''
 }
 
+// Vertical circles indicating games won
+// Circle is hollow if no games won
+const ScoreDisplay = ({ total, count }: { total: number; count: number }) => {
+  return (
+    <div className="bg-base-200 flex flex-col-reverse items-center justify-center gap-1 rounded-md p-1 text-lg">
+      {Array.from({ length: total }, (_, index) => (
+        <div
+          key={index}
+          className={clsx(
+            'h-6 w-6 rounded-full border-2',
+            index < count ? 'bg-primary' : 'border-neutral',
+          )}
+        />
+      ))}
+    </div>
+  )
+}
+
 const YourBoardGrid = memo(
   ({
     title,
     yourTurn,
     state,
+    score,
     total,
     cards,
   }: {
     total: number
     yourTurn: boolean
+    score: number
     state: 'playing' | 'standing' | 'busted'
     title: string
     cards: ReactNode[]
@@ -85,32 +105,35 @@ const YourBoardGrid = memo(
     })
 
     return (
-      <div className="flex flex-col items-start justify-center gap-2">
-        <div className="flex w-full justify-between">
-          <span className="text-2xl font-bold">{title}</span>
-          <span className="text-2xl">
-            {turnStateString(true, yourTurn, state)}
-          </span>
+      <div className="flex flex-row items-start justify-center gap-2">
+        <div className="flex flex-col items-start justify-center gap-2">
+          <div className="flex w-full justify-between">
+            <span className="text-2xl font-bold">{title}</span>
+            <span className="text-2xl">
+              {turnStateString(true, yourTurn, state)}
+            </span>
+          </div>
+          <div className="text-lg">
+            Total: <span className="font-bold">{total}</span>
+          </div>
+          <div
+            ref={setNodeRef}
+            className={clsx(
+              'bg-base-200 relative grid grid-cols-3 grid-rows-3 justify-items-center gap-2 rounded-md p-2',
+              { 'outline-neutral outline-4': isOver },
+            )}
+          >
+            <GridOfItems length={9}>
+              {cards.map((card, index) => (
+                <div key={index} className="h-full w-full">
+                  {card}
+                </div>
+              ))}
+            </GridOfItems>
+            {isDragging && <DropOverlay isOver={isOver} />}
+          </div>
         </div>
-        <div className="text-lg">
-          Total: <span className="font-bold">{total}</span>
-        </div>
-        <div
-          ref={setNodeRef}
-          className={clsx(
-            'bg-base-200 relative grid grid-cols-3 grid-rows-3 justify-items-center gap-2 rounded-md p-2',
-            { 'outline-neutral outline-4': isOver },
-          )}
-        >
-          <GridOfItems length={9}>
-            {cards.map((card, index) => (
-              <div key={index} className="h-full w-full">
-                {card}
-              </div>
-            ))}
-          </GridOfItems>
-          {isDragging && <DropOverlay isOver={isOver} />}
-        </div>
+        <ScoreDisplay total={3} count={score} />
       </div>
     )
   },
@@ -118,6 +141,8 @@ const YourBoardGrid = memo(
 
 const OpponentBoardGrid = ({
   title,
+  state,
+  score,
   theirTurn,
   total,
   cards,
@@ -125,27 +150,31 @@ const OpponentBoardGrid = ({
   title: string
   theirTurn: boolean
   state: 'playing' | 'standing' | 'busted'
+  score: number
   total: number
   cards: ReactNode[]
 }) => (
-  <div className="flex flex-col items-end justify-end gap-2">
-    <div className="flex w-full flex-row-reverse justify-between">
-      <span className="text-2xl font-bold">{title}</span>
-      <span className="text-2xl">
-        {turnStateString(false, !theirTurn, 'playing')}
-      </span>
-    </div>
-    <div className="text-lg">
-      Total: <span className="font-bold">{total}</span>
-    </div>
-    <div className="bg-base-200 relative grid grid-cols-3 grid-rows-3 justify-items-center gap-2 rounded-md p-2">
-      <GridOfItems length={9}>
-        {cards.map((card, index) => (
-          <div key={index} className="h-full w-full">
-            {card}
-          </div>
-        ))}
-      </GridOfItems>
+  <div className="flex flex-row items-start justify-center gap-2">
+    <ScoreDisplay total={3} count={score} />
+    <div className="flex flex-col items-end justify-end gap-2">
+      <div className="flex w-full flex-row-reverse justify-between">
+        <span className="text-2xl font-bold">{title}</span>
+        <span className="text-2xl">
+          {turnStateString(false, !theirTurn, state)}
+        </span>
+      </div>
+      <div className="text-lg">
+        Total: <span className="font-bold">{total}</span>
+      </div>
+      <div className="bg-base-200 relative grid grid-cols-3 grid-rows-3 justify-items-center gap-2 rounded-md p-2">
+        <GridOfItems length={9}>
+          {cards.map((card, index) => (
+            <div key={index} className="h-full w-full">
+              {card}
+            </div>
+          ))}
+        </GridOfItems>
+      </div>
     </div>
   </div>
 )
@@ -155,6 +184,7 @@ const BoardGrid = ({
   cards,
   isOpponent,
   state,
+  score,
   total,
   yourTurn,
 }: {
@@ -162,6 +192,7 @@ const BoardGrid = ({
   state: 'playing' | 'standing' | 'busted'
   cards: ReactNode[]
   total: number
+  score: number
   yourTurn: boolean
   isOpponent?: boolean
 }) => {
@@ -171,6 +202,7 @@ const BoardGrid = ({
         title={title}
         state={state}
         cards={cards}
+        score={score}
         total={total}
         theirTurn={yourTurn}
       />
@@ -179,6 +211,7 @@ const BoardGrid = ({
     <YourBoardGrid
       title={title}
       state={state}
+      score={score}
       cards={cards}
       total={total}
       yourTurn={yourTurn}
@@ -277,6 +310,8 @@ type BoardProps = {
     }
   }
   yourTurn: boolean
+  yourScore: number
+  opponentScore: number
   yourState: 'playing' | 'standing' | 'busted'
   opponentState: 'playing' | 'standing' | 'busted'
   playerCards: CardValue[]
@@ -289,8 +324,10 @@ type BoardProps = {
 
 export const Board = ({
   boards: { yourBoard, opponentBoard },
+  yourScore,
   yourTurn,
   yourState,
+  opponentScore,
   opponentState,
   playerCards,
   opponentCardCount,
@@ -311,11 +348,12 @@ export const Board = ({
           }
         }}
       >
-        <div className="grid w-fit grid-cols-2 grid-rows-1 justify-items-center gap-24 p-5">
+        <div className="grid w-fit grid-cols-2 grid-rows-1 justify-items-center gap-14 p-5">
           <BoardGrid
             title="You"
             yourTurn={yourTurn}
             state={yourState}
+            score={yourScore}
             total={yourBoard.total}
             cards={yourBoard.cards.map((card) => {
               return <Card key={card.id} card={card} id={card.id} />
@@ -325,6 +363,7 @@ export const Board = ({
             title="Opponent"
             yourTurn={!yourTurn}
             state={opponentState}
+            score={opponentScore}
             isOpponent
             total={opponentBoard.total}
             cards={opponentBoard.cards.map((card) => {
