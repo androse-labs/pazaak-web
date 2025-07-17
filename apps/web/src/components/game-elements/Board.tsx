@@ -221,9 +221,11 @@ const BoardGrid = ({
 
 const HandGrid = ({
   cards,
+  yourTurn,
   onMagnitudeFlip,
 }: {
   cards: CardValue[]
+  yourTurn: boolean
   onMagnitudeFlip: (cardId: string) => void
 }) => {
   const { setNodeRef } = useDroppable({
@@ -233,7 +235,14 @@ const HandGrid = ({
   return (
     <div
       ref={setNodeRef}
-      className="bg-base-200 grid w-fit grid-cols-4 grid-rows-1 gap-2 rounded-md p-2"
+      className={clsx(
+        'bg-base-200 grid w-fit grid-cols-4 grid-rows-1 gap-2 rounded-md p-2',
+        {
+          'cursor-pointer': yourTurn,
+          'cursor-not-allowed': !yourTurn,
+          'opacity-50': !yourTurn && cards.length > 0,
+        },
+      )}
     >
       <GridOfItems length={4}>
         {cards.map((card, index) => {
@@ -241,7 +250,12 @@ const HandGrid = ({
             card.type === 'flip' || card.type === 'tiebreaker'
           return (
             <div key={index} className="flex h-full w-full flex-col gap-2">
-              <Card card={card} id={card.id} draggable />
+              <Card
+                card={card}
+                id={card.id}
+                draggable={yourTurn}
+                disabled={!yourTurn}
+              />
               {isConfigurable && (
                 <button
                   className="btn btn-sm btn-neutral w-full"
@@ -274,16 +288,19 @@ const HiddenHandGrid = ({ cardCount }: { cardCount: number }) => {
 }
 
 const BoardControls = ({
+  yourTurn,
   onEndTurn,
   onStand,
 }: {
+  yourTurn: boolean
   onEndTurn: () => void
   onStand: () => void
 }) => (
-  <div className="flex gap-2">
+  <div className={clsx('flex gap-2')}>
     <button
       className="btn btn-secondary flex w-32 items-center justify-center gap-1.5"
       onClick={onStand}
+      disabled={!yourTurn}
     >
       <OctagonMinus size={20} />
       <span>Stand</span>
@@ -291,6 +308,7 @@ const BoardControls = ({
     <button
       className="btn btn-primary flex w-32 items-center justify-center gap-1.5"
       onClick={onEndTurn}
+      disabled={!yourTurn}
     >
       <SkipForward size={20} />
       <span>End Turn</span>
@@ -372,11 +390,19 @@ export const Board = ({
           />
         </div>
         <div className="grid grid-cols-2 grid-rows-1 gap-2 p-5">
-          <HandGrid cards={playerCards} onMagnitudeFlip={onMagnitudeFlip} />
+          <HandGrid
+            cards={playerCards}
+            onMagnitudeFlip={onMagnitudeFlip}
+            yourTurn={yourTurn}
+          />
           <HiddenHandGrid cardCount={opponentCardCount} />
         </div>
       </DndContext>
-      <BoardControls onStand={onStand} onEndTurn={onEndTurn} />
+      <BoardControls
+        onStand={onStand}
+        onEndTurn={onEndTurn}
+        yourTurn={yourTurn}
+      />
     </div>
   )
 }

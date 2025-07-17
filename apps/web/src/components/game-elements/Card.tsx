@@ -6,6 +6,7 @@ import clsx from 'clsx'
 type CardProps = {
   card: CardValue
   id: string
+  disabled?: boolean
   draggable?: boolean
 }
 
@@ -91,7 +92,7 @@ const formatValue = (card: CardValue): string => {
   }
 }
 
-export const Card = ({ card, id, draggable }: CardProps) => {
+export const Card = ({ card, id, draggable, disabled = false }: CardProps) => {
   const { attributes, listeners, setNodeRef, transform, isDragging, over } =
     useDraggable({
       id,
@@ -107,7 +108,13 @@ export const Card = ({ card, id, draggable }: CardProps) => {
 
   if (!draggable) {
     return (
-      <div className="cursor-default select-none">
+      <div
+        className={clsx(
+          'select-none',
+          { 'cursor-not-allowed': disabled },
+          { 'cursor-grab': !disabled },
+        )}
+      >
         <InnerCard card={card} isShaking={false} />
       </div>
     )
@@ -119,7 +126,11 @@ export const Card = ({ card, id, draggable }: CardProps) => {
       style={style}
       {...attributes}
       {...listeners}
-      className={clsx('cursor-grab select-none', {})}
+      className={clsx(
+        'select-none',
+        { 'cursor-not-allowed': disabled },
+        { 'cursor-grab': !disabled },
+      )}
     >
       <InnerCard card={card} isShaking={isDragging && over !== null} />
     </div>
