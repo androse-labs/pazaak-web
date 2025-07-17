@@ -230,7 +230,7 @@ class Match {
     if (!currentGame) return
 
     // Determine winner of this game
-    const winnerIndex = currentGame.checkWinner() // implement this
+    const winnerIndex = currentGame.determineWinner()
 
     if (winnerIndex !== null) {
       this.score[winnerIndex] += 1

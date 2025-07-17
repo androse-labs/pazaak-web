@@ -143,7 +143,10 @@ describe('Match', () => {
         },
       ],
       round: 1,
-      score: [0, 0],
+      score: {
+        yourScore: 0,
+        opponentScore: 0,
+      },
     })
 
     expect(player2View).toEqual({
@@ -173,7 +176,10 @@ describe('Match', () => {
         },
       ],
       round: 1,
-      score: [0, 0],
+      score: {
+        yourScore: 0,
+        opponentScore: 0,
+      },
     })
     expect(player1View).not.toEqual(player2View)
   })

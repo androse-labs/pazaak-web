@@ -49,39 +49,59 @@ class Game {
     return board.some((card) => card.type === 'tiebreaker')
   }
 
-  checkWinner(): number | null {
+  getBustStatus(distance: number): 'busted' | 'safe' {
+    return distance < 0 ? 'busted' : 'safe'
+  }
+
+  private getTiebreakerAdvantage(): 'player1' | 'player2' | 'both' | 'neither' {
+    const player1HasTiebreaker = this.boardHasTiebreaker(
+      this.boards[this.player1Id],
+    )
+    const player2HasTiebreaker = this.boardHasTiebreaker(
+      this.boards[this.player2Id],
+    )
+
+    if (player1HasTiebreaker && player2HasTiebreaker) return 'both'
+    if (player1HasTiebreaker) return 'player1'
+    if (player2HasTiebreaker) return 'player2'
+    return 'neither'
+  }
+
+  determineWinner(): number | null {
     const player1_total = this.boardTotal(this.boards[this.player1Id])
     const player2_total = this.boardTotal(this.boards[this.player2Id])
-
     const player1_distance = 20 - player1_total
     const player2_distance = 20 - player2_total
 
-    if (player1_distance < 0) {
-      if (player2_distance < 0) {
-        // Both players busted
-        return null
-      } else {
-        // Player 2 wins
-        return 1
-      }
-    } else if (player2_distance < 0) {
-      // Player 2 busted
-      return 0
-    } else if (player2_distance == player1_distance) {
-      if (this.boardHasTiebreaker(this.boards[this.player1Id])) {
-        // Player 1 has tiebreaker
-        return 0
-      } else if (this.boardHasTiebreaker(this.boards[this.player2Id])) {
-        // Player 2 has tiebreaker
-        return 1
-      } else {
-        // No tiebreaker, it's a tie
-        return null
-      }
-    } else {
-      // Player 2 is closer to 20
-      return 1
+    const player1Status = this.getBustStatus(player1_distance)
+    const player2Status = this.getBustStatus(player2_distance)
+
+    // Handle bust scenarios
+    if (player1Status === 'busted' && player2Status === 'busted') {
+      return null // Both busted = tie
     }
+
+    if (player1Status === 'busted') return 1
+    if (player2Status === 'busted') return 0
+
+    // Both players are safe - check distances
+    if (player1_distance === player2_distance) {
+      // Equal distances - check tiebreakers
+      const tiebreakerAdvantage = this.getTiebreakerAdvantage()
+
+      switch (tiebreakerAdvantage) {
+        case 'player1':
+          return 0
+        case 'player2':
+          return 1
+        case 'both':
+        case 'neither':
+          return null
+      }
+    }
+
+    // Different distances - closer to 20 wins
+    return player1_distance < player2_distance ? 0 : 1
   }
 }
 
