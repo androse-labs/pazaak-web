@@ -874,7 +874,7 @@ describe('Match', () => {
       expect(() => match.nextTurn()).toThrow('No cards left in game deck')
     })
 
-    it('calls checkEndOfGame when all players are standing or busted', () => {
+    it('calls finalizeGame when all players are standing or busted', () => {
       const match = createTestMatch({
         players: [
           { ...createTestPlayer(), id: 'player1', status: 'standing' },
@@ -888,18 +888,23 @@ describe('Match', () => {
       match.addGame(game)
       match.playersTurn = 1
 
-      const spy = spyOn(match, 'checkEndOfGame')
+      const spy = spyOn(match, 'finalizeGame')
 
       match.nextTurn()
 
       expect(spy).toHaveBeenCalled()
     })
 
-    it('calls notifyPlayersAboutGameState after turn', () => {
+    it('calls notifyPlayersAboutGameState after action', () => {
       const match = createTestMatch({
         players: [
           { ...createTestPlayer(), id: 'player1', status: 'playing' },
-          { ...createTestPlayer(), id: 'player2', status: 'standing' },
+          {
+            ...createTestPlayer(),
+            id: 'player2',
+            status: 'playing',
+            hand: [{ id: 'c1', type: 'add', value: 3 }],
+          },
         ],
         status: 'in-progress',
       })
@@ -911,7 +916,10 @@ describe('Match', () => {
 
       const notifySpy = spyOn(match, 'notifyPlayersAboutGameState')
 
-      match.nextTurn()
+      match.performAction('player2', {
+        type: 'play',
+        card: { id: 'c1', type: 'add', value: 3 },
+      })
 
       expect(notifySpy).toHaveBeenCalled()
     })

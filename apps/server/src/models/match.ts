@@ -31,6 +31,27 @@ class Match {
     this.round += 1
   }
 
+  startGame(index: number): void {
+    // draw card from board deck to first player's board
+    const game = this.games[index]
+    if (!game) {
+      throw new Error('No current game to draw a card for')
+    }
+
+    const player1Board = game.boards[this.players[0]!.id]
+    const drawnCard = game.deck.cards.pop()
+    if (!drawnCard) {
+      throw new Error('No cards left in the deck to draw')
+    }
+    player1Board.push(drawnCard)
+
+    this.players.forEach((p) => {
+      if (p) {
+        p.status = 'playing'
+      }
+    })
+  }
+
   startMatch(secondPlayer: JoinedPlayer): void {
     if (this.status !== 'waiting') {
       throw new Error('Match is already in progress or finished')
@@ -51,19 +72,7 @@ class Match {
     })
 
     this.addGame(new Game(this.players[0].id, this.players[1].id))
-
-    // draw card from board deck to first player's board
-    const currentGame = this.games[this.games.length - 1]
-    if (!currentGame) {
-      throw new Error('No current game to draw a card for')
-    }
-
-    const player1Board = currentGame.boards[this.players[0].id]
-    const drawnCard = currentGame.deck.cards.pop()
-    if (!drawnCard) {
-      throw new Error('No cards left in the deck to draw')
-    }
-    player1Board.push(drawnCard)
+    this.startGame(0)
   }
 
   playCard(playerId: string, cardToPlay: Card): void {
@@ -184,7 +193,7 @@ class Match {
     return this.playersTurn === this.players.indexOf(player) + 1
   }
 
-  checkEndOfGame(): void {
+  finalizeGame(): void {
     const currentGame = this.games[this.games.length - 1]
     if (!currentGame) return
 
@@ -194,7 +203,6 @@ class Match {
     if (winnerIndex === null) {
       // No winner, game is a tie
       currentGame.winner = null
-      this.notifyPlayersAboutGameState()
       return
     }
 
@@ -203,24 +211,16 @@ class Match {
     // Check match winner
     if (this.score[winnerIndex] >= 3) {
       this.status = 'finished'
-      this.notifyPlayersAboutGameState()
       return
     }
 
     // Prepare next game if not match end
     this.addGame(new Game(this.players[0]!.id, this.players[1]!.id))
+    this.startGame(this.games.length - 1)
 
     // Reset players' status and hands as appropriate
-    this.players.forEach((p) => {
-      if (p) {
-        p.status = 'playing'
-        p.hand.push(...p.deck.cards.splice(0, 4)) // draw 4 for new game
-      }
-    })
-
     // Reset turn order
     this.playersTurn = 1
-    this.notifyPlayersAboutGameState()
   }
 
   // Swap to the next players turn, unless the next player is standing
@@ -234,15 +234,31 @@ class Match {
       throw new Error('No current game to proceed to the next turn')
     }
 
-    // Advance to the next player who is not standing
-    do {
+    // Check game end conditions after drawing
+    const allStandingOrBusted = this.players.every(
+      (p) => p && (p.status === 'standing' || p.status === 'busted'),
+    )
+
+    if (allStandingOrBusted) {
+      this.finalizeGame()
+      return
+    }
+
+    // Switch to the other player
+    this.playersTurn = this.playersTurn === 1 ? 2 : 1
+
+    // Find the next active player (not standing)
+    let currentPlayer = this.players[this.playersTurn - 1]
+
+    while (currentPlayer?.status === 'standing') {
       this.playersTurn = this.playersTurn === 1 ? 2 : 1
-    } while (this.players[this.playersTurn - 1]?.status === 'standing')
+      currentPlayer = this.players[this.playersTurn - 1]
+    }
 
-    const currentPlayer = this.players[this.playersTurn - 1]
-    if (!currentPlayer) throw new Error('Current player not found in match')
+    if (!currentPlayer) {
+      throw new Error('Current player not found in match')
+    }
 
-    // Draw a card if they're not standing
     if (currentPlayer.status === 'playing') {
       const drawnCard = currentGame.deck.cards.pop()
       if (!drawnCard) {
@@ -250,16 +266,6 @@ class Match {
       }
       currentGame.boards[currentPlayer.id].push(drawnCard)
     }
-
-    // Check game end conditions after drawing
-    const allStandingOrBusted = this.players.every(
-      (p) => p && (p.status === 'standing' || p.status === 'busted'),
-    )
-    if (allStandingOrBusted) {
-      this.checkEndOfGame()
-    }
-
-    this.notifyPlayersAboutGameState()
   }
 
   performAction(

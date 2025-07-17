@@ -61,7 +61,7 @@ class Game {
         // Both players busted
         return null
       } else {
-        // Player 1 busted
+        // Player 2 wins
         return 1
       }
     } else if (player2_distance < 0) {
