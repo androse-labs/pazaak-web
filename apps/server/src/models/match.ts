@@ -3,20 +3,32 @@ import { Card } from './card'
 import { Game, GameState } from './game'
 import { WSContext } from 'hono/ws'
 import { MatchAction } from './actions'
-import { JoinedPlayer, Player, PlayerView } from './players'
+import { Player, PlayerView } from './players'
+
+type WaitingMatch = {
+  status: 'waiting'
+  players: [Player, null]
+}
+
+type InProgressMatch = {
+  status: 'in-progress' | 'finished'
+  players: [Player, Player]
+}
+
+type MatchState = WaitingMatch | InProgressMatch
 
 class Match {
   id: string
   connections: Map<string, WebSocket> = new Map()
   matchName: string
   games: Game[] = []
-  players: [Player, Player]
+  players: [Player, Player] | [Player, null]
   playersTurn: 1 | 2 = 1
   round: number
   score: [number, number]
   status: 'waiting' | 'in-progress' | 'finished'
 
-  constructor(id: string, matchName: string, firstPlayer: JoinedPlayer) {
+  constructor(id: string, matchName: string, firstPlayer: Player) {
     this.id = id
     this.round = 0
     this.score = [0, 0]
@@ -38,7 +50,7 @@ class Match {
       throw new Error('No current game to draw a card for')
     }
 
-    const player1Board = game.boards[this.players[0]!.id]
+    const player1Board = game.boards[this.players[0].id]
     const drawnCard = game.deck.cards.pop()
     if (!drawnCard) {
       throw new Error('No cards left in the deck to draw')
@@ -52,7 +64,7 @@ class Match {
     })
   }
 
-  startMatch(secondPlayer: JoinedPlayer): void {
+  startMatch(secondPlayer: Player): void {
     if (this.status !== 'waiting') {
       throw new Error('Match is already in progress or finished')
     }
@@ -185,6 +197,22 @@ class Match {
     })
   }
 
+  isInProgress(): this is this & InProgressMatch {
+    return (
+      this.status === 'in-progress' &&
+      this.players[0] !== null &&
+      this.players[1] !== null
+    )
+  }
+
+  isWaiting(): this is this & WaitingMatch {
+    return (
+      this.status === 'waiting' &&
+      this.players[0] !== null &&
+      this.players[1] === null
+    )
+  }
+
   isPlayerTurn(playerId: string): boolean {
     const player = this.getPlayerById(playerId)
     if (!player) {
@@ -194,6 +222,10 @@ class Match {
   }
 
   finalizeGame(): void {
+    if (!this.isInProgress()) {
+      throw new Error('Match is not ready to finalize the game')
+    }
+
     const currentGame = this.games[this.games.length - 1]
     if (!currentGame) return
 
@@ -215,7 +247,7 @@ class Match {
     }
 
     // Prepare next game if not match end
-    this.addGame(new Game(this.players[0]!.id, this.players[1]!.id))
+    this.addGame(new Game(this.players[0].id, this.players[1].id))
     this.startGame(this.games.length - 1)
 
     // Reset players' status and hands as appropriate
@@ -423,7 +455,7 @@ class Match {
   getState(): {
     id: string
     matchName: string
-    players: Player[]
+    players: (Player | null)[]
     games: GameState[]
     round: number
     score: [number, number]

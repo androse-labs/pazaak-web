@@ -3,9 +3,7 @@ import { WSContext } from 'hono/ws'
 import { Card } from './card'
 import { Deck } from './deck'
 
-type Player = JoinedPlayer | null
-
-type JoinedPlayer = {
+type Player = {
   id: string
   connection: WSContext<ServerWebSocket> | null
   token: string
@@ -33,4 +31,4 @@ type PlayerView = {
   score: [number, number]
 }
 
-export type { Player, JoinedPlayer, PlayerView }
+export type { Player, PlayerView }
