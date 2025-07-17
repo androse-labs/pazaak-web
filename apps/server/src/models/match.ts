@@ -261,6 +261,8 @@ class Match {
       throw new Error('No current game to proceed to the next turn')
     }
 
+    currentGame.turn += 1
+
     // Check game end conditions after drawing
     const allStandingOrBusted = this.players.every(
       (p) => p && (p.status === 'standing' || p.status === 'busted'),
@@ -314,6 +316,9 @@ class Match {
       throw new Error('No current game to perform action in')
     }
 
+    const playerBoard = currentGame.boards[playerId]
+    const playerTotal = currentGame.boardTotal(playerBoard)
+
     switch (action.type) {
       case 'play':
         const cardIndex = player.hand.findIndex(
@@ -330,13 +335,18 @@ class Match {
         break
 
       case 'end':
-        currentGame.turn += 1
+        if (playerTotal > 20) {
+          player.status = 'busted'
+        }
         this.nextTurn()
         break
 
       case 'stand':
-        player.status = 'standing'
-        currentGame.turn += 1
+        if (playerTotal > 20) {
+          player.status = 'busted'
+        } else {
+          player.status = 'standing'
+        }
         this.nextTurn()
         break
 

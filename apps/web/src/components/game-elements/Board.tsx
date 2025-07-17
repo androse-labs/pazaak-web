@@ -3,7 +3,13 @@ import { Card } from './Card'
 import { EmptyCard } from './EmptyCard'
 import { HiddenCard } from './HiddenCard'
 import type { CardValue } from './types'
-import { ArrowDownUp, OctagonMinus, SkipForward } from 'lucide-react'
+import {
+  ArrowDownUp,
+  MoveLeft,
+  MoveRight,
+  OctagonMinus,
+  SkipForward,
+} from 'lucide-react'
 import { DndContext, useDndMonitor, useDroppable } from '@dnd-kit/core'
 import clsx from 'clsx'
 
@@ -41,11 +47,7 @@ const DropOverlay = ({ isOver }: { isOver: boolean }) => (
   </div>
 )
 
-const turnStateString = (
-  you: boolean,
-  yourTurn: boolean,
-  state: 'playing' | 'standing' | 'busted',
-): string => {
+const turnStateString = (state: 'playing' | 'standing' | 'busted'): string => {
   if (state === 'busted') {
     return 'Busted'
   }
@@ -54,11 +56,7 @@ const turnStateString = (
     return 'Standing'
   }
 
-  if (you) {
-    return yourTurn ? 'Your Turn' : ''
-  }
-
-  return !yourTurn ? 'Their Turn' : ''
+  return ''
 }
 
 // Vertical circles indicating games won
@@ -82,7 +80,6 @@ const ScoreDisplay = ({ total, count }: { total: number; count: number }) => {
 const YourBoardGrid = memo(
   ({
     title,
-    yourTurn,
     state,
     score,
     total,
@@ -109,9 +106,7 @@ const YourBoardGrid = memo(
         <div className="flex flex-col items-start justify-center gap-2">
           <div className="flex w-full justify-between">
             <span className="text-2xl font-bold">{title}</span>
-            <span className="text-2xl">
-              {turnStateString(true, yourTurn, state)}
-            </span>
+            <span className="text-2xl">{turnStateString(state)}</span>
           </div>
           <div className="text-lg">
             Total: <span className="font-bold">{total}</span>
@@ -143,7 +138,6 @@ const OpponentBoardGrid = ({
   title,
   state,
   score,
-  theirTurn,
   total,
   cards,
 }: {
@@ -159,9 +153,7 @@ const OpponentBoardGrid = ({
     <div className="flex flex-col items-end justify-end gap-2">
       <div className="flex w-full flex-row-reverse justify-between">
         <span className="text-2xl font-bold">{title}</span>
-        <span className="text-2xl">
-          {turnStateString(false, !theirTurn, state)}
-        </span>
+        <span className="text-2xl">{turnStateString(state)}</span>
       </div>
       <div className="text-lg">
         Total: <span className="font-bold">{total}</span>
@@ -238,7 +230,6 @@ const HandGrid = ({
       className={clsx(
         'bg-base-200 grid w-fit grid-cols-4 grid-rows-1 gap-2 rounded-md p-2',
         {
-          'cursor-pointer': yourTurn,
           'cursor-not-allowed': !yourTurn,
           'opacity-50': !yourTurn && cards.length > 0,
         },
@@ -340,6 +331,22 @@ type BoardProps = {
   onMagnitudeFlip: (cardId: string) => void
 }
 
+const TurnIndicator = ({ yourTurn }: { yourTurn: boolean }) => (
+  <div className="text-center text-2xl font-bold">
+    {yourTurn ? (
+      <span className="flex flex-col items-center justify-center gap-1">
+        Your Turn
+        <MoveLeft size={32} className="inline-block" />
+      </span>
+    ) : (
+      <span className="flex flex-col items-center justify-center gap-1">
+        Opponent's Turn
+        <MoveRight size={32} className="inline-block" />
+      </span>
+    )}
+  </div>
+)
+
 export const Board = ({
   boards: { yourBoard, opponentBoard },
   yourScore,
@@ -366,28 +373,35 @@ export const Board = ({
           }
         }}
       >
-        <div className="grid w-fit grid-cols-2 grid-rows-1 justify-items-center gap-14 p-5">
-          <BoardGrid
-            title="You"
-            yourTurn={yourTurn}
-            state={yourState}
-            score={yourScore}
-            total={yourBoard.total}
-            cards={yourBoard.cards.map((card) => {
-              return <Card key={card.id} card={card} id={card.id} />
-            })}
-          />
-          <BoardGrid
-            title="Opponent"
-            yourTurn={!yourTurn}
-            state={opponentState}
-            score={opponentScore}
-            isOpponent
-            total={opponentBoard.total}
-            cards={opponentBoard.cards.map((card) => {
-              return <Card key={card.id} card={card} id={card.id} />
-            })}
-          />
+        <div className="flex items-center justify-between gap-2 py-5">
+          <div className="flex-1">
+            <BoardGrid
+              title="You"
+              yourTurn={yourTurn}
+              state={yourState}
+              score={yourScore}
+              total={yourBoard.total}
+              cards={yourBoard.cards.map((card) => (
+                <Card key={card.id} card={card} id={card.id} />
+              ))}
+            />
+          </div>
+          <div className="flex w-48 justify-center">
+            <TurnIndicator yourTurn={yourTurn} />
+          </div>
+          <div className="flex-1">
+            <BoardGrid
+              title="Opponent"
+              yourTurn={!yourTurn}
+              state={opponentState}
+              score={opponentScore}
+              isOpponent
+              total={opponentBoard.total}
+              cards={opponentBoard.cards.map((card) => (
+                <Card key={card.id} card={card} id={card.id} />
+              ))}
+            />
+          </div>
         </div>
         <div className="grid grid-cols-2 grid-rows-1 gap-2 p-5">
           <HandGrid
