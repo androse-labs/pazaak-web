@@ -2,7 +2,7 @@ import { HTTPException } from 'hono/http-exception'
 import { generateHexToken, sendTypedMessage } from '../utils'
 import { Match } from './match'
 import { Deck } from './deck'
-import { Card, PlayerView } from '@pazaak-web/shared'
+import { Card } from '@pazaak-web/shared'
 import { PazaakSocketEvent } from '@pazaak-web/shared/src/web-socket-types'
 
 class MatchManager {
