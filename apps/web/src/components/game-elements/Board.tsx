@@ -8,6 +8,7 @@ import {
   MoveLeft,
   MoveRight,
   OctagonMinus,
+  OctagonX,
   SkipForward,
 } from 'lucide-react'
 import { DndContext, useDndMonitor, useDroppable } from '@dnd-kit/core'
@@ -47,18 +48,6 @@ const DropOverlay = ({ isOver }: { isOver: boolean }) => (
   </div>
 )
 
-const turnStateString = (state: 'playing' | 'standing' | 'busted'): string => {
-  if (state === 'busted') {
-    return 'Busted'
-  }
-
-  if (state === 'standing') {
-    return 'Standing'
-  }
-
-  return ''
-}
-
 // Vertical circles indicating games won
 // Circle is hollow if no games won
 const ScoreDisplay = ({ total, count }: { total: number; count: number }) => {
@@ -75,6 +64,42 @@ const ScoreDisplay = ({ total, count }: { total: number; count: number }) => {
       ))}
     </div>
   )
+}
+
+const StateDisplay = ({
+  state,
+}: {
+  state: 'playing' | 'standing' | 'busted'
+}) => {
+  if (state === 'busted') {
+    return (
+      <span className="flex items-center gap-2 text-red-300">
+        <OctagonX
+          size={20}
+          strokeWidth={3}
+          className="inline-block align-middle leading-none"
+        />
+        <span className="align-middle text-2xl font-bold leading-none">
+          Busted
+        </span>
+      </span>
+    )
+  }
+  if (state === 'standing') {
+    return (
+      <span className="flex items-center gap-2 text-yellow-200">
+        <OctagonMinus
+          size={20}
+          strokeWidth={3}
+          className="inline-block align-middle leading-none"
+        />
+        <span className="align-middle text-2xl font-bold leading-none">
+          Standing
+        </span>
+      </span>
+    )
+  }
+  return null
 }
 
 const YourBoardGrid = memo(
@@ -106,7 +131,7 @@ const YourBoardGrid = memo(
         <div className="flex flex-col items-start justify-center gap-2">
           <div className="flex w-full justify-between">
             <span className="text-2xl font-bold">{title}</span>
-            <span className="text-2xl">{turnStateString(state)}</span>
+            <StateDisplay state={state} />
           </div>
           <div className="text-lg">
             Total: <span className="font-bold">{total}</span>
@@ -153,7 +178,7 @@ const OpponentBoardGrid = ({
     <div className="flex flex-col items-end justify-end gap-2">
       <div className="flex w-full flex-row-reverse justify-between">
         <span className="text-2xl font-bold">{title}</span>
-        <span className="text-2xl">{turnStateString(state)}</span>
+        <StateDisplay state={state} />
       </div>
       <div className="text-lg">
         Total: <span className="font-bold">{total}</span>

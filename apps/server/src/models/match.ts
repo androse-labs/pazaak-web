@@ -279,7 +279,10 @@ class Match {
     // Find the next active player (not standing)
     let currentPlayer = this.players[this.playersTurn - 1]
 
-    while (currentPlayer?.status === 'standing') {
+    while (
+      currentPlayer?.status === 'standing' ||
+      currentPlayer?.status === 'busted'
+    ) {
       this.playersTurn = this.playersTurn === 1 ? 2 : 1
       currentPlayer = this.players[this.playersTurn - 1]
     }
