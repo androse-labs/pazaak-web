@@ -1,9 +1,8 @@
 import { HTTPException } from 'hono/http-exception'
-import { generateHexToken, sendTypedMessage } from '../utils'
+import { generateHexToken, sendPazaakEvent } from '../utils'
 import { Match } from './match'
 import { Deck } from './deck'
 import { Card } from '@pazaak-web/shared'
-import { PazaakSocketEvent } from '@pazaak-web/shared/src/web-socket-types'
 
 class MatchManager {
   private matches: Match[] = []
@@ -64,7 +63,7 @@ class MatchManager {
     // notify each player about game state
     match.players.forEach((player) => {
       if (player?.connection) {
-        sendTypedMessage<PazaakSocketEvent>(player.connection, {
+        sendPazaakEvent(player.connection, {
           type: 'gameStateUpdate',
           ...match.getPlayerView(player.id),
         })

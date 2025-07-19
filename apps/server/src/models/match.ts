@@ -4,8 +4,7 @@ import { WSContext } from 'hono/ws'
 import { MatchAction } from './actions'
 import { Player, PlayerView } from './players'
 import { Card } from '@pazaak-web/shared'
-import { sendTypedMessage } from '../utils'
-import { PazaakSocketEvent } from '@pazaak-web/shared/src/web-socket-types'
+import { sendPazaakEvent } from '../utils'
 
 type WaitingMatch = {
   status: 'waiting'
@@ -192,7 +191,7 @@ class Match {
   notifyPlayersAboutGameState(): void {
     this.players.forEach((player) => {
       if (player?.connection) {
-        sendTypedMessage<PazaakSocketEvent>(player.connection, {
+        sendPazaakEvent(player.connection, {
           type: 'gameStateUpdate',
           ...this.getPlayerView(player.id),
         })
