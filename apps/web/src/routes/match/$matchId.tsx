@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Board } from '../../components/game-elements/Board'
 import useWebSocket from 'react-use-websocket'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { usePlayer } from '../../contexts/PlayerContext'
 import type { MatchAction } from '../../components/game-elements/types'
 import { api } from '../../webClient'
@@ -11,6 +11,7 @@ import type {
   PazaakSocketEvent,
   PlayerView,
 } from '@pazaak-web/shared/src/web-socket-types'
+import { GameNotification } from '../../components/GameNotification'
 
 export const Route = createFileRoute('/match/$matchId')({
   component: MatchPage,
@@ -39,6 +40,37 @@ function MatchPage() {
       }),
   })
 
+  // Notification state
+  const [notification, setNotification] = useState<{
+    open: boolean
+    content: React.ReactNode
+    persistent: boolean
+  }>({
+    open: false,
+    content: null,
+    persistent: false,
+  })
+  const notificationTimeout = useRef<NodeJS.Timeout | null>(null)
+
+  useEffect(() => {
+    if (notification.open && !notification.persistent) {
+      // Set a timeout to close the modal after 2 seconds
+      notificationTimeout.current = setTimeout(() => {
+        setNotification((n) => ({ ...n, open: false }))
+      }, 2000)
+    } else {
+      // Cleanup timeout if modal is closed or persistent
+      if (notificationTimeout.current) {
+        clearTimeout(notificationTimeout.current)
+        notificationTimeout.current = null
+      }
+    }
+    // Cleanup on unmount
+    return () => {
+      if (notificationTimeout.current) clearTimeout(notificationTimeout.current)
+    }
+  }, [notification.open, notification.persistent])
+
   useWebSocket(
     `ws://localhost:3000/match/${matchId}/subscribe?token=${matchConnection?.token}`,
     {
@@ -60,9 +92,31 @@ function MatchPage() {
               return newCard
             }),
           )
+        } else if (message.type === 'playerScored') {
+          setNotification({
+            open: true,
+            content:
+              message.who === 'opponent' ? (
+                <span>Your opponent won the round.</span>
+              ) : (
+                <span>You won the round!</span>
+              ),
+            persistent: false,
+          })
+        } else if (message.type === 'matchComplete') {
+          setNotification({
+            open: true,
+            content: (
+              <span>
+                The match is complete! You{' '}
+                {message.youWon ? 'won!' : 'lost. Better luck next time!'}
+              </span>
+            ),
+            persistent: true,
+          })
+        } else {
+          console.warn('Unknown message type:', message)
         }
-
-        console.log('Received message:', message)
       },
     },
   )
@@ -89,6 +143,13 @@ function MatchPage() {
 
   return (
     <div className="flex flex-col items-center justify-center p-5">
+      <GameNotification
+        id="game-notification"
+        open={notification.open}
+        persistent={notification.persistent}
+      >
+        {notification.content}
+      </GameNotification>
       <h1 className="text-2xl font-bold">Match ID: {matchId}</h1>
       {hasStarted ? (
         <Board

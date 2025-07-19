@@ -197,6 +197,48 @@ class Match {
     })
   }
 
+  notifyPlayersAboutGameWinner(): void {
+    const currentGame = this.games[this.games.length - 1]
+    if (!currentGame) {
+      throw new Error('No current game to notify players about winner')
+    }
+
+    const winnerIndex = currentGame.determineWinner()
+    if (winnerIndex !== null) {
+      this.players.forEach((player, index) => {
+        if (!player) {
+          throw new Error('Player not found in match')
+        }
+
+        const opponent = this.players.find((p) => p?.id !== player.id)
+
+        const playerIndex = this.players.findIndex((p) => p?.id === player.id)
+        const opponentIndex = this.players.findIndex(
+          (p) => p?.id === opponent?.id,
+        )
+
+        player?.sendEvent({
+          type: 'playerScored',
+          opponentScore: this.score[opponentIndex],
+          yourScore: this.score[playerIndex],
+          who: winnerIndex === playerIndex ? 'you' : 'opponent',
+        })
+      })
+    }
+  }
+
+  notifyPlayersAboutMatchWinner(): void {
+    const winnerId = this.checkMatchWinner()
+    if (winnerId) {
+      this.players.forEach((player) => {
+        player?.sendEvent({
+          type: 'matchComplete',
+          youWon: player.id === winnerId,
+        })
+      })
+    }
+  }
+
   isInProgress(): this is this & InProgressMatch {
     return (
       this.status === 'in-progress' &&
@@ -237,8 +279,10 @@ class Match {
       // Check match winner
       if (this.score[winnerIndex] >= 3) {
         this.status = 'finished'
+        this.notifyPlayersAboutMatchWinner()
         return
       }
+      this.notifyPlayersAboutGameWinner()
     }
 
     // Prepare next game if not match end
