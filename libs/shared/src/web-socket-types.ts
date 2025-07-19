@@ -1,4 +1,4 @@
-import { Card } from './models/card'
+import type { Card } from './models/card'
 
 export type PlayerView = {
   matchName: string
@@ -21,3 +21,18 @@ export type PlayerView = {
     opponentScore: number
   }
 }
+
+export type PazaakSocketEvent =
+  | {
+      type: 'matchComplete'
+      youWon: boolean
+    }
+  | {
+      type: 'playerScored'
+      who: 'you' | 'opponent'
+      yourScore: number
+      opponentScore: number
+    }
+  | ({
+      type: 'gameStateUpdate'
+    } & PlayerView)

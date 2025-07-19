@@ -3,44 +3,18 @@ import { Board } from '../../components/game-elements/Board'
 import useWebSocket from 'react-use-websocket'
 import { useState } from 'react'
 import { usePlayer } from '../../contexts/PlayerContext'
-import type {
-  CardValue as Card,
-  MatchAction,
-} from '../../components/game-elements/types'
+import type { MatchAction } from '../../components/game-elements/types'
 import { api } from '../../webClient'
 import { useMutation } from '@tanstack/react-query'
+import type { Card } from '@pazaak-web/shared'
+import type {
+  PazaakSocketEvent,
+  PlayerView,
+} from '@pazaak-web/shared/src/web-socket-types'
 
 export const Route = createFileRoute('/match/$matchId')({
   component: MatchPage,
 })
-
-type PlayerView = {
-  matchName: string
-  games: {
-    boards: {
-      yourBoard: {
-        cards: Card[]
-        total: number
-      }
-      opponentBoard: {
-        cards: Card[]
-        total: number
-      }
-    }
-    turn: number
-    winnner: string | null
-  }[]
-  yourHand: Card[]
-  yourState: 'playing' | 'standing' | 'busted'
-  opponentState: 'playing' | 'standing' | 'busted'
-  yourTurn: boolean
-  opponentHandSize: number
-  round: number
-  score: {
-    yourScore: number
-    opponentScore: number
-  }
-}
 
 function hasMagnitude(
   card: Card,
@@ -70,21 +44,25 @@ function MatchPage() {
     {
       retryOnError: true,
       onMessage: (event) => {
-        const message: PlayerView = JSON.parse(event.data)
+        const message: PazaakSocketEvent = JSON.parse(event.data)
 
-        setGameState(message)
+        if (message.type === 'gameStateUpdate') {
+          setGameState(message)
 
-        setPlayerHand((prevHand) =>
-          message.yourHand.map((newCard) => {
-            const prevCard = prevHand.find((c) => c.id === newCard.id)
-            // update the player hand but don't overwrite magnitude for flip or tiebreaker cards
-            if (prevCard && hasMagnitude(prevCard) && hasMagnitude(newCard)) {
-              return { ...newCard, magnitude: prevCard.magnitude }
-            }
+          setPlayerHand((prevHand) =>
+            message.yourHand.map((newCard) => {
+              const prevCard = prevHand.find((c) => c.id === newCard.id)
+              // update the player hand but don't overwrite magnitude for flip or tiebreaker cards
+              if (prevCard && hasMagnitude(prevCard) && hasMagnitude(newCard)) {
+                return { ...newCard, magnitude: prevCard.magnitude }
+              }
 
-            return newCard
-          }),
-        )
+              return newCard
+            }),
+          )
+        }
+
+        console.log('Received message:', message)
       },
     },
   )

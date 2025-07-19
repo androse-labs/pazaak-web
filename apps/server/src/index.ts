@@ -7,6 +7,8 @@ import { ServerWebSocket } from 'bun'
 import { MatchManager } from './models/match-manager'
 import { MatchActionSchema } from './models/actions'
 import { CardSchema } from '@pazaak-web/shared'
+import { sendTypedMessage } from './utils'
+import { PazaakSocketEvent } from '@pazaak-web/shared/src/web-socket-types'
 
 const { upgradeWebSocket, websocket } = createBunWebSocket<ServerWebSocket>()
 
@@ -127,7 +129,10 @@ export const createApp = (matchManager: MatchManager) => {
           match.updatePlayerConnection(player.id, ws)
 
           console.log(`Player ${player.id} connected to match ${matchId}`)
-          ws.send(JSON.stringify(match.getPlayerView(player.id)))
+          sendTypedMessage<PazaakSocketEvent>(ws, {
+            type: 'gameStateUpdate',
+            ...match.getPlayerView(player.id),
+          })
         },
         onMessage(event, _) {
           console.log(`Message from client: ${event.data}`)
