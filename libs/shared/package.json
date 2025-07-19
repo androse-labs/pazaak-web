@@ -1,0 +1,12 @@
+{
+  "name": "@pazaak-web/shared",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5",
+    "zod": "^3.25.67"
+  }
+}

@@ -1,9 +1,9 @@
 import { ServerWebSocket } from 'bun'
-import { Card } from './card'
 import { Game, GameState } from './game'
 import { WSContext } from 'hono/ws'
 import { MatchAction } from './actions'
 import { Player, PlayerView } from './players'
+import { Card } from '@pazaak-web/shared'
 
 type WaitingMatch = {
   status: 'waiting'
@@ -14,8 +14,6 @@ type InProgressMatch = {
   status: 'in-progress' | 'finished'
   players: [Player, Player]
 }
-
-type MatchState = WaitingMatch | InProgressMatch
 
 class Match {
   id: string

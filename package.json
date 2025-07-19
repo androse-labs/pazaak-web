@@ -1,23 +1,24 @@
 {
-	"name": "pazaak-web",
-	"private": true,
-	"workspaces": [
-		"apps/*"
-	],
-	"scripts": {
-		"dev:server": "bun --cwd apps/server dev",
-		"dev:web": "bun --cwd apps/web dev",
-		"dev": "bun --filter web --filter server dev"
-	},
-	"devDependencies": {
-		"@typescript-eslint/eslint-plugin": "^5.45.0",
-		"@typescript-eslint/parser": "^5.45.0",
-		"prettier": "^3.0.3",
-		"prettier-plugin-tailwindcss": "^0.5.3",
-		"eslint": "^8.28.0",
-		"eslint-config-prettier": "^8.5.0"
-	},
-	"dependencies": {
-		"clsx": "^2.1.1"
-	}
+  "name": "pazaak-web",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "libs/*"
+  ],
+  "scripts": {
+    "dev:server": "bun --cwd apps/server dev",
+    "dev:web": "bun --cwd apps/web dev",
+    "dev": "bun --filter web --filter server dev"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "prettier": "^3.0.3",
+    "prettier-plugin-tailwindcss": "^0.5.3",
+    "eslint": "^8.28.0",
+    "eslint-config-prettier": "^8.5.0"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1"
+  }
 }

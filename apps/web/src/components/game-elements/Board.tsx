@@ -2,7 +2,7 @@ import { Children, memo, useState, type ReactNode } from 'react'
 import { Card } from './Card'
 import { EmptyCard } from './EmptyCard'
 import { HiddenCard } from './HiddenCard'
-import type { CardValue } from './types'
+import type { Card as CardValue } from '@pazaak-web/shared'
 import {
   ArrowDownUp,
   MoveLeft,

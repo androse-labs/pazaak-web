@@ -1,5 +1,5 @@
+import { CardSchema } from '@pazaak-web/shared'
 import z from 'zod'
-import { CardSchema } from './card'
 
 const MatchActionSchema = z.discriminatedUnion('type', [
   z.object({

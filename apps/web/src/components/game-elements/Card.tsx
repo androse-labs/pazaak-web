@@ -1,5 +1,6 @@
 import { memo } from 'react'
-import type { CardType, CardValue } from './types'
+import type { CardType } from './types'
+import type { Card as CardValue } from '@pazaak-web/shared'
 import { useDraggable } from '@dnd-kit/core'
 import clsx from 'clsx'
 

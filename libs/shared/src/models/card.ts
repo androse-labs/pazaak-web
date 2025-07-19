@@ -1,4 +1,4 @@
-import z from 'zod'
+import { z } from 'zod'
 
 const cardMagnitudeSchema = z.enum(['subtract', 'add'])
 
@@ -44,4 +44,4 @@ const CardSchema = z.discriminatedUnion('type', [
 
 type Card = z.infer<typeof CardSchema>
 
-export { Card, CardSchema }
+export { type Card, CardSchema }

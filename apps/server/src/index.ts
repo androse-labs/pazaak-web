@@ -5,8 +5,8 @@ import { z } from 'zod'
 import { createBunWebSocket } from 'hono/bun'
 import { ServerWebSocket } from 'bun'
 import { MatchManager } from './models/match-manager'
-import { CardSchema } from './models/card'
 import { MatchActionSchema } from './models/actions'
+import { CardSchema } from '@pazaak-web/shared'
 
 const { upgradeWebSocket, websocket } = createBunWebSocket<ServerWebSocket>()
 

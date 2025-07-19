@@ -1,4 +1,4 @@
-import { Card } from './card'
+import { Card } from '@pazaak-web/shared'
 
 type DeckState = {
   cards: Card[]

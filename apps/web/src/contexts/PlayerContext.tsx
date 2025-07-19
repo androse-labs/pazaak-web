@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react'
-import type { CardValue } from '../components/game-elements/types'
+import type { Card as CardValue } from '@pazaak-web/shared'
 
 type MatchConnection = {
   matchId: string

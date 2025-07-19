@@ -1,18 +1,6 @@
-import { ServerWebSocket } from 'bun'
-import { WSContext } from 'hono/ws'
-import { Deck } from './deck'
-import { Card } from '@pazaak-web/shared'
+import { Card } from './models/card'
 
-type Player = {
-  id: string
-  connection: WSContext<ServerWebSocket> | null
-  token: string
-  status: 'playing' | 'standing' | 'busted'
-  deck: Deck
-  hand: Card[]
-}
-
-type PlayerView = {
+export type PlayerView = {
   matchName: string
   games: {
     boards: {
@@ -33,5 +21,3 @@ type PlayerView = {
     opponentScore: number
   }
 }
-
-export type { Player, PlayerView }
