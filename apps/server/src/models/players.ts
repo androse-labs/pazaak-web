@@ -1,11 +1,10 @@
-import { ServerWebSocket } from 'bun'
-import { WSContext } from 'hono/ws'
 import { Deck } from './deck'
 import { Card } from '@pazaak-web/shared'
+import { PazaakSocketEvent } from '@pazaak-web/shared/src/web-socket-types'
 
 type Player = {
   id: string
-  connection: WSContext<ServerWebSocket> | null
+  sendEvent: (event: PazaakSocketEvent) => void
   token: string
   status: 'playing' | 'standing' | 'busted'
   deck: Deck

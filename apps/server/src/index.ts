@@ -7,7 +7,6 @@ import { ServerWebSocket } from 'bun'
 import { MatchManager } from './models/match-manager'
 import { MatchActionSchema } from './models/actions'
 import { CardSchema } from '@pazaak-web/shared'
-import { sendPazaakEvent } from './utils'
 
 const { upgradeWebSocket, websocket } = createBunWebSocket<ServerWebSocket>()
 
@@ -128,7 +127,7 @@ export const createApp = (matchManager: MatchManager) => {
           match.updatePlayerConnection(player.id, ws)
 
           console.log(`Player ${player.id} connected to match ${matchId}`)
-          sendPazaakEvent(ws, {
+          player.sendEvent({
             type: 'gameStateUpdate',
             ...match.getPlayerView(player.id),
           })

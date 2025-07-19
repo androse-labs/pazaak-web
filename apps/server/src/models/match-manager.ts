@@ -1,5 +1,5 @@
 import { HTTPException } from 'hono/http-exception'
-import { generateHexToken, sendPazaakEvent } from '../utils'
+import { generateHexToken } from '../utils'
 import { Match } from './match'
 import { Deck } from './deck'
 import { Card } from '@pazaak-web/shared'
@@ -22,7 +22,7 @@ class MatchManager {
     this.matches.push(
       new Match(matchId, matchName, {
         id: playerId,
-        connection: null,
+        sendEvent: () => {},
         token,
         status: 'playing',
         deck: new Deck().fillWithCustomCards(deck),
@@ -53,7 +53,7 @@ class MatchManager {
 
     match.startMatch({
       id: playerId,
-      connection: null,
+      sendEvent: () => {},
       token,
       status: 'playing',
       hand: [],
@@ -62,12 +62,10 @@ class MatchManager {
 
     // notify each player about game state
     match.players.forEach((player) => {
-      if (player?.connection) {
-        sendPazaakEvent(player.connection, {
-          type: 'gameStateUpdate',
-          ...match.getPlayerView(player.id),
-        })
-      }
+      player?.sendEvent({
+        type: 'gameStateUpdate',
+        ...match.getPlayerView(player.id),
+      })
     })
 
     return { playerId, token }

@@ -4,7 +4,6 @@ import { WSContext } from 'hono/ws'
 import { MatchAction } from './actions'
 import { Player, PlayerView } from './players'
 import { Card } from '@pazaak-web/shared'
-import { sendPazaakEvent } from '../utils'
 
 type WaitingMatch = {
   status: 'waiting'
@@ -18,7 +17,6 @@ type InProgressMatch = {
 
 class Match {
   id: string
-  connections: Map<string, WebSocket> = new Map()
   matchName: string
   games: Game[] = []
   players: [Player, Player] | [Player, null]
@@ -178,11 +176,13 @@ class Match {
 
   updatePlayerConnection(
     playerId: string,
-    connection: WSContext<ServerWebSocket> | null,
+    connection: WSContext<ServerWebSocket>,
   ): void {
     const player = this.getPlayerById(playerId)
     if (player) {
-      player.connection = connection
+      player.sendEvent = (event) => {
+        connection.send(JSON.stringify(event))
+      }
     } else {
       throw new Error('Player not found in match')
     }
@@ -190,12 +190,10 @@ class Match {
 
   notifyPlayersAboutGameState(): void {
     this.players.forEach((player) => {
-      if (player?.connection) {
-        sendPazaakEvent(player.connection, {
-          type: 'gameStateUpdate',
-          ...this.getPlayerView(player.id),
-        })
-      }
+      player?.sendEvent({
+        type: 'gameStateUpdate',
+        ...this.getPlayerView(player.id),
+      })
     })
   }
 
