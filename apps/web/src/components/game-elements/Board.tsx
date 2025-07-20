@@ -245,13 +245,8 @@ const HandGrid = ({
   yourTurn: boolean
   onMagnitudeFlip: (cardId: string) => void
 }) => {
-  const { setNodeRef } = useDroppable({
-    id: 'hand',
-  })
-
   return (
     <div
-      ref={setNodeRef}
       className={clsx(
         'bg-base-200 grid w-fit grid-cols-4 grid-rows-1 gap-2 rounded-md p-2',
         {

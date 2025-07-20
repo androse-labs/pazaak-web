@@ -5,8 +5,8 @@ import { api } from '../webClient'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { Card } from '@pazaak-web/shared'
 import { MatchList } from '../components/MatchList'
-import { usePlayer } from '../contexts/PlayerContext'
 import { useState } from 'react'
+import { usePlayerStore } from '../stores/playerStore'
 
 export const Route = createFileRoute('/')({
   component: Index,
@@ -61,7 +61,7 @@ const demoDeck: Card[] = [
 
 const JoinMatchModal = () => {
   const { data: matches, isPending, error, refetch } = useGetJoinableMatches()
-  const { setMatchConnection } = usePlayer()
+  const setMatchConnection = usePlayerStore((s) => s.setMatchConnection)
   const navigate = useNavigate()
   const [matchId, setMatchId] = useState<string>('')
 
@@ -76,7 +76,6 @@ const JoinMatchModal = () => {
     setMatchConnection({
       matchId: matchId,
       playerId: response.data.playerId,
-      playerDeck: demoDeck,
       token: response.data.token,
     })
 
@@ -130,7 +129,6 @@ const JoinMatchModal = () => {
             setMatchConnection({
               matchId,
               playerId: response.data.playerId,
-              playerDeck: demoDeck,
               token: response.data.token,
             })
 
@@ -174,7 +172,7 @@ function Index() {
   const { refetch } = useGetJoinableMatches()
   const { mutate } = useCreateMatchMutation()
   const navigate = useNavigate()
-  const { setMatchConnection } = usePlayer()
+  const setMatchConnection = usePlayerStore((s) => s.setMatchConnection)
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-24">
@@ -192,7 +190,6 @@ function Index() {
                   setMatchConnection({
                     matchId: data.matchId,
                     playerId: crypto.randomUUID(),
-                    playerDeck: demoDeck,
                     token: data.token,
                   })
                   navigate({ to: `/match/${data.matchId}` })

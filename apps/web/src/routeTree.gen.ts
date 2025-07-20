@@ -12,6 +12,7 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
+import { Route as DeckBuilderIndexImport } from './routes/deck-builder/index'
 import { Route as MatchMatchIdImport } from './routes/match/$matchId'
 
 // Create/Update Routes
@@ -19,6 +20,12 @@ import { Route as MatchMatchIdImport } from './routes/match/$matchId'
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const DeckBuilderIndexRoute = DeckBuilderIndexImport.update({
+  id: '/deck-builder/',
+  path: '/deck-builder/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -46,6 +53,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MatchMatchIdImport
       parentRoute: typeof rootRoute
     }
+    '/deck-builder/': {
+      id: '/deck-builder/'
+      path: '/deck-builder'
+      fullPath: '/deck-builder'
+      preLoaderRoute: typeof DeckBuilderIndexImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -54,36 +68,41 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/match/$matchId': typeof MatchMatchIdRoute
+  '/deck-builder': typeof DeckBuilderIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/match/$matchId': typeof MatchMatchIdRoute
+  '/deck-builder': typeof DeckBuilderIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/match/$matchId': typeof MatchMatchIdRoute
+  '/deck-builder/': typeof DeckBuilderIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/match/$matchId'
+  fullPaths: '/' | '/match/$matchId' | '/deck-builder'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/match/$matchId'
-  id: '__root__' | '/' | '/match/$matchId'
+  to: '/' | '/match/$matchId' | '/deck-builder'
+  id: '__root__' | '/' | '/match/$matchId' | '/deck-builder/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   MatchMatchIdRoute: typeof MatchMatchIdRoute
+  DeckBuilderIndexRoute: typeof DeckBuilderIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   MatchMatchIdRoute: MatchMatchIdRoute,
+  DeckBuilderIndexRoute: DeckBuilderIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -97,7 +116,8 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/match/$matchId"
+        "/match/$matchId",
+        "/deck-builder/"
       ]
     },
     "/": {
@@ -105,6 +125,9 @@ export const routeTree = rootRoute
     },
     "/match/$matchId": {
       "filePath": "match/$matchId.tsx"
+    },
+    "/deck-builder/": {
+      "filePath": "deck-builder/index.tsx"
     }
   }
 }

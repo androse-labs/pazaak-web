@@ -9,6 +9,12 @@ export const Route = createRootRoute({
           <Link to="/" className="btn btn-ghost text-xl normal-case">
             Home
           </Link>
+          <Link
+            to="/deck-builder"
+            className="btn btn-ghost text-xl normal-case"
+          >
+            Deck Builder
+          </Link>
         </div>
         <Outlet />
       </div>

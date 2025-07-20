@@ -2,7 +2,6 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Board } from '../../components/game-elements/Board'
 import useWebSocket from 'react-use-websocket'
 import { useEffect, useRef, useState } from 'react'
-import { usePlayer } from '../../contexts/PlayerContext'
 import type { MatchAction } from '../../components/game-elements/types'
 import { api } from '../../webClient'
 import { useMutation } from '@tanstack/react-query'
@@ -12,6 +11,7 @@ import type {
   PlayerView,
 } from '@pazaak-web/shared/src/web-socket-types'
 import { GameNotification } from '../../components/GameNotification'
+import { usePlayerStore } from '../../stores/playerStore'
 
 export const Route = createFileRoute('/match/$matchId')({
   component: MatchPage,
@@ -25,7 +25,7 @@ function hasMagnitude(
 
 function MatchPage() {
   const { matchId } = Route.useParams()
-  const { matchConnection } = usePlayer()
+  const matchConnection = usePlayerStore((s) => s.matchConnection)
   const [gameState, setGameState] = useState<PlayerView | null>(null)
   const [playerHand, setPlayerHand] = useState<Card[]>([])
   const { mutate } = useMutation({
