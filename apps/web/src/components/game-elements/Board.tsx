@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import { DndContext, useDndMonitor, useDroppable } from '@dnd-kit/core'
 import clsx from 'clsx'
+import { DropOverlay } from './DropOverlay'
 
 // Takes either card components or hidden card components and fills the rest
 // with empty card components
@@ -34,19 +35,6 @@ export const GridOfItems: React.FC<GridOfItemsProps> = ({
     </>
   )
 }
-
-const DropOverlay = ({ isOver }: { isOver: boolean }) => (
-  <div
-    className={clsx(
-      'absolute inset-0 z-10 flex items-center justify-center rounded-md bg-black/40 text-white',
-      {
-        'backdrop-blur-[2px]': isOver,
-      },
-    )}
-  >
-    Drop to play card
-  </div>
-)
 
 // Vertical circles indicating games won
 // Circle is hollow if no games won
@@ -150,7 +138,9 @@ const YourBoardGrid = memo(
                 </div>
               ))}
             </GridOfItems>
-            {isDragging && <DropOverlay isOver={isOver} />}
+            {isDragging && (
+              <DropOverlay isOver={isOver} text={'Drop to play a card.'} />
+            )}
           </div>
         </div>
         <ScoreDisplay total={3} count={score} />

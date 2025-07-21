@@ -6,7 +6,7 @@ import { createBunWebSocket } from 'hono/bun'
 import { ServerWebSocket } from 'bun'
 import { MatchManager } from './models/match-manager'
 import { MatchActionSchema } from './models/actions'
-import { CardSchema } from '@pazaak-web/shared'
+import { cardSchema } from '@pazaak-web/shared'
 
 const { upgradeWebSocket, websocket } = createBunWebSocket<ServerWebSocket>()
 
@@ -25,7 +25,7 @@ export const createApp = (matchManager: MatchManager) => {
     zValidator(
       'json',
       z.object({
-        deck: z.array(CardSchema),
+        deck: z.array(cardSchema),
         matchName: z.string().min(5),
       }),
     ),
@@ -53,7 +53,7 @@ export const createApp = (matchManager: MatchManager) => {
       'json',
       z.object({
         deck: z
-          .array(CardSchema)
+          .array(cardSchema)
           .min(1, 'Deck must have at least one card')
           .max(10, 'Deck can have a maximum of 10 cards'),
       }),
