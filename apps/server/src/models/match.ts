@@ -205,7 +205,7 @@ class Match {
 
     const winnerIndex = currentGame.determineWinner()
     if (winnerIndex !== null) {
-      this.players.forEach((player, index) => {
+      this.players.forEach((player) => {
         if (!player) {
           throw new Error('Player not found in match')
         }

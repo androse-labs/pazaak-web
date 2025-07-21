@@ -48,7 +48,7 @@ describe('Match', () => {
           status: 'playing',
           deck: match.players[0]!.deck,
           hand: [],
-          connection: null,
+          sendEvent: () => {},
         },
         {
           id: 'player2',
@@ -56,7 +56,7 @@ describe('Match', () => {
           status: 'playing',
           deck: match.players[1]!.deck,
           hand: [],
-          connection: null,
+          sendEvent: () => {},
         },
       ],
       games: [

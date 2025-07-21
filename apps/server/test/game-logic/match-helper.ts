@@ -14,7 +14,7 @@ const playerDeck = new Deck().fillWithCustomCards([
 
 const createTestPlayer = (): Player => ({
   id: randomUUIDv7(),
-  connection: null,
+  sendEvent: () => {},
   token: generateHexToken(16),
   status: 'playing',
   deck: playerDeck,
@@ -38,7 +38,7 @@ const createTestMatch = (
   match.players = options.players || [
     {
       id: randomUUIDv7(),
-      connection: null,
+      sendEvent: () => {},
       token: generateHexToken(16),
       status: 'playing',
       deck: playerDeck,
@@ -46,7 +46,7 @@ const createTestMatch = (
     },
     {
       id: randomUUIDv7(),
-      connection: null,
+      sendEvent: () => {},
       token: generateHexToken(16),
       status: 'playing',
       deck: playerDeck,
