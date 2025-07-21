@@ -8,6 +8,23 @@ interface DeckStore {
   setDeck: (deck: Card[]) => void
 }
 
+const demoDeck: Card[] = [
+  {
+    id: crypto.randomUUID(),
+    type: 'tiebreaker',
+    value: 1,
+    magnitude: 'subtract',
+  },
+  { id: crypto.randomUUID(), type: 'double', value: 'D' },
+  { id: crypto.randomUUID(), type: 'invert', value: '2&4' },
+  { id: crypto.randomUUID(), type: 'add', value: 1 },
+  { id: crypto.randomUUID(), type: 'subtract', value: 1 },
+  { id: crypto.randomUUID(), type: 'invert', value: '3&6' },
+  { id: crypto.randomUUID(), type: 'subtract', value: 3 },
+  { id: crypto.randomUUID(), type: 'flip', value: 2, magnitude: 'subtract' },
+  { id: crypto.randomUUID(), type: 'tiebreaker', value: 2, magnitude: 'add' },
+]
+
 export const deckSchema = z
   .array(cardSchema)
   .refine((deck) => deck.length === 10, {
@@ -31,7 +48,7 @@ export const deckSchema = z
 export const useDeckStore = create<DeckStore>()(
   persist(
     (set) => ({
-      deck: [],
+      deck: demoDeck,
       setDeck: (deck) => set({ deck }),
     }),
     {

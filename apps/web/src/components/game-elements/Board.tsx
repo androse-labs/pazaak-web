@@ -128,7 +128,6 @@ const YourBoardGrid = memo(
             ref={setNodeRef}
             className={clsx(
               'bg-base-200 relative grid grid-cols-3 grid-rows-3 justify-items-center gap-2 rounded-md p-2',
-              { 'outline-neutral outline-4': isOver },
             )}
           >
             <GridOfItems length={9}>

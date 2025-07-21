@@ -7,6 +7,7 @@ import type { Card } from '@pazaak-web/shared'
 import { MatchList } from '../components/MatchList'
 import { useState } from 'react'
 import { usePlayerStore } from '../stores/playerStore'
+import { useDeckStore } from '../stores/deckStore'
 
 export const Route = createFileRoute('/')({
   component: Index,
@@ -42,33 +43,17 @@ const joinMatch = (matchId: string, deck: Card[]) => {
   )
 }
 
-const demoDeck: Card[] = [
-  {
-    id: crypto.randomUUID(),
-    type: 'tiebreaker',
-    value: 1,
-    magnitude: 'subtract',
-  },
-  { id: crypto.randomUUID(), type: 'double', value: 'D' },
-  { id: crypto.randomUUID(), type: 'invert', value: '2&4' },
-  { id: crypto.randomUUID(), type: 'add', value: 1 },
-  { id: crypto.randomUUID(), type: 'subtract', value: 1 },
-  { id: crypto.randomUUID(), type: 'invert', value: '3&6' },
-  { id: crypto.randomUUID(), type: 'subtract', value: 3 },
-  { id: crypto.randomUUID(), type: 'flip', value: 2, magnitude: 'subtract' },
-  { id: crypto.randomUUID(), type: 'tiebreaker', value: 2, magnitude: 'add' },
-]
-
 const JoinMatchModal = () => {
   const { data: matches, isPending, error, refetch } = useGetJoinableMatches()
   const setMatchConnection = usePlayerStore((s) => s.setMatchConnection)
   const navigate = useNavigate()
   const [matchId, setMatchId] = useState<string>('')
+  const userDeck = useDeckStore((s) => s.deck)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    const response = await joinMatch(matchId, demoDeck)
+    const response = await joinMatch(matchId, userDeck)
     if (response.status !== 200) {
       throw new Error('Failed to join match')
     }
@@ -120,7 +105,7 @@ const JoinMatchModal = () => {
               return
             }
             const matchId = matches[0].matchId
-            const response = await joinMatch(matchId, demoDeck)
+            const response = await joinMatch(matchId, userDeck)
 
             if (response.status !== 200) {
               throw new Error('Failed to join match')
@@ -171,6 +156,7 @@ function useCreateMatchMutation() {
 function Index() {
   const { refetch } = useGetJoinableMatches()
   const { mutate } = useCreateMatchMutation()
+  const userDeck = useDeckStore((s) => s.deck)
   const navigate = useNavigate()
   const setMatchConnection = usePlayerStore((s) => s.setMatchConnection)
 
@@ -182,7 +168,7 @@ function Index() {
           onClick={() => {
             mutate(
               {
-                deck: demoDeck,
+                deck: userDeck,
                 matchName: 'Test Match',
               },
               {

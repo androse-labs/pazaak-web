@@ -97,7 +97,11 @@ export function DeckPanel({
           )}
         </div>
       </div>
-      <p className="text-center text-red-500">{validationMessage || ' '}</p>
+      {validationMessage && (
+        <div role="alert" className="alert alert-error alert-soft">
+          <span>{validationMessage}</span>
+        </div>
+      )}
       <div className="flex shrink-0 items-center justify-between">
         <button
           className="btn btn-primary btn-block"
