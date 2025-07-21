@@ -7,6 +7,9 @@ import { useState } from 'react'
 import type { Card } from '@pazaak-web/shared'
 import clsx from 'clsx'
 import { DropOverlay } from '../../components/game-elements/DropOverlay'
+import { CopyIcon, ImportIcon } from 'lucide-react'
+import { codeToDeck, deckToCode } from './-deck-serializer'
+import { Modal } from '../../components/Modal'
 
 export const Route = createFileRoute('/deck-builder/')({
   component: RouteComponent,
@@ -46,6 +49,7 @@ interface DeckPanelProps {
   draftDeck: Card[]
   validationMessage: string | null
   showDropOverlay: boolean
+  setDraftDeck: (deck: Card[]) => void
   onSave: () => void
 }
 
@@ -55,22 +59,107 @@ const decksAreEqual = (a: Card[], b: Card[]) =>
     (card, idx) => card.type === b[idx].type && card.value === b[idx].value,
   )
 
+const ImportDeckCodeModal = ({
+  setDraftDeck,
+}: {
+  setDraftDeck: (deck: Card[]) => void
+}) => {
+  const [deckCode, setDeckCode] = useState<string>('')
+  const [deckValidationMessage, setDeckValidationMessage] = useState<
+    string | null
+  >(null)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    const deckResult = codeToDeck(deckCode)
+    if (!deckResult.success) {
+      setDeckValidationMessage('Invalid deck code format')
+      return
+    }
+
+    const validDeck = deckSchema.safeParse(deckResult.result)
+
+    if (!validDeck.success) {
+      setDeckValidationMessage('Invalid deck code format')
+      return
+    }
+
+    setDraftDeck(validDeck.data)
+    setDeckCode('')
+    setDeckValidationMessage(null)
+
+    const modal = document.getElementById('import-deck-code-modal')
+    if (modal instanceof HTMLDialogElement) {
+      modal.close()
+    }
+  }
+
+  return (
+    <Modal
+      id="import-deck-code-modal"
+      withExitButton
+      onClose={() => {
+        setDeckValidationMessage(null)
+      }}
+    >
+      <h3 className="text-lg font-bold">Import Deck Code</h3>
+
+      {deckValidationMessage && (
+        <div role="alert" className="alert alert-error alert-soft">
+          <span>{deckValidationMessage}</span>
+        </div>
+      )}
+      <div className="flex w-full items-center justify-center gap-2">
+        <form className="join w-full" onSubmit={handleSubmit}>
+          <input
+            id="deck-code-input"
+            type="text"
+            value={deckCode}
+            onChange={(e) => setDeckCode(e.target.value)}
+            placeholder="Enter Deck Code"
+            className="input join-item input-bordered w-full"
+          />
+          <button className="btn btn-primary join-item" type="submit">
+            Submit
+          </button>
+        </form>
+      </div>
+    </Modal>
+  )
+}
+
 export function DeckPanel({
   draftDeck,
   validationMessage,
   showDropOverlay,
+  setDraftDeck,
   onSave,
 }: DeckPanelProps) {
   const { setNodeRef, isOver } = useDroppable({ id: 'your-deck' })
   const userDeck = useDeckStore((s) => s.deck)
 
-  const deckUpToDate = decksAreEqual(userDeck, draftDeck)
+  const deckIsChanged = decksAreEqual(userDeck, draftDeck)
 
   return (
     <div className="flex flex-1 flex-col gap-2">
       <div className="flex shrink-0 items-center justify-between">
         <h1 className="text-2xl font-bold">Deck</h1>
-        <h2 className="text-xl">{draftDeck.length}/10 cards</h2>
+        <div className="flex gap-2">
+          <button
+            className="btn btn-secondary"
+            onClick={async () => {
+              const modal = document.getElementById('import-deck-code-modal')
+              if (modal instanceof HTMLDialogElement) {
+                modal.showModal()
+              }
+            }}
+          >
+            <ImportIcon />
+            Import
+          </button>
+          <ImportDeckCodeModal setDraftDeck={setDraftDeck} />
+        </div>
       </div>
       <div className="flex w-full grow">
         <div
@@ -102,14 +191,26 @@ export function DeckPanel({
           <span>{validationMessage}</span>
         </div>
       )}
-      <div className="flex shrink-0 items-center justify-between">
+      <div className="flex shrink-0 items-center justify-between gap-2">
+        <h2 className="flex-1/6 text-center text-xl">{draftDeck.length}/10</h2>
         <button
-          className="btn btn-primary btn-block"
+          className="btn btn-primary flex-2/3"
           onClick={onSave}
-          disabled={deckUpToDate}
+          disabled={deckIsChanged}
         >
           Save
         </button>
+        <div className="tooltip tooltip-left" data-tip="Copy deck code">
+          <button
+            className="btn btn-secondary btn-square"
+            disabled={!deckIsChanged}
+            onClick={() => {
+              navigator.clipboard.writeText(deckToCode(draftDeck))
+            }}
+          >
+            <CopyIcon />
+          </button>
+        </div>
       </div>
     </div>
   )
@@ -191,6 +292,7 @@ function RouteComponent() {
             draftDeck={draftDeck}
             validationMessage={deckValidationMessage}
             showDropOverlay={isDragging && dragSourceZone !== 'your-deck'}
+            setDraftDeck={setDraftDeck}
             onSave={() => {
               const validDeck = deckSchema.safeParse(draftDeck)
 
