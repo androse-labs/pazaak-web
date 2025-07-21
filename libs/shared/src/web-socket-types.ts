@@ -29,7 +29,7 @@ export type PazaakSocketEvent =
     }
   | {
       type: 'playerScored'
-      who: 'you' | 'opponent'
+      who: 'you' | 'opponent' | 'no-one'
       yourScore: number
       opponentScore: number
     }

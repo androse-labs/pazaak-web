@@ -204,27 +204,40 @@ class Match {
     }
 
     const winnerIndex = currentGame.determineWinner()
-    if (winnerIndex !== null) {
-      this.players.forEach((player) => {
-        if (!player) {
-          throw new Error('Player not found in match')
-        }
 
-        const opponent = this.players.find((p) => p?.id !== player.id)
+    console.log(`winner was ${winnerIndex}`)
 
-        const playerIndex = this.players.findIndex((p) => p?.id === player.id)
-        const opponentIndex = this.players.findIndex(
-          (p) => p?.id === opponent?.id,
-        )
+    this.players.forEach((player) => {
+      if (!player) {
+        throw new Error('Player not found in match')
+      }
 
-        player?.sendEvent({
+      const opponent = this.players.find((p) => p?.id !== player.id)
+
+      const playerIndex = this.players.findIndex((p) => p?.id === player.id)
+      const opponentIndex = this.players.findIndex(
+        (p) => p?.id === opponent?.id,
+      )
+
+      if (winnerIndex === null) {
+        console.log('telling the players about the tie')
+        player.sendEvent({
           type: 'playerScored',
           opponentScore: this.score[opponentIndex],
           yourScore: this.score[playerIndex],
-          who: winnerIndex === playerIndex ? 'you' : 'opponent',
+          who: 'no-one',
         })
+
+        return
+      }
+
+      player.sendEvent({
+        type: 'playerScored',
+        opponentScore: this.score[opponentIndex],
+        yourScore: this.score[playerIndex],
+        who: winnerIndex === playerIndex ? 'you' : 'opponent',
       })
-    }
+    })
   }
 
   notifyPlayersAboutMatchWinner(): void {
@@ -282,8 +295,9 @@ class Match {
         this.notifyPlayersAboutMatchWinner()
         return
       }
-      this.notifyPlayersAboutGameWinner()
     }
+
+    this.notifyPlayersAboutGameWinner()
 
     // Prepare next game if not match end
     this.addGame(new Game(this.players[0].id, this.players[1].id))

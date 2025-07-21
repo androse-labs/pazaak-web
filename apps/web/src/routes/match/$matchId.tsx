@@ -95,12 +95,16 @@ function MatchPage() {
         } else if (message.type === 'playerScored') {
           setNotification({
             open: true,
-            content:
-              message.who === 'opponent' ? (
-                <span>Your opponent won the round.</span>
-              ) : (
-                <span>You won the round!</span>
-              ),
+            content: (() => {
+              switch (message.who) {
+                case 'opponent':
+                  return <span>Your opponent won the round.</span>
+                case 'you':
+                  return <span>You won the round!</span>
+                case 'no-one':
+                  return <span>Round was a tie! Nobody wins</span>
+              }
+            })(),
             persistent: false,
           })
         } else if (message.type === 'matchComplete') {

@@ -96,6 +96,7 @@ class Game {
           return 1
         case 'both':
         case 'neither':
+          console.log('tie baby')
           return null
       }
     }
