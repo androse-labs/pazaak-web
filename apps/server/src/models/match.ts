@@ -525,7 +525,9 @@ class Match {
       players: this.players,
       games: this.games.map((game) => ({
         boards: game.boards,
-        deck: game.deck,
+        deck: {
+          cards: [...game.deck.cards],
+        },
         turn: game.turn,
         winner: game.winner,
       })),

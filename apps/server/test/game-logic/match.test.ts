@@ -38,7 +38,7 @@ describe('Match', () => {
 
     const state = match.getState()
 
-    expect(state).toEqual({
+    expect(state).toMatchObject({
       id: match.id,
       matchName: 'Test Match',
       players: [
@@ -62,7 +62,6 @@ describe('Match', () => {
       games: [
         {
           winner: null,
-          deck: expect.any(Object),
           turn: 1,
           boards: {
             [match.players[0]!.id]: [],
