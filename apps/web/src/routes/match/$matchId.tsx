@@ -12,6 +12,7 @@ import type {
 } from '@pazaak-web/shared/src/web-socket-types'
 import { GameNotification } from '../../components/GameNotification'
 import { usePlayerStore } from '../../stores/playerStore'
+import { CircleX, Crown, Scale } from 'lucide-react'
 
 export const Route = createFileRoute('/match/$matchId')({
   component: MatchPage,
@@ -98,11 +99,26 @@ function MatchPage() {
             content: (() => {
               switch (message.who) {
                 case 'opponent':
-                  return <span>Your opponent won the round.</span>
+                  return (
+                    <div className="flex flex-col items-center gap-2">
+                      <CircleX size={24} className="text-red-500" />
+                      You loss the round!
+                    </div>
+                  )
                 case 'you':
-                  return <span>You won the round!</span>
+                  return (
+                    <div className="flex flex-col items-center gap-2">
+                      <Crown size={24} className="text-yellow-500" />
+                      You won the round!
+                    </div>
+                  )
                 case 'no-one':
-                  return <span>Round was a tie! Nobody wins</span>
+                  return (
+                    <div className="flex flex-col items-center gap-2">
+                      <Scale size={24} className="text-blue-500" />
+                      Round was a tie! Nobody wins
+                    </div>
+                  )
               }
             })(),
             persistent: false,
@@ -111,10 +127,10 @@ function MatchPage() {
           setNotification({
             open: true,
             content: (
-              <span>
+              <div className="flex flex-col items-center gap-2">
                 The match is complete! You{' '}
                 {message.youWon ? 'won!' : 'lost. Better luck next time!'}
-              </span>
+              </div>
             ),
             persistent: true,
           })

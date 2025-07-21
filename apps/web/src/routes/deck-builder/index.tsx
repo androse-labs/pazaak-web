@@ -7,7 +7,7 @@ import { useState } from 'react'
 import type { Card } from '@pazaak-web/shared'
 import clsx from 'clsx'
 import { DropOverlay } from '../../components/game-elements/DropOverlay'
-import { CopyIcon, ImportIcon } from 'lucide-react'
+import { Copy, Import } from 'lucide-react'
 import { codeToDeck, deckToCode } from './-deck-serializer'
 import { Modal } from '../../components/Modal'
 
@@ -155,7 +155,7 @@ export function DeckPanel({
               }
             }}
           >
-            <ImportIcon />
+            <Import />
             Import
           </button>
           <ImportDeckCodeModal setDraftDeck={setDraftDeck} />
@@ -208,7 +208,7 @@ export function DeckPanel({
               navigator.clipboard.writeText(deckToCode(draftDeck))
             }}
           >
-            <CopyIcon />
+            <Copy />
           </button>
         </div>
       </div>
