@@ -1,4 +1,3 @@
-import { memo } from 'react'
 import type { CardType } from './types'
 import type { Card as CardValue } from '@pazaak-web/shared'
 import { useDraggable } from '@dnd-kit/core'
@@ -138,52 +137,55 @@ export const Card = ({ card, id, draggable, disabled = false }: CardProps) => {
   )
 }
 
-const InnerCard = memo(
-  ({ card, isShaking }: { card: CardValue; isShaking: boolean }) => {
-    const { top, middle, bottomLeft, bottomRight } = colorMap[card.type]
+const InnerCard = ({
+  card,
+  isShaking,
+}: {
+  card: CardValue
+  isShaking: boolean
+}) => {
+  const { top, middle, bottomLeft, bottomRight } = colorMap[card.type]
 
-    const isFlipOrTiebreaker =
-      card.type === 'flip' || card.type === 'tiebreaker'
+  const isFlipOrTiebreaker = card.type === 'flip' || card.type === 'tiebreaker'
 
-    // swap top and middle based on the magnitude
-    const [topColor, middleColor] =
-      isFlipOrTiebreaker && card.magnitude === 'subtract'
-        ? [middle, top]
-        : [top, middle]
+  // swap top and middle based on the magnitude
+  const [topColor, middleColor] =
+    isFlipOrTiebreaker && card.magnitude === 'subtract'
+      ? [middle, top]
+      : [top, middle]
 
-    return (
-      <div
-        className={clsx(
-          'aspect-card relative flex h-36 w-24 origin-[50%_35%] flex-col items-center justify-center overflow-hidden rounded-lg bg-gray-300 p-2 shadow-lg',
-          { 'animate-slow-shake': isShaking },
-        )}
-      >
-        <div className="flex">
-          <div
-            className={`${topColor} absolute left-1/2 top-0 h-1/6 w-3/4 -translate-x-1/2 translate-y-1/2 transform rounded-t-lg`}
-          />
-          <div className="z-1 absolute flex w-3/4 -translate-x-1/2 -translate-y-10 items-center justify-center bg-gray-900 text-2xl font-bold text-white">
-            <p>{formatValue(card)}</p>
-          </div>
-          <div
-            className={`${middleColor} absolute left-1/2 h-1/6 w-3/4 -translate-x-1/2 -translate-y-2 transform rounded-b-lg`}
-          />
+  return (
+    <div
+      className={clsx(
+        'aspect-card relative flex h-36 w-24 origin-[50%_35%] flex-col items-center justify-center overflow-hidden rounded-lg bg-gray-300 p-2 shadow-lg',
+        { 'animate-slow-shake': isShaking },
+      )}
+    >
+      <div className="flex">
+        <div
+          className={`${topColor} absolute left-1/2 top-0 h-1/6 w-3/4 -translate-x-1/2 translate-y-1/2 transform rounded-t-lg`}
+        />
+        <div className="z-1 absolute flex w-3/4 -translate-x-1/2 -translate-y-10 items-center justify-center bg-gray-900 text-2xl font-bold text-white">
+          <p>{formatValue(card)}</p>
         </div>
         <div
-          className={`${bottomLeft} absolute bottom-0 left-1/4 h-1/5 w-9 -translate-x-1/3 transform items-center justify-center rounded-tl-lg`}
-        >
-          {isFlipOrTiebreaker && (
-            <p className="text-center text-2xl font-bold text-black/30">-</p>
-          )}
-        </div>
-        <div
-          className={`${bottomRight} absolute bottom-0 right-1/4 h-1/5 w-9 translate-x-1/3 transform items-center justify-center rounded-tr-lg`}
-        >
-          {isFlipOrTiebreaker && (
-            <p className="text-center text-2xl font-bold text-black/30">+</p>
-          )}
-        </div>
+          className={`${middleColor} absolute left-1/2 h-1/6 w-3/4 -translate-x-1/2 -translate-y-2 transform rounded-b-lg`}
+        />
       </div>
-    )
-  },
-)
+      <div
+        className={`${bottomLeft} absolute bottom-0 left-1/4 h-1/5 w-9 -translate-x-1/3 transform items-center justify-center rounded-tl-lg`}
+      >
+        {isFlipOrTiebreaker && (
+          <p className="text-center text-2xl font-bold text-black/30">-</p>
+        )}
+      </div>
+      <div
+        className={`${bottomRight} absolute bottom-0 right-1/4 h-1/5 w-9 translate-x-1/3 transform items-center justify-center rounded-tr-lg`}
+      >
+        {isFlipOrTiebreaker && (
+          <p className="text-center text-2xl font-bold text-black/30">+</p>
+        )}
+      </div>
+    </div>
+  )
+}

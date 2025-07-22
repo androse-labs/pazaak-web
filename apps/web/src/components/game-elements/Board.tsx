@@ -1,4 +1,4 @@
-import { Children, memo, useState, type ReactNode } from 'react'
+import { Children, useState, type ReactNode } from 'react'
 import { Card } from './Card'
 import { EmptyCard } from './EmptyCard'
 import { HiddenCard } from './HiddenCard'
@@ -90,63 +90,61 @@ const StateDisplay = ({
   return null
 }
 
-const YourBoardGrid = memo(
-  ({
-    title,
-    state,
-    score,
-    total,
-    cards,
-  }: {
-    total: number
-    yourTurn: boolean
-    score: number
-    state: 'playing' | 'standing' | 'busted'
-    title: string
-    cards: ReactNode[]
-  }) => {
-    const { setNodeRef, isOver } = useDroppable({ id: 'your-board' })
-    const [isDragging, setIsDragging] = useState(false)
+const YourBoardGrid = ({
+  title,
+  state,
+  score,
+  total,
+  cards,
+}: {
+  total: number
+  yourTurn: boolean
+  score: number
+  state: 'playing' | 'standing' | 'busted'
+  title: string
+  cards: ReactNode[]
+}) => {
+  const { setNodeRef, isOver } = useDroppable({ id: 'your-board' })
+  const [isDragging, setIsDragging] = useState(false)
 
-    useDndMonitor({
-      onDragStart: () => setIsDragging(true),
-      onDragEnd: () => setIsDragging(false),
-      onDragCancel: () => setIsDragging(false),
-    })
+  useDndMonitor({
+    onDragStart: () => setIsDragging(true),
+    onDragEnd: () => setIsDragging(false),
+    onDragCancel: () => setIsDragging(false),
+  })
 
-    return (
-      <div className="flex flex-row items-start justify-center gap-2">
-        <div className="flex flex-col items-start justify-center gap-2">
-          <div className="flex w-full justify-between">
-            <span className="text-2xl font-bold">{title}</span>
-            <StateDisplay state={state} />
-          </div>
-          <div className="text-lg">
-            Total: <span className="font-bold">{total}</span>
-          </div>
-          <div
-            ref={setNodeRef}
-            className={clsx(
-              'bg-base-200 relative grid grid-cols-3 grid-rows-3 justify-items-center gap-2 rounded-md p-2',
-            )}
-          >
-            <GridOfItems length={9}>
-              {cards.map((card, index) => (
-                <div key={index} className="h-full w-full">
-                  {card}
-                </div>
-              ))}
-            </GridOfItems>
-            {isDragging && (
-              <DropOverlay isOver={isOver} text={'Drop to play a card.'} />
-            )}
-          </div>
+  return (
+    <div className="flex flex-row items-start justify-center gap-2">
+      <div className="flex flex-col items-start justify-center gap-2">
+        <div className="flex w-full justify-between">
+          <span className="text-2xl font-bold">{title}</span>
+          <StateDisplay state={state} />
         </div>
-        <ScoreDisplay total={3} count={score} />
+        <div className="text-lg">
+          Total: <span className="font-bold">{total}</span>
+        </div>
+        <div
+          ref={setNodeRef}
+          className={clsx(
+            'bg-base-200 relative grid grid-cols-3 grid-rows-3 justify-items-center gap-2 rounded-md p-2',
+          )}
+        >
+          <GridOfItems length={9}>
+            {cards.map((card, index) => (
+              <div key={index} className="h-full w-full">
+                {card}
+              </div>
+            ))}
+          </GridOfItems>
+          {isDragging && (
+            <DropOverlay isOver={isOver} text={'Drop to play a card.'} />
+          )}
+        </div>
       </div>
-    )
-  },
-)
+      <ScoreDisplay total={3} count={score} />
+    </div>
+  )
+}
 
 const OpponentBoardGrid = ({
   title,
