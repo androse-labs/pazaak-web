@@ -10,7 +10,10 @@ import { cardSchema } from '@pazaak-web/shared'
 
 const { upgradeWebSocket, websocket } = createBunWebSocket<ServerWebSocket>()
 
-export const createApp = (matchManager: MatchManager) => {
+export const createApp = (
+  matchManager: MatchManager,
+  cleanUpInterval = 10 * 60 * 1000,
+) => {
   const app = new Hono({})
 
   app.use(
@@ -136,7 +139,43 @@ export const createApp = (matchManager: MatchManager) => {
           console.log(`Message from client: ${event.data}`)
         },
         onClose: () => {
-          console.log('Connection closed')
+          // set sendEvent to null to prevent sending messages
+          const match = matchManager.getMatch(matchId)
+          if (!match) {
+            console.log(`Match ${matchId} not found on close`)
+            return
+          }
+
+          if (!playerToken) {
+            console.log('Player token is required on close')
+            return
+          }
+
+          const player = match.getPlayerByToken(playerToken)
+
+          if (!player) {
+            console.log(`Player with token ${playerToken} not found on close`)
+            return
+          }
+
+          match.clearPlayerConnection(player.id)
+
+          console.log(`Player ${player.id} disconnected from match ${matchId}`)
+          // if both players are disconnected, end the match
+          if (
+            !match.players[0]?.wsConnected &&
+            !match.players[1]?.wsConnected
+          ) {
+            const result = matchManager.deleteMatch(matchId)
+            if (!result) {
+              console.log(`Failed to delete match ${matchId}`)
+              return
+            }
+
+            console.log(
+              `Match ${matchId} ended due to both players disconnecting`,
+            )
+          }
         },
       }
     }),
@@ -170,6 +209,11 @@ export const createApp = (matchManager: MatchManager) => {
       return c.body(null, 204)
     },
   )
+
+  setInterval(() => {
+    console.log('Running scheduled match cleanup...')
+    matchManager.cleanUpMatches()
+  }, cleanUpInterval)
 
   return app
 }

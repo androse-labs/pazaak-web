@@ -22,6 +22,7 @@ class Match {
   players: [Player, Player] | [Player, null]
   playersTurn: 1 | 2 = 1
   round: number
+  lastModifiedDateUtc: number
   score: [number, number]
   status: 'waiting' | 'in-progress' | 'finished'
 
@@ -32,15 +33,24 @@ class Match {
     this.status = 'waiting'
     this.matchName = matchName
     this.games = []
+    this.lastModifiedDateUtc = Date.now()
     this.players = [firstPlayer, null] // Second player will join later
   }
 
+  touch(): void {
+    this.lastModifiedDateUtc = Date.now()
+  }
+
   addGame(game: Game): void {
+    this.touch()
+
     this.games.push(game)
     this.round += 1
   }
 
   startGame(index: number): void {
+    this.touch()
+
     // draw card from board deck to first player's board
     const game = this.games[index]
     if (!game) {
@@ -62,6 +72,8 @@ class Match {
   }
 
   startMatch(secondPlayer: Player): void {
+    this.touch()
+
     if (this.status !== 'waiting') {
       throw new Error('Match is already in progress or finished')
     }
@@ -85,6 +97,8 @@ class Match {
   }
 
   playCard(playerId: string, cardToPlay: Card): void {
+    this.touch()
+
     const player = this.players.find((p) => p?.id === playerId)
     if (!player) {
       throw new Error('Player not found')
@@ -178,11 +192,24 @@ class Match {
     playerId: string,
     connection: WSContext<ServerWebSocket>,
   ): void {
+    this.touch()
+
     const player = this.getPlayerById(playerId)
     if (player) {
+      player.wsConnected = true
       player.sendEvent = (event) => {
         connection.send(JSON.stringify(event))
       }
+    } else {
+      throw new Error('Player not found in match')
+    }
+  }
+
+  clearPlayerConnection(playerId: string): void {
+    const player = this.getPlayerById(playerId)
+    if (player) {
+      player.wsConnected = false
+      player.sendEvent = () => null
     } else {
       throw new Error('Player not found in match')
     }
@@ -362,6 +389,8 @@ class Match {
     playerId: string,
     action: MatchAction,
   ): { success: true } | { success: false; reason: string } {
+    this.touch()
+
     const validation = this.isActionValid(playerId, action)
     if (!validation.valid) {
       return { success: false, reason: validation.reason }

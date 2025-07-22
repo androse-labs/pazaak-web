@@ -4,6 +4,7 @@ import { PazaakSocketEvent } from '@pazaak-web/shared/src/web-socket-types'
 
 type Player = {
   id: string
+  wsConnected: boolean
   sendEvent: (event: PazaakSocketEvent) => void
   token: string
   status: 'playing' | 'standing' | 'busted'

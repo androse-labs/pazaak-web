@@ -22,6 +22,7 @@ class MatchManager {
     this.matches.push(
       new Match(matchId, matchName, {
         id: playerId,
+        wsConnected: false,
         sendEvent: () => {},
         token,
         status: 'playing',
@@ -53,6 +54,7 @@ class MatchManager {
 
     match.startMatch({
       id: playerId,
+      wsConnected: false,
       sendEvent: () => {},
       token,
       status: 'playing',
@@ -85,6 +87,26 @@ class MatchManager {
       return true
     }
     return false
+  }
+
+  // Clean up matches that are no longer active
+  // Older than 10 minutes since last activity
+  // or have no players connected
+  // log as each one is cleaned up
+  cleanUpMatches(): void {
+    const now = Date.now()
+
+    this.matches = this.matches.filter((match) => {
+      const isActive = match.players.some((player) => player?.wsConnected)
+      const lastActivity = match.lastModifiedDateUtc
+      const isOld = now - lastActivity > 5 * 60 * 1000 // 5 minutes
+
+      if (!isActive || isOld) {
+        console.log(`Cleaning up inactive match: ${match.id}`)
+        return false
+      }
+      return true
+    })
   }
 }
 
