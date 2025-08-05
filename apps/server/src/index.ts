@@ -19,7 +19,7 @@ export const createApp = (
   app.use(
     '*',
     cors({
-      origin: ['http://localhost:5173'],
+      origin: ['http://localhost:5173', 'https://pazaak.androse.dev'],
     }),
   )
 
