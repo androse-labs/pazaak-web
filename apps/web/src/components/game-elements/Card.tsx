@@ -73,20 +73,32 @@ const formatValue = (card: CardValue): string => {
   switch (type) {
     case 'flip': {
       const sign = card.magnitude === 'subtract' ? '-' : '+'
-      return `${sign}${value}`
+      return `${sign}${Math.abs(value)}`
     }
-    case 'double':
-      return value.toString()
     case 'tiebreaker': {
       const sign = card.magnitude === 'subtract' ? '-' : '+'
-      return `${sign}${value}T`
+      return `${sign}${Math.abs(value)}T`
     }
     case 'add':
+      if (value === 0) {
+        return '0'
+      }
+      if (value < 0) {
+        return `-${Math.abs(value)}`
+      }
+
       return `+${value}`
     case 'subtract':
+      if (value === 0) {
+        return '0'
+      }
+      if (value < 0) {
+        return `+${Math.abs(value)}`
+      }
+
       return `-${value}`
+    case 'double':
     case 'invert':
-      return value.toString()
     default:
       return value.toString()
   }

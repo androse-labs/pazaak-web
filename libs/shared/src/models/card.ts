@@ -11,33 +11,37 @@ const cardSchema = z.discriminatedUnion('type', [
   z.object({
     id: z.uuid(),
     type: z.literal('invert'),
-    value: z.string().regex(/^\d+&\d+$/), // Matches `${number}&${number}`
+    value: z.templateLiteral([
+      z.number().int().positive(),
+      '&',
+      z.number().int().positive(),
+    ]),
   }),
   z.object({
     id: z.uuid(),
     type: z.literal('none'),
-    value: z.number(),
+    value: z.number().int().positive(),
   }),
   z.object({
     id: z.uuid(),
     type: z.literal('add'),
-    value: z.number(),
+    value: z.number().int().positive(),
   }),
   z.object({
     id: z.uuid(),
     type: z.literal('subtract'),
-    value: z.number(),
+    value: z.number().int().positive(),
   }),
   z.object({
     id: z.uuid(),
     type: z.literal('flip'),
-    value: z.number(),
+    value: z.number().int().positive(),
     magnitude: cardMagnitudeSchema,
   }),
   z.object({
     id: z.uuid(),
     type: z.literal('tiebreaker'),
-    value: z.number(),
+    value: z.number().int().positive(),
     magnitude: cardMagnitudeSchema,
   }),
 ])

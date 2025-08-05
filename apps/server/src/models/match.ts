@@ -159,6 +159,10 @@ class Match {
         if (card.type === 'double' || card.type === 'invert') {
           return
         }
+        if (card.type === 'flip' || card.type === 'tiebreaker') {
+          card.magnitude = card.magnitude === 'subtract' ? 'add' : 'subtract'
+          return
+        }
         if (invertedValues.includes(card.value)) {
           card.value = card.value * -1
         }
