@@ -1,4 +1,4 @@
-import { Card } from '@pazaak-web/shared'
+import { type Card } from '@pazaak-web/shared'
 
 type DeckState = {
   cards: Card[]
@@ -39,4 +39,4 @@ class Deck {
   }
 }
 
-export { Deck, DeckState }
+export { Deck, type DeckState }

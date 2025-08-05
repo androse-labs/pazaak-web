@@ -1,7 +1,7 @@
 import { randomUUIDv7 } from 'bun'
 import { Match } from '../../src/models/match'
 import { generateHexToken } from '../../src/utils'
-import { Player } from '../../src/models/players'
+import { type Player } from '../../src/models/players'
 import { Deck } from '../../src/models/deck'
 import { Game } from '../../src/models/game'
 

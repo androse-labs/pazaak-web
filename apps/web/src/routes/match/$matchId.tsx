@@ -31,7 +31,7 @@ function MatchPage() {
   const [playerHand, setPlayerHand] = useState<Card[]>([])
   const { mutate } = useMutation({
     mutationFn: async (action: MatchAction) =>
-      api.patch(`http://localhost:3000/match/${matchId}/action`, action, {
+      api.patch(`${import.meta.env.VITE_API_URL}/${matchId}/action`, action, {
         params: {
           token: matchConnection?.token,
         },
@@ -73,7 +73,7 @@ function MatchPage() {
   }, [notification.open, notification.persistent])
 
   useWebSocket(
-    `ws://localhost:3000/match/${matchId}/subscribe?token=${matchConnection?.token}`,
+    `${import.meta.env.VITE_API_SOCKET_URL}/match/${matchId}/subscribe?token=${matchConnection?.token}`,
     {
       retryOnError: true,
       onMessage: (event) => {

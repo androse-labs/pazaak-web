@@ -1,9 +1,9 @@
-import { ServerWebSocket } from 'bun'
-import { Game, GameState } from './game'
+import { type ServerWebSocket } from 'bun'
+import { Game, type GameState } from './game'
 import { WSContext } from 'hono/ws'
-import { MatchAction } from './actions'
-import { Player, PlayerView } from './players'
-import { Card } from '@pazaak-web/shared'
+import { type MatchAction } from './actions'
+import { type Player, type PlayerView } from './players'
+import { type Card } from '@pazaak-web/shared'
 
 type WaitingMatch = {
   status: 'waiting'

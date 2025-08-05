@@ -2,7 +2,7 @@ import { HTTPException } from 'hono/http-exception'
 import { generateHexToken } from '../utils'
 import { Match } from './match'
 import { Deck } from './deck'
-import { Card } from '@pazaak-web/shared'
+import { type Card } from '@pazaak-web/shared'
 
 class MatchManager {
   private matches: Match[] = []

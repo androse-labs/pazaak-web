@@ -1,5 +1,5 @@
-import { Deck, DeckState } from './deck'
-import { Card } from '@pazaak-web/shared'
+import { Deck, type DeckState } from './deck'
+import { type Card } from '@pazaak-web/shared'
 
 type GameState = {
   boards: Record<string, Card[]>
@@ -106,4 +106,4 @@ class Game {
   }
 }
 
-export { Game, GameState }
+export { Game, type GameState }

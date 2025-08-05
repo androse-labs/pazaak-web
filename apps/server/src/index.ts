@@ -3,7 +3,7 @@ import { zValidator } from '@hono/zod-validator'
 import { cors } from 'hono/cors'
 import { z } from 'zod'
 import { createBunWebSocket } from 'hono/bun'
-import { ServerWebSocket } from 'bun'
+import { type ServerWebSocket } from 'bun'
 import { MatchManager } from './models/match-manager'
 import { MatchActionSchema } from './models/actions'
 import { cardSchema } from '@pazaak-web/shared'
@@ -219,7 +219,7 @@ export const createApp = (
 }
 
 export default {
-  port: 3000,
+  port: 443,
   fetch: createApp(new MatchManager()).fetch,
   websocket,
 }

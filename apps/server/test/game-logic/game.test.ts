@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { Game } from '../../src/models/game'
-import { Card } from '@pazaak-web/shared'
+import { type Card } from '@pazaak-web/shared'
 
 describe('Game', () => {
   it('sums the board with none-type cards', () => {

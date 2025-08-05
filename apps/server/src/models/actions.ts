@@ -16,4 +16,4 @@ const MatchActionSchema = z.discriminatedUnion('type', [
 
 type MatchAction = z.infer<typeof MatchActionSchema>
 
-export { MatchAction, MatchActionSchema }
+export { type MatchAction, MatchActionSchema }

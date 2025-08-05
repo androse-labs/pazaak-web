@@ -1,8 +1,8 @@
 import { spyOn, describe, it, expect } from 'bun:test'
 import { createTestMatch, createTestPlayer } from './match-helper'
 import { Game } from '../../src/models/game'
-import { MatchAction } from '../../src/models/actions'
-import { Card } from '@pazaak-web/shared'
+import { type MatchAction } from '../../src/models/actions'
+import { type Card } from '@pazaak-web/shared'
 
 describe('Match', () => {
   it('adds a new game to the match', () => {
