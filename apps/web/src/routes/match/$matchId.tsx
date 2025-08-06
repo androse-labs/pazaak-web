@@ -31,14 +31,18 @@ function MatchPage() {
   const [playerHand, setPlayerHand] = useState<Card[]>([])
   const { mutate } = useMutation({
     mutationFn: async (action: MatchAction) =>
-      api.patch(`${import.meta.env.VITE_API_URL}/${matchId}/action`, action, {
-        params: {
-          token: matchConnection?.token,
+      api.patch(
+        `${import.meta.env.VITE_API_URL}/match/${matchId}/action`,
+        action,
+        {
+          params: {
+            token: matchConnection?.token,
+          },
+          headers: {
+            'Content-Type': 'application/json',
+          },
         },
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }),
+      ),
   })
 
   // Notification state
