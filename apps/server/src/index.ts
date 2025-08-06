@@ -219,7 +219,7 @@ export const createApp = (
 }
 
 export default {
-  port: 443,
+  port: 3000,
   fetch: createApp(new MatchManager()).fetch,
   websocket,
 }
