@@ -4,6 +4,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 6.0"
     }
+    digitalocean = {
+      source  = "digitalocean/digitalocean"
+      version = "~> 2.0"
+    }
   }
 
   backend "s3" {
@@ -24,4 +28,14 @@ provider "aws" {
 provider "aws" {
   region = "us-east-1"
   alias  = "virginia"
+}
+
+provider "digitalocean" {
+  token = var.do_token
+}
+
+variable "do_token" {
+  description = "DigitalOcean API token"
+  type        = string
+  sensitive   = true
 }
