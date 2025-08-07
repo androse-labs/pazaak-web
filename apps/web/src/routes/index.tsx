@@ -155,6 +155,7 @@ function Index() {
   const { mutate } = useCreateMatchMutation()
   const userDeck = useDeckStore((s) => s.deck)
   const [unlisted, setUnlisted] = useState<boolean>(true)
+  const [matchName, setMatchName] = useState<string>('')
   const navigate = useNavigate()
   const setMatchConnection = usePlayerStore((s) => s.setMatchConnection)
 
@@ -162,13 +163,33 @@ function Index() {
     <div className="flex flex-1 flex-col items-center justify-center gap-24">
       <h1 className="font-mono text-6xl font-semibold uppercase">Pazaak-Web</h1>
       <div className="flex flex-col gap-4">
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-4">
+            <input
+              type="text"
+              placeholder="Match Name"
+              className="input input-bordered w-full max-w-xs"
+              value={matchName}
+              onChange={(e) => {
+                setMatchName(e.target.value)
+              }}
+            />
+            <label className="label">
+              <input
+                type="checkbox"
+                className="checkbox checkbox-primary"
+                checked={unlisted}
+                onChange={(e) => setUnlisted(e.target.checked)}
+              />
+              Unlisted
+            </label>
+          </div>
           <button
             onClick={() => {
               mutate(
                 {
                   deck: userDeck,
-                  matchName: 'Test Match',
+                  matchName: matchName,
                   unlisted: unlisted,
                 },
                 {
@@ -187,16 +208,8 @@ function Index() {
           >
             Create Match
           </button>
-          <label className="label">
-            <input
-              type="checkbox"
-              className="checkbox checkbox-primary"
-              checked={unlisted}
-              onChange={(e) => setUnlisted(e.target.checked)}
-            />
-            Unlisted
-          </label>
         </div>
+        <div className="divider">or</div>
         <button
           className="btn btn-secondary"
           onClick={() => {
