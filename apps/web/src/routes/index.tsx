@@ -8,6 +8,7 @@ import { MatchList } from '../components/MatchList'
 import { useState } from 'react'
 import { usePlayerStore } from '../stores/playerStore'
 import { useDeckStore } from '../stores/deckStore'
+import { joinMatch } from '../api'
 
 export const Route = createFileRoute('/')({
   component: Index,
@@ -32,15 +33,6 @@ function useGetJoinableMatches() {
   })
 
   return { data, isPending, error, refetch }
-}
-
-const joinMatch = (matchId: string, deck: Card[]) => {
-  return api.post<{ playerId: string; token: string }>(
-    `/match/${matchId}/join`,
-    {
-      deck: deck,
-    },
-  )
 }
 
 const JoinMatchModal = () => {

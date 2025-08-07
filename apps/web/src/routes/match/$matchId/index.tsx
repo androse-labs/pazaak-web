@@ -1,21 +1,21 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Board } from '../../components/game-elements/Board'
+import { Board } from '../../../components/game-elements/Board'
 import useWebSocket from 'react-use-websocket'
 import { useEffect, useRef, useState } from 'react'
-import type { MatchAction } from '../../components/game-elements/types'
-import { api } from '../../webClient'
+import type { MatchAction } from '../../../components/game-elements/types'
+import { api } from '../../../webClient'
 import { useMutation } from '@tanstack/react-query'
 import type { Card } from '@pazaak-web/shared'
 import type {
   PazaakSocketEvent,
   PlayerView,
 } from '@pazaak-web/shared/src/web-socket-types'
-import { GameNotification } from '../../components/GameNotification'
-import { usePlayerStore } from '../../stores/playerStore'
+import { GameNotification } from '../../../components/GameNotification'
+import { usePlayerStore } from '../../../stores/playerStore'
 import { CircleX, Crown, Scale } from 'lucide-react'
-import { WaitingForMatchToStart } from '../../components/WaitingForMatchToStart'
+import { WaitingForMatchToStart } from '../../../components/WaitingForMatchToStart'
 
-export const Route = createFileRoute('/match/$matchId')({
+export const Route = createFileRoute('/match/$matchId/')({
   component: MatchPage,
 })
 
@@ -175,7 +175,6 @@ function MatchPage() {
       >
         {notification.content}
       </GameNotification>
-      <h1 className="text-2xl font-bold">Match ID: {matchId}</h1>
       {hasStarted ? (
         <Board
           boards={{

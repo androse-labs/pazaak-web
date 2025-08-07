@@ -46,6 +46,10 @@ export const createApp = (
         token,
       }
 
+      console.log(
+        `Match created with ID ${matchId} by player ${playerId} with token ${token}`,
+      )
+
       return c.json(response, 200)
     },
   )
@@ -70,6 +74,10 @@ export const createApp = (
         return c.json({ error: 'Match not found or invalid deck' }, 400)
       }
       const { playerId, token } = result
+
+      console.log(
+        `Player ${playerId} joined match ${matchId} with token ${token}`,
+      )
 
       return c.json({
         playerId,
