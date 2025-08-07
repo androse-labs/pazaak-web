@@ -156,6 +156,7 @@ function Index() {
   const userDeck = useDeckStore((s) => s.deck)
   const [unlisted, setUnlisted] = useState<boolean>(true)
   const [matchName, setMatchName] = useState<string>('')
+  const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
   const setMatchConnection = usePlayerStore((s) => s.setMatchConnection)
 
@@ -168,9 +169,10 @@ function Index() {
             <input
               type="text"
               placeholder="Match Name"
-              className="input input-bordered w-full max-w-xs"
+              className="input input-bordered w-full"
               value={matchName}
               onChange={(e) => {
+                setError(null)
                 setMatchName(e.target.value)
               }}
             />
@@ -179,13 +181,26 @@ function Index() {
                 type="checkbox"
                 className="checkbox checkbox-primary"
                 checked={unlisted}
-                onChange={(e) => setUnlisted(e.target.checked)}
+                onChange={(e) => {
+                  setUnlisted(e.target.checked)
+                }}
               />
               Unlisted
             </label>
           </div>
+          {error && (
+            <div className="text-error max-w-2xs shrink-0 break-words">
+              <p>{error}</p>
+            </div>
+          )}
+
           <button
             onClick={() => {
+              if (matchName.length < 5) {
+                setError('Match name must be at least 5 characters long')
+                return
+              }
+
               mutate(
                 {
                   deck: userDeck,
