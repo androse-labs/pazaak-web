@@ -8,11 +8,11 @@ A simple application recreating a niche card game with web technologies.
 
 ```text
 apps/
-   web          # React Single Page App
-   server       # Bun + Hono
-infrastructure/ # Terraform Infrastructure-As-Code
+   web/             # React Single Page App
+   server/          # Bun + Hono
+infrastructure/     # Terraform Infrastructure-As-Code
 libs/
-   shared       # Shared types & helpers between server + web projects
+   shared/          # Shared types & helpers between server + web projects
 ```
 
 ---
