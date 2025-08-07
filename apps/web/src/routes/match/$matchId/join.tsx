@@ -16,34 +16,32 @@ export function MatchJoinPage() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
-  const doJoin = async () => {
-    console.log('Joining match:', matchId, 'with deck:', userDeck)
-    setLoading(true)
-    setError(null)
-    try {
-      const response = await joinMatch(matchId, userDeck)
-      if (response.status !== 200) {
-        console.error('Failed to join match:', response.data)
-        throw new Error('Failed to join match')
-      }
-      setMatchConnection({
-        matchId,
-        playerId: response.data.playerId,
-        token: response.data.token,
-      })
-      navigate({ to: `/match/${matchId}` })
-    } catch (err) {
-      setError((err as Error).message)
-    } finally {
-      setLoading(false)
-    }
-  }
-
   useEffect(() => {
+    const doJoin = async () => {
+      console.log('Joining match:', matchId, 'with deck:', userDeck)
+      setLoading(true)
+      setError(null)
+      try {
+        const response = await joinMatch(matchId, userDeck)
+        if (response.status !== 200) {
+          console.error('Failed to join match:', response.data)
+          throw new Error('Failed to join match')
+        }
+        setMatchConnection({
+          matchId,
+          playerId: response.data.playerId,
+          token: response.data.token,
+        })
+        navigate({ to: `/match/${matchId}` })
+      } catch (err) {
+        setError((err as Error).message)
+      } finally {
+        setLoading(false)
+      }
+    }
+
     doJoin()
-    // Only run on mount or matchId/userDeck change
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [matchId, userDeck])
+  }, [matchId, userDeck, setMatchConnection, navigate])
 
   if (loading) return <div>Joining match...</div>
   if (error)
@@ -53,5 +51,5 @@ export function MatchJoinPage() {
         <button onClick={doJoin}>Retry</button>
       </div>
     )
-  return null // Or redirect/spinner
+  return null
 }
