@@ -13,6 +13,7 @@ import type {
 import { GameNotification } from '../../components/GameNotification'
 import { usePlayerStore } from '../../stores/playerStore'
 import { CircleX, Crown, Scale } from 'lucide-react'
+import { WaitingForMatchToStart } from '../../components/WaitingForMatchToStart'
 
 export const Route = createFileRoute('/match/$matchId')({
   component: MatchPage,
@@ -203,9 +204,7 @@ function MatchPage() {
           onMagnitudeFlip={onMagnitudeFlip}
         />
       ) : (
-        <div className="text-center text-lg">
-          Waiting for the game to start...
-        </div>
+        <WaitingForMatchToStart matchId={matchId} />
       )}
     </div>
   )
