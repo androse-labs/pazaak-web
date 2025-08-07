@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useParams, useNavigate, createFileRoute } from '@tanstack/react-router'
 import { usePlayerStore } from '../../../stores/playerStore'
 import { useDeckStore } from '../../../stores/deckStore'
@@ -16,32 +16,31 @@ export function MatchJoinPage() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    const doJoin = async () => {
-      console.log('Joining match:', matchId, 'with deck:', userDeck)
-      setLoading(true)
-      setError(null)
-      try {
-        const response = await joinMatch(matchId, userDeck)
-        if (response.status !== 200) {
-          console.error('Failed to join match:', response.data)
-          throw new Error('Failed to join match')
-        }
-        setMatchConnection({
-          matchId,
-          playerId: response.data.playerId,
-          token: response.data.token,
-        })
-        navigate({ to: `/match/${matchId}` })
-      } catch (err) {
-        setError((err as Error).message)
-      } finally {
-        setLoading(false)
+  const doJoin = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const response = await joinMatch(matchId, userDeck)
+      if (response.status !== 200) {
+        console.error('Failed to join match:', response.data)
+        throw new Error('Failed to join match')
       }
+      setMatchConnection({
+        matchId,
+        playerId: response.data.playerId,
+        token: response.data.token,
+      })
+      navigate({ to: `/match/${matchId}` })
+    } catch (err) {
+      setError((err as Error).message)
+    } finally {
+      setLoading(false)
     }
-
-    doJoin()
   }, [matchId, userDeck, setMatchConnection, navigate])
+
+  useEffect(() => {
+    doJoin()
+  }, [doJoin])
 
   if (loading) return <div>Joining match...</div>
   if (error)
