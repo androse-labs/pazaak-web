@@ -33,7 +33,7 @@ class MatchManager {
           deck: new Deck().fillWithCustomCards(deck),
           hand: [],
         },
-        false,
+        unlisted,
       ),
     )
 

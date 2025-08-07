@@ -154,6 +154,7 @@ function Index() {
   const { refetch } = useGetJoinableMatches()
   const { mutate } = useCreateMatchMutation()
   const userDeck = useDeckStore((s) => s.deck)
+  const [unlisted, setUnlisted] = useState<boolean>(true)
   const navigate = useNavigate()
   const setMatchConnection = usePlayerStore((s) => s.setMatchConnection)
 
@@ -161,30 +162,41 @@ function Index() {
     <div className="flex flex-1 flex-col items-center justify-center gap-24">
       <h1 className="font-mono text-6xl font-semibold uppercase">Pazaak-Web</h1>
       <div className="flex flex-col gap-4">
-        <button
-          onClick={() => {
-            mutate(
-              {
-                deck: userDeck,
-                matchName: 'Test Match',
-                unlisted: true,
-              },
-              {
-                onSuccess: (data) => {
-                  setMatchConnection({
-                    matchId: data.matchId,
-                    playerId: crypto.randomUUID(),
-                    token: data.token,
-                  })
-                  navigate({ to: `/match/${data.matchId}` })
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => {
+              mutate(
+                {
+                  deck: userDeck,
+                  matchName: 'Test Match',
+                  unlisted: unlisted,
                 },
-              },
-            )
-          }}
-          className="btn btn-primary"
-        >
-          Create Match
-        </button>
+                {
+                  onSuccess: (data) => {
+                    setMatchConnection({
+                      matchId: data.matchId,
+                      playerId: crypto.randomUUID(),
+                      token: data.token,
+                    })
+                    navigate({ to: `/match/${data.matchId}` })
+                  },
+                },
+              )
+            }}
+            className="btn btn-primary"
+          >
+            Create Match
+          </button>
+          <label className="label">
+            <input
+              type="checkbox"
+              className="checkbox checkbox-primary"
+              checked={unlisted}
+              onChange={(e) => setUnlisted(e.target.checked)}
+            />
+            Unlisted
+          </label>
+        </div>
         <button
           className="btn btn-secondary"
           onClick={() => {
