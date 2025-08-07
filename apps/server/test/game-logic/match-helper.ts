@@ -33,7 +33,12 @@ const createTestMatch = (
     score?: [number, number]
   } = {},
 ): Match => {
-  const match = new Match(randomUUIDv7(), 'Test Match', createTestPlayer())
+  const match = new Match(
+    randomUUIDv7(),
+    'Test Match',
+    createTestPlayer(),
+    false,
+  )
 
   match.matchName = options.matchName || 'Test Match'
   match.players = options.players || [

@@ -13,6 +13,7 @@ class MatchManager {
 
   createMatch(
     matchName: string,
+    unlisted: boolean,
     deck: Card[],
   ): { matchId: string; playerId: string; token: string } {
     const playerId = crypto.randomUUID()
@@ -20,15 +21,20 @@ class MatchManager {
     const token = generateHexToken(16)
 
     this.matches.push(
-      new Match(matchId, matchName, {
-        id: playerId,
-        wsConnected: false,
-        sendEvent: () => {},
-        token,
-        status: 'playing',
-        deck: new Deck().fillWithCustomCards(deck),
-        hand: [],
-      }),
+      new Match(
+        matchId,
+        matchName,
+        {
+          id: playerId,
+          wsConnected: false,
+          sendEvent: () => {},
+          token,
+          status: 'playing',
+          deck: new Deck().fillWithCustomCards(deck),
+          hand: [],
+        },
+        false,
+      ),
     )
 
     return { matchId, playerId, token }

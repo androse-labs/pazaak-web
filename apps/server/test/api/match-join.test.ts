@@ -8,7 +8,7 @@ describe('Match Joining', () => {
   it('joins a match successfully', async () => {
     const matchManager = new MatchManager()
 
-    const { matchId } = matchManager.createMatch('Test Match', [
+    const { matchId } = matchManager.createMatch('Test Match', false, [
       { id: randomUUIDv7(), type: 'double', value: 'D' },
       { id: randomUUIDv7(), type: 'invert', value: '2&4' },
       { id: randomUUIDv7(), type: 'flip', value: 2, magnitude: 'subtract' },
@@ -42,7 +42,7 @@ describe('Match Joining', () => {
 
   it('rejects a match join with invalid deck', async () => {
     const matchManager = new MatchManager()
-    const { matchId } = matchManager.createMatch('Test Match', [
+    const { matchId } = matchManager.createMatch('Test Match', false, [
       { id: randomUUIDv7(), type: 'double', value: 'D' },
       { id: randomUUIDv7(), type: 'invert', value: '2&4' },
       { id: randomUUIDv7(), type: 'flip', value: 2, magnitude: 'subtract' },
@@ -82,7 +82,7 @@ describe('Match Joining', () => {
 
   it('rejects joining a match with 2 players already', async () => {
     const matchManager = new MatchManager()
-    const { matchId } = matchManager.createMatch('Test Match', [
+    const { matchId } = matchManager.createMatch('Test Match', false, [
       { id: randomUUIDv7(), type: 'double', value: 'D' },
       { id: randomUUIDv7(), type: 'invert', value: '2&4' },
       { id: randomUUIDv7(), type: 'flip', value: 2, magnitude: 'subtract' },

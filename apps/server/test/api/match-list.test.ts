@@ -8,19 +8,27 @@ describe('Match List', () => {
   it('lists joinable matches', async () => {
     const matchManager = new MatchManager()
 
-    const { matchId: matchId1 } = matchManager.createMatch('Test Match', [
-      { id: randomUUIDv7(), type: 'double', value: 'D' },
-      { id: randomUUIDv7(), type: 'invert', value: '2&4' },
-      { id: randomUUIDv7(), type: 'flip', value: 2, magnitude: 'subtract' },
-      { id: randomUUIDv7(), type: 'subtract', value: 3 },
-    ])
+    const { matchId: matchId1 } = matchManager.createMatch(
+      'Test Match',
+      false,
+      [
+        { id: randomUUIDv7(), type: 'double', value: 'D' },
+        { id: randomUUIDv7(), type: 'invert', value: '2&4' },
+        { id: randomUUIDv7(), type: 'flip', value: 2, magnitude: 'subtract' },
+        { id: randomUUIDv7(), type: 'subtract', value: 3 },
+      ],
+    )
 
-    const { matchId: matchId2 } = matchManager.createMatch('Other Test Match', [
-      { id: randomUUIDv7(), type: 'double', value: 'D' },
-      { id: randomUUIDv7(), type: 'invert', value: '2&4' },
-      { id: randomUUIDv7(), type: 'flip', value: 2, magnitude: 'subtract' },
-      { id: randomUUIDv7(), type: 'subtract', value: 3 },
-    ])
+    const { matchId: matchId2 } = matchManager.createMatch(
+      'Other Test Match',
+      false,
+      [
+        { id: randomUUIDv7(), type: 'double', value: 'D' },
+        { id: randomUUIDv7(), type: 'invert', value: '2&4' },
+        { id: randomUUIDv7(), type: 'flip', value: 2, magnitude: 'subtract' },
+        { id: randomUUIDv7(), type: 'subtract', value: 3 },
+      ],
+    )
 
     const client = testClient(createApp(matchManager))
 
@@ -53,7 +61,7 @@ describe('Match List', () => {
   it('does not list matches that are full', async () => {
     const matchManager = new MatchManager()
 
-    const { matchId } = matchManager.createMatch('Full Match', [
+    const { matchId } = matchManager.createMatch('Full Match', false, [
       { id: randomUUIDv7(), type: 'double', value: 'D' },
       { id: randomUUIDv7(), type: 'invert', value: '2&4' },
       { id: randomUUIDv7(), type: 'flip', value: 2, magnitude: 'subtract' },
@@ -68,12 +76,16 @@ describe('Match List', () => {
       { id: randomUUIDv7(), type: 'subtract', value: 3 },
     ])
 
-    const { matchId: matchId2 } = matchManager.createMatch('Another Match', [
-      { id: randomUUIDv7(), type: 'double', value: 'D' },
-      { id: randomUUIDv7(), type: 'invert', value: '2&4' },
-      { id: randomUUIDv7(), type: 'flip', value: 2, magnitude: 'subtract' },
-      { id: randomUUIDv7(), type: 'subtract', value: 3 },
-    ])
+    const { matchId: matchId2 } = matchManager.createMatch(
+      'Another Match',
+      false,
+      [
+        { id: randomUUIDv7(), type: 'double', value: 'D' },
+        { id: randomUUIDv7(), type: 'invert', value: '2&4' },
+        { id: randomUUIDv7(), type: 'flip', value: 2, magnitude: 'subtract' },
+        { id: randomUUIDv7(), type: 'subtract', value: 3 },
+      ],
+    )
 
     const client = testClient(createApp(matchManager))
 

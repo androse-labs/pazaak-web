@@ -126,11 +126,16 @@ function useCreateMatchMutation() {
   const queryClient = useQueryClient()
   const { mutate, isPending, error } = useMutation({
     // deck does not need card id. exclude it from the type
-    mutationFn: async (data: { deck: Card[]; matchName: string }) => {
+    mutationFn: async (data: {
+      deck: Card[]
+      matchName: string
+      unlisted: boolean
+    }) => {
       // drop the id from each card in the deck
       const response = await api.post<CreateMatchResponse>('/match/create', {
         deck: data.deck,
         matchName: data.matchName,
+        unlisted: data.unlisted,
       })
       if (response.status !== 200) {
         throw new Error('Failed to create match')
@@ -162,6 +167,7 @@ function Index() {
               {
                 deck: userDeck,
                 matchName: 'Test Match',
+                unlisted: true,
               },
               {
                 onSuccess: (data) => {

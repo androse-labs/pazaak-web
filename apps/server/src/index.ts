@@ -30,13 +30,15 @@ export const createApp = (
       z.object({
         deck: z.array(cardSchema),
         matchName: z.string().min(5),
+        unlisted: z.boolean(),
       }),
     ),
     async (c) => {
-      const { deck, matchName } = c.req.valid('json')
+      const { deck, matchName, unlisted } = c.req.valid('json')
 
       const { matchId, token, playerId } = matchManager.createMatch(
         matchName,
+        unlisted,
         deck,
       )
 
@@ -45,10 +47,6 @@ export const createApp = (
         playerId,
         token,
       }
-
-      console.log(
-        `Match created with ID ${matchId} by player ${playerId} with token ${token}`,
-      )
 
       return c.json(response, 200)
     },
@@ -93,7 +91,7 @@ export const createApp = (
     }
 
     const joinableMatches = matches.filter(
-      (match) => !match.players[1] && match.players[0],
+      (match) => !match.players[1] && match.players[0] && !match.unlisted,
     )
 
     if (joinableMatches.length === 0) {

@@ -18,6 +18,7 @@ type InProgressMatch = {
 class Match {
   id: string
   matchName: string
+  unlisted: boolean
   games: Game[] = []
   players: [Player, Player] | [Player, null]
   playersTurn: 1 | 2 = 1
@@ -26,13 +27,19 @@ class Match {
   score: [number, number]
   status: 'waiting' | 'in-progress' | 'finished'
 
-  constructor(id: string, matchName: string, firstPlayer: Player) {
+  constructor(
+    id: string,
+    matchName: string,
+    firstPlayer: Player,
+    unlisted: boolean,
+  ) {
     this.id = id
     this.round = 0
     this.score = [0, 0]
     this.status = 'waiting'
     this.matchName = matchName
     this.games = []
+    this.unlisted = unlisted
     this.lastModifiedDateUtc = Date.now()
     this.players = [firstPlayer, null] // Second player will join later
   }
