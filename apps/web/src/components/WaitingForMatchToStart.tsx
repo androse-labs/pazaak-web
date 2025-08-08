@@ -17,25 +17,24 @@ const WaitingForMatchToStart = ({ matchId }: WaitingForMatchToStartProps) => {
       <div className="flex flex-col gap-2 text-center text-lg">
         Share this match ID with your opponent:{' '}
         <div className="flex items-center justify-center gap-2">
-          <strong>
-            <a
-              href={createMatchURL(matchId)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-500 hover:underline"
-            >
-              {createMatchURL(matchId)}
-            </a>
-          </strong>
-          <div className="tooltip tooltip-left" data-tip="Copy match url">
-            <button
-              className="btn btn-secondary btn-square"
-              onClick={() => {
-                navigator.clipboard.writeText(createMatchURL(matchId))
-              }}
-            >
-              <Copy />
-            </button>
+          <div className="join">
+            <input
+              type="text"
+              className="input input-bordered join-item w-96"
+              value={createMatchURL(matchId)}
+              onFocus={(e) => e.target.select()}
+              readOnly
+            />
+            <div className="tooltip tooltip-top" data-tip="Copy match url">
+              <button
+                className="btn btn-secondary btn-square join-item"
+                onClick={() => {
+                  navigator.clipboard.writeText(createMatchURL(matchId))
+                }}
+              >
+                <Copy />
+              </button>
+            </div>
           </div>
         </div>
       </div>
