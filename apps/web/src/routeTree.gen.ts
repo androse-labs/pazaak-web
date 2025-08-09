@@ -12,6 +12,7 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
+import { Route as HowToPlayIndexImport } from './routes/how-to-play/index'
 import { Route as DeckBuilderIndexImport } from './routes/deck-builder/index'
 import { Route as MatchMatchIdIndexImport } from './routes/match/$matchId/index'
 import { Route as MatchMatchIdJoinImport } from './routes/match/$matchId/join'
@@ -21,6 +22,12 @@ import { Route as MatchMatchIdJoinImport } from './routes/match/$matchId/join'
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const HowToPlayIndexRoute = HowToPlayIndexImport.update({
+  id: '/how-to-play/',
+  path: '/how-to-play/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -60,6 +67,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DeckBuilderIndexImport
       parentRoute: typeof rootRoute
     }
+    '/how-to-play/': {
+      id: '/how-to-play/'
+      path: '/how-to-play'
+      fullPath: '/how-to-play'
+      preLoaderRoute: typeof HowToPlayIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/match/$matchId/join': {
       id: '/match/$matchId/join'
       path: '/match/$matchId/join'
@@ -82,6 +96,7 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/deck-builder': typeof DeckBuilderIndexRoute
+  '/how-to-play': typeof HowToPlayIndexRoute
   '/match/$matchId/join': typeof MatchMatchIdJoinRoute
   '/match/$matchId': typeof MatchMatchIdIndexRoute
 }
@@ -89,6 +104,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/deck-builder': typeof DeckBuilderIndexRoute
+  '/how-to-play': typeof HowToPlayIndexRoute
   '/match/$matchId/join': typeof MatchMatchIdJoinRoute
   '/match/$matchId': typeof MatchMatchIdIndexRoute
 }
@@ -97,19 +113,31 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/deck-builder/': typeof DeckBuilderIndexRoute
+  '/how-to-play/': typeof HowToPlayIndexRoute
   '/match/$matchId/join': typeof MatchMatchIdJoinRoute
   '/match/$matchId/': typeof MatchMatchIdIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/deck-builder' | '/match/$matchId/join' | '/match/$matchId'
+  fullPaths:
+    | '/'
+    | '/deck-builder'
+    | '/how-to-play'
+    | '/match/$matchId/join'
+    | '/match/$matchId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/deck-builder' | '/match/$matchId/join' | '/match/$matchId'
+  to:
+    | '/'
+    | '/deck-builder'
+    | '/how-to-play'
+    | '/match/$matchId/join'
+    | '/match/$matchId'
   id:
     | '__root__'
     | '/'
     | '/deck-builder/'
+    | '/how-to-play/'
     | '/match/$matchId/join'
     | '/match/$matchId/'
   fileRoutesById: FileRoutesById
@@ -118,6 +146,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DeckBuilderIndexRoute: typeof DeckBuilderIndexRoute
+  HowToPlayIndexRoute: typeof HowToPlayIndexRoute
   MatchMatchIdJoinRoute: typeof MatchMatchIdJoinRoute
   MatchMatchIdIndexRoute: typeof MatchMatchIdIndexRoute
 }
@@ -125,6 +154,7 @@ export interface RootRouteChildren {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DeckBuilderIndexRoute: DeckBuilderIndexRoute,
+  HowToPlayIndexRoute: HowToPlayIndexRoute,
   MatchMatchIdJoinRoute: MatchMatchIdJoinRoute,
   MatchMatchIdIndexRoute: MatchMatchIdIndexRoute,
 }
@@ -141,6 +171,7 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/deck-builder/",
+        "/how-to-play/",
         "/match/$matchId/join",
         "/match/$matchId/"
       ]
@@ -150,6 +181,9 @@ export const routeTree = rootRoute
     },
     "/deck-builder/": {
       "filePath": "deck-builder/index.tsx"
+    },
+    "/how-to-play/": {
+      "filePath": "how-to-play/index.tsx"
     },
     "/match/$matchId/join": {
       "filePath": "match/$matchId/join.tsx"

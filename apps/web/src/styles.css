@@ -6,6 +6,8 @@
     dracula --prefersdark;
 }
 
+@plugin "@tailwindcss/typography";
+
 @theme {
   --color-pzk-red: rgb(209, 38, 57);
   --color-pzk-blue: rgb(59, 130, 246);

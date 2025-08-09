@@ -7,7 +7,7 @@ import { useState } from 'react'
 import type { Card } from '@pazaak-web/shared'
 import clsx from 'clsx'
 import { DropOverlay } from '../../components/game-elements/DropOverlay'
-import { Copy, Import } from 'lucide-react'
+import { Copy, Import, Trash2 } from 'lucide-react'
 import { codeToDeck, deckToCode } from './-deck-serializer'
 import { Modal } from '../../components/Modal'
 
@@ -147,6 +147,16 @@ export function DeckPanel({
         <h1 className="text-2xl font-bold">Deck</h1>
         <div className="flex gap-2">
           <button
+            className="btn btn-accent"
+            onClick={() => {
+              setDraftDeck([])
+            }}
+          >
+            <Trash2 />
+            Clear Deck
+          </button>
+
+          <button
             className="btn btn-secondary"
             onClick={async () => {
               const modal = document.getElementById('import-deck-code-modal')
@@ -158,8 +168,8 @@ export function DeckPanel({
             <Import />
             Import
           </button>
-          <ImportDeckCodeModal setDraftDeck={setDraftDeck} />
         </div>
+        <ImportDeckCodeModal setDraftDeck={setDraftDeck} />
       </div>
       <div className="flex w-full grow">
         <div

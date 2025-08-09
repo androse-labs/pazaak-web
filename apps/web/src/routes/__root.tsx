@@ -15,6 +15,9 @@ export const Route = createRootRoute({
           >
             Deck Builder
           </Link>
+          <Link to="/how-to-play" className="btn btn-ghost text-xl normal-case">
+            How to Play
+          </Link>
         </div>
         <Outlet />
       </div>

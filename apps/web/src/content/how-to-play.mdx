@@ -1,0 +1,142 @@
+# How to Play Pazaak
+
+## The Basics
+
+Pazaak is a card game played between two players. Each player brings a deck of
+cards, which consists of a set of positive and negative cards. The goal is to
+reach a score of 20 without going over. You must beat your opponent 3 times
+to win the game.
+
+The game is played in turns, with each player drawing a card from the shared deck.
+Every turn the play can either play a card, end their turn (and wait for their
+opponent to play), or stand on their current score.
+
+If a player goes over 20 and is not able to reduce their score back to 20
+before the end of their turn, they will bust and wait to see if their opponent
+also busts. If both players bust, no one wins the round.
+
+If both players reach the same score at the end of a round, the round is a draw unless
+one of the players has a tiebreaker card in the last slot on the board. The
+player with the tiebreaker card will win the round and score a point. If both players
+have a tiebreaker card, the round is a draw.
+
+## Card Types
+
+There are 2 main categories of cards in Pazaak:
+
+### Neutral Cards
+
+These cards are green and are drawn from a shared deck. They are numbered from
+1 to 10.
+
+<div className="not-prose mx-auto grid w-fit">
+  <Card card={{ type: 'none', value: 5 }} id="5" />
+</div>
+
+### Add Cards
+
+These cards are blue and add a value to the board's total score.
+
+<div className="not-prose mx-auto grid w-fit">
+  <Card card={{ type: 'add', value: 5 }} id="5" />
+</div>
+
+### Subtract Cards
+
+These cards are red and subtract a value from the board's total score.
+
+<div className="not-prose mx-auto grid w-fit">
+  <Card card={{ type: 'subtract', value: 5 }} id="5" />
+</div>
+
+### Flip Cards
+
+These cards are both red and blue and can be configured to be played as either
+an add or subtract card.
+
+<div className="not-prose mx-auto grid w-fit grid-cols-2 gap-4">
+  <Card card={{ type: 'flip', value: 5, magnitude: 'add' }} id="5" />
+  <Card card={{ type: 'flip', value: 5, magnitude: 'subtract' }} id="5" />
+</div>
+
+### Tiebreaker Cards
+
+These are yellow flip cards that can be used to break ties when they are the
+last card on your board. They too can be configured like flip cards and will
+give the player an advantage in the event of a tie.
+
+<div className="not-prose mx-auto grid w-fit grid-cols-2 gap-4">
+  <Card card={{ type: 'tiebreaker', value: 1, magnitude: 'add' }} id="5" />
+  <Card card={{ type: 'tiebreaker', value: 1, magnitude: 'subtract' }} id="5" />
+</div>
+
+### Double Cards
+
+These are yellow cards identified by a "D" as their value. They do not add or substract from
+the board's total score, but instead double the value of the last played card.
+
+<div className="not-prose mx-auto grid w-fit">
+  <Card card={{ type: 'double', value: 'D' }} id="1" />
+</div>
+
+### Invert Cards
+
+These are yellow cards with 2 distinct values separated by an ampersand (&). They
+invert the values of the cards specified. For example, an invert card with a value
+of "2&4" will invert the values of all 2s and 4s played on the board,
+turning them into -2s and -4s respectively.
+
+<div className="not-prose mx-auto grid w-fit">
+  <Card card={{ type: 'invert', value: '2&4' }} id="1" />
+</div>
+
+## Board Deck
+
+Players will draw a card each turn from the shared deck. The deck consists of 4
+copies of the below cards:
+
+<div className="not-prose mx-auto grid w-fit grid-cols-5 grid-rows-2 gap-4">
+  <Card card={{ type: 'none', value: 1 }} id="1" />
+  <Card card={{ type: 'none', value: 2 }} id="2" />
+  <Card card={{ type: 'none', value: 3 }} id="3" />
+  <Card card={{ type: 'none', value: 4 }} id="4" />
+  <Card card={{ type: 'none', value: 5 }} id="5" />
+  <Card card={{ type: 'none', value: 6 }} id="6" />
+  <Card
+    card={{
+      type: 'none',
+      value: 7,
+    }}
+    id="7"
+  />
+  <Card card={{ type: 'none', value: 8 }} id="8" />
+  <Card card={{ type: 'none', value: 9 }} id="9" />
+  <Card card={{ type: 'none', value: 10 }} id="10" />
+</div>
+
+## Player Decks
+
+Each player can bring their own deck of cards to the game provided the deck
+does not contain more than 2 copies of any card and is exactly 10 cards.
+Players can configure their decks on the [Deck Builder](/deck-builder) page.
+
+#### Example Deck
+
+If you're not sure where to start with your deck, here's an example of a
+balanced deck that you can use:
+
+<div className="not-prose mx-auto grid w-fit grid-cols-5 grid-rows-2 gap-4">
+  <Card card={{ type: 'tiebreaker', value: 1, magnitude: 'add' }} id="1" />
+  <Card card={{ type: 'tiebreaker', value: 1, magnitude: 'add' }} id="1" />
+  <Card card={{ type: 'flip', value: 1, magnitude: 'add' }} id="1" />
+  <Card card={{ type: 'flip', value: 2, magnitude: 'add' }} id="1" />
+  <Card card={{ type: 'flip', value: 2, magnitude: 'add' }} id="1" />
+  <Card card={{ type: 'flip', value: 3, magnitude: 'add' }} id="1" />
+  <Card card={{ type: 'flip', value: 3, magnitude: 'add' }} id="1" />
+  <Card card={{ type: 'double', value: 'D' }} id="1" />
+  <Card card={{ type: 'invert', value: '2&4' }} id="1" />
+  <Card card={{ type: 'invert', value: '3&6' }} id="1" />
+</div>
+
+You can import this deck into the [Deck Builder](/deck-builder) page by copying
+the following code into the import box: `T1-T1-F1-F2-F2-F3-F3-DD-I2&4-I3&6`
