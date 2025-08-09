@@ -45,8 +45,8 @@ class Game {
     }, 0)
   }
 
-  boardHasTiebreaker(board: Card[]): boolean {
-    return board.some((card) => card.type === 'tiebreaker')
+  boardHasActiveTiebreaker(board: Card[]): boolean {
+    return board.length > 0 && board.at(-1)?.type === 'tiebreaker'
   }
 
   getBustStatus(distance: number): 'busted' | 'safe' {
@@ -54,10 +54,10 @@ class Game {
   }
 
   private getTiebreakerAdvantage(): 'player1' | 'player2' | 'both' | 'neither' {
-    const player1HasTiebreaker = this.boardHasTiebreaker(
+    const player1HasTiebreaker = this.boardHasActiveTiebreaker(
       this.boards[this.player1Id],
     )
-    const player2HasTiebreaker = this.boardHasTiebreaker(
+    const player2HasTiebreaker = this.boardHasActiveTiebreaker(
       this.boards[this.player2Id],
     )
 
