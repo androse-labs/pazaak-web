@@ -164,7 +164,33 @@ function Index() {
     <div className="flex flex-1 flex-col items-center justify-center gap-24">
       <h1 className="font-mono text-6xl font-semibold uppercase">Pazaak-Web</h1>
       <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-4">
+        <form
+          className="flex flex-col gap-4"
+          onSubmit={(e) => {
+            e.preventDefault()
+            if (matchName.length < 5) {
+              setError('Match name must be at least 5 characters long')
+              return
+            }
+            mutate(
+              {
+                deck: userDeck,
+                matchName: matchName,
+                unlisted: unlisted,
+              },
+              {
+                onSuccess: (data) => {
+                  setMatchConnection({
+                    matchId: data.matchId,
+                    playerId: crypto.randomUUID(),
+                    token: data.token,
+                  })
+                  navigate({ to: `/match/${data.matchId}` })
+                },
+              },
+            )
+          }}
+        >
           <div className="flex items-center gap-4">
             <input
               type="text"
@@ -194,36 +220,10 @@ function Index() {
             </div>
           )}
 
-          <button
-            onClick={() => {
-              if (matchName.length < 5) {
-                setError('Match name must be at least 5 characters long')
-                return
-              }
-
-              mutate(
-                {
-                  deck: userDeck,
-                  matchName: matchName,
-                  unlisted: unlisted,
-                },
-                {
-                  onSuccess: (data) => {
-                    setMatchConnection({
-                      matchId: data.matchId,
-                      playerId: crypto.randomUUID(),
-                      token: data.token,
-                    })
-                    navigate({ to: `/match/${data.matchId}` })
-                  },
-                },
-              )
-            }}
-            className="btn btn-primary"
-          >
+          <button type="submit" className="btn btn-primary">
             Create Match
           </button>
-        </div>
+        </form>
         <div className="divider">or</div>
         <button
           className="btn btn-secondary"
