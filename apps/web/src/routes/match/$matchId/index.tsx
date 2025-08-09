@@ -133,11 +133,11 @@ function MatchPage() {
             open: true,
             content: (
               <div className="flex flex-col items-center gap-2">
-                The match is complete! You{' '}
+                The match is complete! You
                 {message.youWon ? 'won!' : 'lost. Better luck next time!'}
               </div>
             ),
-            persistent: true,
+            persistent: false,
           })
         } else {
           console.warn('Unknown message type:', message)
