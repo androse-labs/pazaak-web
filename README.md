@@ -4,7 +4,7 @@ A simple application recreating a niche card game with web technologies.
 
 ---
 
-## 📦 Structure
+## Structure
 
 ```text
 apps/
