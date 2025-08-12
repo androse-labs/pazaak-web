@@ -29,7 +29,7 @@ const Collection = ({
       <h1 className="text-2xl font-bold">Collection</h1>
       <div
         ref={setNodeRef}
-        className="border-3 border-neutral relative flex h-full flex-wrap content-start items-start gap-4 rounded-lg border-dashed p-4"
+        className="border-3 border-neutral relative flex h-full max-h-full flex-wrap content-start items-start gap-4 overflow-y-scroll rounded-lg border-dashed p-4 lg:max-h-full"
       >
         {cards.map((card) => (
           <CardComponent key={card.id} card={card} id={card.id} draggable />
@@ -142,22 +142,22 @@ export function DeckPanel({
   const deckIsChanged = decksAreEqual(userDeck, draftDeck)
 
   return (
-    <div className="flex flex-1 flex-col gap-2">
+    <div className="flex flex-1 flex-col gap-2 overflow-hidden">
       <div className="flex shrink-0 items-center justify-between">
         <h1 className="text-2xl font-bold">Deck</h1>
         <div className="flex gap-2">
           <button
-            className="btn btn-accent"
+            className="btn btn-accent max-sm:btn-square"
             onClick={() => {
               setDraftDeck([])
             }}
           >
             <Trash2 />
-            Clear Deck
+            <span className="hidden sm:inline">Clear Deck</span>
           </button>
 
           <button
-            className="btn btn-secondary"
+            className="btn btn-secondary max-sm:btn-square"
             onClick={async () => {
               const modal = document.getElementById('import-deck-code-modal')
               if (modal instanceof HTMLDialogElement) {
@@ -166,35 +166,33 @@ export function DeckPanel({
             }}
           >
             <Import />
-            Import
+            <span className="hidden sm:inline">Import</span>
           </button>
         </div>
         <ImportDeckCodeModal setDraftDeck={setDraftDeck} />
       </div>
-      <div className="flex w-full grow">
-        <div
-          ref={setNodeRef}
-          className={clsx(
-            'border-3 border-neutral relative w-full rounded-lg border-dashed p-4',
-            draftDeck.length === 0
-              ? 'flex min-h-[120px] flex-col justify-center'
-              : 'flex flex-wrap content-start items-start gap-4',
-          )}
-        >
-          {draftDeck.length === 0 ? (
-            <h3 className="text-center text-lg">Drag cards to your deck</h3>
-          ) : (
-            draftDeck.map((card) => (
-              <CardComponent key={card.id} card={card} id={card.id} draggable />
-            ))
-          )}
-          {showDropOverlay && (
-            <DropOverlay
-              isOver={isOver}
-              text="Drop cards here to add them to your deck"
-            />
-          )}
-        </div>
+      <div
+        ref={setNodeRef}
+        className={clsx(
+          'border-3 border-neutral relative h-full w-full overflow-y-scroll rounded-lg border-dashed p-4',
+          draftDeck.length === 0
+            ? 'flex min-h-[120px] flex-col justify-center'
+            : 'flex flex-wrap content-start items-start gap-4',
+        )}
+      >
+        {draftDeck.length === 0 ? (
+          <h3 className="text-center text-lg">Drag cards to your deck</h3>
+        ) : (
+          draftDeck.map((card) => (
+            <CardComponent key={card.id} card={card} id={card.id} draggable />
+          ))
+        )}
+        {showDropOverlay && (
+          <DropOverlay
+            isOver={isOver}
+            text="Drop cards here to add them to your deck"
+          />
+        )}
       </div>
       {validationMessage && (
         <div role="alert" className="alert alert-error alert-soft">
@@ -239,7 +237,7 @@ function RouteComponent() {
   const [draftDeck, setDraftDeck] = useState<Card[]>(userDeck)
 
   return (
-    <div className="flex flex-1">
+    <div className="flex h-[calc(100vh-64px)] flex-col lg:flex-1 lg:flex-row">
       <DndContext
         onDragStart={(event) => {
           setIsDragging(true)
@@ -291,13 +289,13 @@ function RouteComponent() {
           setDragSourceZone(null)
         }}
       >
-        <div className="bg-base-200 flex w-2/3 flex-col gap-2 p-4">
+        <div className="bg-base-200 flex h-3/5 flex-col gap-2 p-4 lg:h-auto lg:w-2/3">
           <Collection
             cards={collectionCards}
             showDropOverlay={isDragging && dragSourceZone !== 'collection'}
           />
         </div>
-        <div className="bg-base-100 flex h-auto w-1/3 flex-col p-4">
+        <div className="bg-base-100 flex h-2/5 flex-col gap-4 p-4 lg:h-auto lg:w-1/3">
           <DeckPanel
             draftDeck={draftDeck}
             validationMessage={deckValidationMessage}
