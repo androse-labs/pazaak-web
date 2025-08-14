@@ -20,7 +20,7 @@ const WaitingForMatchToStart = ({ matchId }: WaitingForMatchToStartProps) => {
           <div className="join">
             <input
               type="text"
-              className="input input-bordered join-item w-96"
+              className="input input-bordered join-item w-72"
               value={createMatchURL(matchId)}
               onFocus={(e) => e.target.select()}
               readOnly
