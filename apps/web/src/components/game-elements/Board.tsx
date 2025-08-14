@@ -1,4 +1,4 @@
-import { Children, useState, type ReactNode } from 'react'
+import { Children, useState, useEffect, type ReactNode } from 'react'
 import { Card, CardPresentation } from './Card'
 import { EmptyCard } from './EmptyCard'
 import { HiddenCard } from './HiddenCard'
@@ -103,6 +103,7 @@ const YourBoardGrid = ({
   score,
   total,
   cards,
+  isDesktop,
 }: {
   total: number
   yourTurn: boolean
@@ -110,6 +111,7 @@ const YourBoardGrid = ({
   state: 'playing' | 'standing' | 'busted'
   title: string
   cards: ReactNode[]
+  isDesktop: boolean
 }) => {
   const { setNodeRef, isOver } = useDroppable({ id: 'your-board' })
   const [isDragging, setIsDragging] = useState(false)
@@ -120,18 +122,15 @@ const YourBoardGrid = ({
     onDragCancel: () => setIsDragging(false),
   })
 
-  return (
-    <>
-      <div className="flex items-start justify-between gap-2 lg:hidden">
-        <div className="flex items-start justify-center gap-2">
-          <ScoreDisplay total={3} count={score} />
-          <div>
-            <span className="text-2xl font-bold">{title}</span>
-            <div className="text-lg">
-              Total: <span className="font-bold">{total}</span>
-              <StateDisplay state={state} />
-            </div>
-          </div>
+  if (isDesktop) {
+    return (
+      <div className="flex flex-col items-start justify-center gap-2">
+        <div className="flex w-full justify-between">
+          <span className="text-2xl font-bold">{title}</span>
+          <StateDisplay state={state} />
+        </div>
+        <div className="text-lg">
+          Total: <span className="font-bold">{total}</span>
         </div>
         <DropOverlay
           isOver={isOver}
@@ -154,39 +153,38 @@ const YourBoardGrid = ({
           </div>
         </DropOverlay>
       </div>
-      <div className="hidden flex-row items-start justify-center gap-2 lg:flex">
-        <div className="flex flex-col items-start justify-center gap-2">
-          <div className="flex w-full justify-between">
-            <span className="text-2xl font-bold">{title}</span>
-            <StateDisplay state={state} />
-          </div>
+    )
+  }
+
+  return (
+    <div className="flex items-start justify-between gap-2">
+      <div className="flex items-start justify-center gap-2">
+        <ScoreDisplay total={3} count={score} />
+        <div>
+          <span className="text-2xl font-bold">{title}</span>
           <div className="text-lg">
             Total: <span className="font-bold">{total}</span>
+            <StateDisplay state={state} />
           </div>
-          <DropOverlay
-            isOver={isOver}
-            show={isDragging}
-            text="Drop to play a card"
-          >
-            <div
-              ref={setNodeRef}
-              className={clsx(
-                'bg-base-200 relative grid grid-cols-3 grid-rows-3 justify-items-center gap-2 rounded-md p-2',
-              )}
-            >
-              <GridOfItems length={9}>
-                {cards.map((card, index) => (
-                  <div key={index} className="h-full w-full">
-                    {card}
-                  </div>
-                ))}
-              </GridOfItems>
-            </div>
-          </DropOverlay>
         </div>
-        <ScoreDisplay total={3} count={score} />
       </div>
-    </>
+      <DropOverlay isOver={isOver} show={isDragging} text="Drop to play a card">
+        <div
+          ref={setNodeRef}
+          className={clsx(
+            'bg-base-200 relative grid grid-cols-3 grid-rows-3 justify-items-center gap-2 rounded-md p-2',
+          )}
+        >
+          <GridOfItems length={9}>
+            {cards.map((card, index) => (
+              <div key={index} className="h-full w-full">
+                {card}
+              </div>
+            ))}
+          </GridOfItems>
+        </div>
+      </DropOverlay>
+    </div>
   )
 }
 
@@ -196,6 +194,7 @@ const OpponentBoardGrid = ({
   score,
   total,
   cards,
+  isDesktop,
 }: {
   title: string
   theirTurn: boolean
@@ -203,9 +202,33 @@ const OpponentBoardGrid = ({
   score: number
   total: number
   cards: ReactNode[]
-}) => (
-  <>
-    <div className="flex items-end justify-between gap-2 lg:hidden">
+  isDesktop: boolean
+}) => {
+  if (isDesktop) {
+    return (
+      <div className="flex flex-col items-end justify-end gap-2">
+        <div className="flex w-full flex-row-reverse justify-between">
+          <span className="text-2xl font-bold">{title}</span>
+          <StateDisplay state={state} />
+        </div>
+        <div className="text-lg">
+          Total: <span className="font-bold">{total}</span>
+        </div>
+        <div className="bg-base-200 relative grid grid-cols-3 grid-rows-3 justify-items-center gap-2 rounded-md p-2">
+          <GridOfItems length={9}>
+            {cards.map((card, index) => (
+              <div key={index} className="h-full w-full">
+                {card}
+              </div>
+            ))}
+          </GridOfItems>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex items-end justify-between gap-2">
       <div className="flex items-end justify-center gap-2">
         <ScoreDisplay total={3} count={score} />
         <div>
@@ -228,29 +251,8 @@ const OpponentBoardGrid = ({
         </GridOfItems>
       </div>
     </div>
-    <div className="hidden flex-row items-start justify-center gap-2 lg:flex">
-      <ScoreDisplay total={3} count={score} />
-      <div className="flex flex-col items-end justify-end gap-2">
-        <div className="flex w-full flex-row-reverse justify-between">
-          <span className="text-2xl font-bold">{title}</span>
-          <StateDisplay state={state} />
-        </div>
-        <div className="text-lg">
-          Total: <span className="font-bold">{total}</span>
-        </div>
-        <div className="bg-base-200 relative grid grid-cols-3 grid-rows-3 justify-items-center gap-2 rounded-md p-2">
-          <GridOfItems length={9}>
-            {cards.map((card, index) => (
-              <div key={index} className="h-full w-full">
-                {card}
-              </div>
-            ))}
-          </GridOfItems>
-        </div>
-      </div>
-    </div>
-  </>
-)
+  )
+}
 
 const BoardGrid = ({
   title,
@@ -260,6 +262,7 @@ const BoardGrid = ({
   score,
   total,
   yourTurn,
+  isDesktop,
 }: {
   title: string
   state: 'playing' | 'standing' | 'busted'
@@ -268,6 +271,7 @@ const BoardGrid = ({
   score: number
   yourTurn: boolean
   isOpponent?: boolean
+  isDesktop: boolean
 }) => {
   if (isOpponent)
     return (
@@ -278,6 +282,7 @@ const BoardGrid = ({
         score={score}
         total={total}
         theirTurn={yourTurn}
+        isDesktop={isDesktop}
       />
     )
   return (
@@ -288,6 +293,7 @@ const BoardGrid = ({
       cards={cards}
       total={total}
       yourTurn={yourTurn}
+      isDesktop={isDesktop}
     />
   )
 }
@@ -402,19 +408,23 @@ type BoardProps = {
   onMagnitudeFlip: (cardId: string) => void
 }
 
-const TurnIndicator = ({ yourTurn }: { yourTurn: boolean }) => (
+const TurnIndicator = ({
+  yourTurn,
+  isDesktop,
+}: {
+  yourTurn: boolean
+  isDesktop: boolean
+}) => (
   <div className="text-center text-2xl font-bold">
     {yourTurn ? (
       <span className="flex flex-row items-center justify-center gap-1 lg:flex-col">
         Your Turn
-        <MoveLeft size={32} className="hidden lg:inline-block" />
-        <MoveDown size={32} className="inline-block lg:hidden" />
+        {isDesktop ? <MoveLeft size={32} /> : <MoveDown size={32} />}
       </span>
     ) : (
       <span className="flex flex-row items-center justify-center gap-1 lg:flex-col">
         Opponent's Turn
-        <MoveRight size={32} className="hidden lg:inline-block" />
-        <MoveUp size={32} className="inline-block lg:hidden" />
+        {isDesktop ? <MoveRight size={32} /> : <MoveUp size={32} />}
       </span>
     )}
   </div>
@@ -436,6 +446,32 @@ export const Board = ({
 }: BoardProps) => {
   const [draggedCard, setDraggedCard] = useState<CardValue | null>(null)
   const [isShaking, setIsShaking] = useState(false)
+  const [isDesktop, setIsDesktop] = useState(false)
+
+  // Use effect to check window size once on mount and whenever window is resized
+  useEffect(() => {
+    const checkIfDesktop = () => {
+      setIsDesktop(window.innerWidth >= 1024) // 1024px is the lg breakpoint in Tailwind
+    }
+
+    // Initial check
+    checkIfDesktop()
+
+    // Add event listener
+    window.addEventListener('resize', checkIfDesktop)
+
+    // Clean up
+    return () => window.removeEventListener('resize', checkIfDesktop)
+  }, [])
+
+  // Prepare card elements only once
+  const yourBoardCards = yourBoard.cards.map((card) => (
+    <Card key={card.id} card={card} />
+  ))
+
+  const opponentBoardCards = opponentBoard.cards.map((card) => (
+    <Card key={card.id} card={card} />
+  ))
 
   return (
     <div className="flex h-full flex-col items-center justify-center">
@@ -464,68 +500,56 @@ export const Board = ({
           }
         }}
       >
-        <div className="flex flex-col items-center justify-around gap-2 lg:hidden">
-          <HiddenHandGrid cardCount={opponentCardCount} />
-          <div className="w-100 items-around flex flex-col justify-around gap-4">
-            <BoardGrid
-              title="Opponent"
-              yourTurn={!yourTurn}
-              state={opponentState}
-              score={opponentScore}
-              isOpponent
-              total={opponentBoard.total}
-              cards={opponentBoard.cards.map((card) => (
-                <Card key={card.id} card={card} />
-              ))}
-            />
-            <div className="flex w-full justify-center">
-              <TurnIndicator yourTurn={yourTurn} />
+        {isDesktop ? (
+          // Desktop Layout
+          <div className="flex flex-col items-center justify-center">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex-1">
+                <BoardGrid
+                  title="You"
+                  yourTurn={yourTurn}
+                  state={yourState}
+                  score={yourScore}
+                  total={yourBoard.total}
+                  cards={yourBoardCards}
+                  isDesktop={true}
+                />
+              </div>
+              <div className="flex w-48 justify-center">
+                <TurnIndicator yourTurn={yourTurn} isDesktop={true} />
+              </div>
+              <div className="flex-1">
+                <BoardGrid
+                  title="Opponent"
+                  yourTurn={!yourTurn}
+                  state={opponentState}
+                  score={opponentScore}
+                  isOpponent
+                  total={opponentBoard.total}
+                  cards={opponentBoardCards}
+                  isDesktop={true}
+                />
+              </div>
             </div>
-            <BoardGrid
-              title="You"
+            <div className="grid grid-cols-2 grid-rows-1 gap-2 p-5">
+              <HandGrid
+                cards={playerCards}
+                onMagnitudeFlip={onMagnitudeFlip}
+                yourTurn={yourTurn}
+              />
+              <HiddenHandGrid cardCount={opponentCardCount} />
+            </div>
+            <BoardControls
+              onStand={onStand}
+              onEndTurn={onEndTurn}
               yourTurn={yourTurn}
-              state={yourState}
-              score={yourScore}
-              total={yourBoard.total}
-              cards={yourBoard.cards.map((card) => (
-                <Card key={card.id} card={card} />
-              ))}
             />
           </div>
-          <HandGrid
-            cards={playerCards}
-            onMagnitudeFlip={onMagnitudeFlip}
-            yourTurn={yourTurn}
-          />
-          <DragOverlay>
-            {draggedCard && (
-              <CardPresentation card={draggedCard} isShaking={isShaking} />
-            )}
-          </DragOverlay>
-          <BoardControls
-            onStand={onStand}
-            onEndTurn={onEndTurn}
-            yourTurn={yourTurn}
-          />
-        </div>
-        <div className="hidden lg:flex lg:flex-col lg:items-center lg:justify-center">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex-1">
-              <BoardGrid
-                title="You"
-                yourTurn={yourTurn}
-                state={yourState}
-                score={yourScore}
-                total={yourBoard.total}
-                cards={yourBoard.cards.map((card) => (
-                  <Card key={card.id} card={card} />
-                ))}
-              />
-            </div>
-            <div className="flex w-48 justify-center">
-              <TurnIndicator yourTurn={yourTurn} />
-            </div>
-            <div className="flex-1">
+        ) : (
+          // Mobile Layout
+          <div className="flex flex-col items-center justify-around gap-2">
+            <HiddenHandGrid cardCount={opponentCardCount} />
+            <div className="w-100 items-around flex flex-col justify-around gap-4">
               <BoardGrid
                 title="Opponent"
                 yourTurn={!yourTurn}
@@ -533,31 +557,40 @@ export const Board = ({
                 score={opponentScore}
                 isOpponent
                 total={opponentBoard.total}
-                cards={opponentBoard.cards.map((card) => (
-                  <Card key={card.id} card={card} />
-                ))}
+                cards={opponentBoardCards}
+                isDesktop={false}
+              />
+              <div className="flex w-full justify-center">
+                <TurnIndicator yourTurn={yourTurn} isDesktop={false} />
+              </div>
+              <BoardGrid
+                title="You"
+                yourTurn={yourTurn}
+                state={yourState}
+                score={yourScore}
+                total={yourBoard.total}
+                cards={yourBoardCards}
+                isDesktop={false}
               />
             </div>
-          </div>
-          <div className="grid grid-cols-2 grid-rows-1 gap-2 p-5">
             <HandGrid
               cards={playerCards}
               onMagnitudeFlip={onMagnitudeFlip}
               yourTurn={yourTurn}
             />
-            <HiddenHandGrid cardCount={opponentCardCount} />
+            <BoardControls
+              onStand={onStand}
+              onEndTurn={onEndTurn}
+              yourTurn={yourTurn}
+            />
           </div>
-          <DragOverlay>
-            {draggedCard && (
-              <CardPresentation card={draggedCard} isShaking={isShaking} />
-            )}
-          </DragOverlay>
-          <BoardControls
-            onStand={onStand}
-            onEndTurn={onEndTurn}
-            yourTurn={yourTurn}
-          />
-        </div>
+        )}
+
+        <DragOverlay>
+          {draggedCard && (
+            <CardPresentation card={draggedCard} isShaking={isShaking} />
+          )}
+        </DragOverlay>
       </DndContext>
     </div>
   )
