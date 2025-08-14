@@ -9,7 +9,7 @@ const blueCards: Card[] = Array.from({ length: 6 }, (_, i) => ({
 const redCards: Card[] = Array.from({ length: 6 }, (_, i) => ({
   id: `red-${i + 1}`,
   type: 'subtract',
-  value: -(i + 1),
+  value: i + 1,
 }))
 
 const flipCards: Card[] = Array.from({ length: 6 }, (_, i) => ({

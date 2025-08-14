@@ -2,6 +2,8 @@ import type { CardType } from './types'
 import type { Card as CardValue } from '@pazaak-web/shared'
 import { useDraggable } from '@dnd-kit/core'
 import clsx from 'clsx'
+import { forwardRef } from 'react'
+import { EmptyCard } from './EmptyCard'
 
 type CardProps = {
   card: CardValue
@@ -104,7 +106,7 @@ const formatValue = (card: CardValue): string => {
 }
 
 export const Card = ({ card, draggable, disabled = false }: CardProps) => {
-  const { attributes, listeners, setNodeRef, transform, isDragging, over } =
+  const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
       id: card.id,
       data: { card },
@@ -126,35 +128,33 @@ export const Card = ({ card, draggable, disabled = false }: CardProps) => {
           { 'cursor-grab': !disabled },
         )}
       >
-        <InnerCard card={card} isShaking={false} />
+        <CardPresentation card={card} isShaking={false} />
       </div>
     )
   }
 
-  return (
+  return !isDragging ? (
     <div
-      ref={setNodeRef}
       style={style}
       {...attributes}
       {...listeners}
       className={clsx(
-        'select-none',
+        'touch-none select-none',
         { 'cursor-not-allowed': disabled },
         { 'cursor-grab': !disabled },
       )}
     >
-      <InnerCard card={card} isShaking={isDragging && over !== null} />
+      <CardPresentation card={card} ref={setNodeRef} />
     </div>
+  ) : (
+    <EmptyCard />
   )
 }
 
-const InnerCard = ({
-  card,
-  isShaking,
-}: {
-  card: CardValue
-  isShaking: boolean
-}) => {
+export const CardPresentation = forwardRef<
+  HTMLDivElement,
+  { card: CardValue; isShaking?: boolean }
+>(({ card, isShaking = false }, ref) => {
   const { top, middle, bottomLeft, bottomRight } = colorMap[card.type]
 
   const isFlipOrTiebreaker = card.type === 'flip' || card.type === 'tiebreaker'
@@ -167,6 +167,7 @@ const InnerCard = ({
 
   return (
     <div
+      ref={ref}
       className={clsx(
         'aspect-card relative flex h-36 w-24 origin-[50%_35%] flex-col items-center justify-center overflow-hidden rounded-lg bg-gray-300 p-2 shadow-lg',
         { 'animate-slow-shake': isShaking },
@@ -199,4 +200,4 @@ const InnerCard = ({
       </div>
     </div>
   )
-}
+})

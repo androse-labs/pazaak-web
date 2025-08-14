@@ -1,5 +1,5 @@
 import { Children, useState, type ReactNode } from 'react'
-import { Card } from './Card'
+import { Card, CardPresentation } from './Card'
 import { EmptyCard } from './EmptyCard'
 import { HiddenCard } from './HiddenCard'
 import type { Card as CardValue } from '@pazaak-web/shared'
@@ -11,7 +11,12 @@ import {
   OctagonX,
   SkipForward,
 } from 'lucide-react'
-import { DndContext, useDndMonitor, useDroppable } from '@dnd-kit/core'
+import {
+  DndContext,
+  DragOverlay,
+  useDndMonitor,
+  useDroppable,
+} from '@dnd-kit/core'
 import clsx from 'clsx'
 import { DropOverlay } from './DropOverlay'
 
@@ -123,23 +128,26 @@ const YourBoardGrid = ({
         <div className="text-lg">
           Total: <span className="font-bold">{total}</span>
         </div>
-        <div
-          ref={setNodeRef}
-          className={clsx(
-            'bg-base-200 relative grid grid-cols-3 grid-rows-3 justify-items-center gap-2 rounded-md p-2',
-          )}
+        <DropOverlay
+          isOver={isOver}
+          show={isDragging}
+          text="Drop to play a card"
         >
-          <GridOfItems length={9}>
-            {cards.map((card, index) => (
-              <div key={index} className="h-full w-full">
-                {card}
-              </div>
-            ))}
-          </GridOfItems>
-          {isDragging && (
-            <DropOverlay isOver={isOver} text={'Drop to play a card.'} />
-          )}
-        </div>
+          <div
+            ref={setNodeRef}
+            className={clsx(
+              'bg-base-200 relative grid grid-cols-3 grid-rows-3 justify-items-center gap-2 rounded-md p-2',
+            )}
+          >
+            <GridOfItems length={9}>
+              {cards.map((card, index) => (
+                <div key={index} className="h-full w-full">
+                  {card}
+                </div>
+              ))}
+            </GridOfItems>
+          </div>
+        </DropOverlay>
       </div>
       <ScoreDisplay total={3} count={score} />
     </div>
@@ -363,15 +371,33 @@ export const Board = ({
   onBoardDrop,
   onMagnitudeFlip,
 }: BoardProps) => {
+  const [draggedCard, setDraggedCard] = useState<CardValue | null>(null)
+  const [isShaking, setIsShaking] = useState(false)
+
   return (
     <div className="flex flex-col items-center justify-center">
       <DndContext
+        onDragStart={(event) => {
+          const { active } = event
+          if (active.data.current && active.data.current.card) {
+            setDraggedCard(active.data.current.card as CardValue)
+          }
+        }}
         onDragEnd={(event) => {
           const { active, over } = event
           if (active.data.current && over) {
             if (over.id === 'your-board' && active.data.current.card) {
               onBoardDrop(active.data.current.card as CardValue)
             }
+          }
+          setDraggedCard(null)
+        }}
+        onDragOver={(event) => {
+          const { active, over } = event
+          if (over?.id === 'your-board' && active.data.current) {
+            setIsShaking(true)
+          } else {
+            setIsShaking(false)
           }
         }}
       >
@@ -413,6 +439,11 @@ export const Board = ({
           />
           <HiddenHandGrid cardCount={opponentCardCount} />
         </div>
+        <DragOverlay>
+          {draggedCard && (
+            <CardPresentation card={draggedCard} isShaking={isShaking} />
+          )}
+        </DragOverlay>
       </DndContext>
       <BoardControls
         onStand={onStand}
