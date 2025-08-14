@@ -24,14 +24,14 @@ export default {
       yourScore={1}
       opponentScore={2}
       yourTurn={true}
-      yourState={'playing'}
+      yourState={'busted'}
       playerCards={[
         { id: 'card1', type: 'add', value: 5 },
         { id: 'card2', type: 'subtract', value: 3 },
         { id: 'card3', type: 'flip', value: 1, magnitude: 'subtract' },
         { id: 'card4', type: 'invert', value: '2&4' },
       ]}
-      opponentState={'playing'}
+      opponentState={'standing'}
       onStand={() => {}}
       onEndTurn={() => {}}
       onBoardDrop={() => {}}

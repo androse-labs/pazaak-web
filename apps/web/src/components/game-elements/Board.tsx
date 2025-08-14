@@ -5,8 +5,10 @@ import { HiddenCard } from './HiddenCard'
 import type { Card as CardValue } from '@pazaak-web/shared'
 import {
   ArrowDownUp,
+  MoveDown,
   MoveLeft,
   MoveRight,
+  MoveUp,
   OctagonMinus,
   OctagonX,
   SkipForward,
@@ -119,14 +121,17 @@ const YourBoardGrid = ({
   })
 
   return (
-    <div className="flex flex-row items-start justify-center gap-2">
-      <div className="flex flex-col items-start justify-center gap-2">
-        <div className="flex w-full justify-between">
-          <span className="text-2xl font-bold">{title}</span>
-          <StateDisplay state={state} />
-        </div>
-        <div className="text-lg">
-          Total: <span className="font-bold">{total}</span>
+    <>
+      <div className="flex items-start justify-between gap-2 lg:hidden">
+        <div className="flex items-start justify-center gap-2">
+          <ScoreDisplay total={3} count={score} />
+          <div>
+            <span className="text-2xl font-bold">{title}</span>
+            <div className="text-lg">
+              Total: <span className="font-bold">{total}</span>
+              <StateDisplay state={state} />
+            </div>
+          </div>
         </div>
         <DropOverlay
           isOver={isOver}
@@ -149,8 +154,39 @@ const YourBoardGrid = ({
           </div>
         </DropOverlay>
       </div>
-      <ScoreDisplay total={3} count={score} />
-    </div>
+      <div className="hidden flex-row items-start justify-center gap-2 lg:flex">
+        <div className="flex flex-col items-start justify-center gap-2">
+          <div className="flex w-full justify-between">
+            <span className="text-2xl font-bold">{title}</span>
+            <StateDisplay state={state} />
+          </div>
+          <div className="text-lg">
+            Total: <span className="font-bold">{total}</span>
+          </div>
+          <DropOverlay
+            isOver={isOver}
+            show={isDragging}
+            text="Drop to play a card"
+          >
+            <div
+              ref={setNodeRef}
+              className={clsx(
+                'bg-base-200 relative grid grid-cols-3 grid-rows-3 justify-items-center gap-2 rounded-md p-2',
+              )}
+            >
+              <GridOfItems length={9}>
+                {cards.map((card, index) => (
+                  <div key={index} className="h-full w-full">
+                    {card}
+                  </div>
+                ))}
+              </GridOfItems>
+            </div>
+          </DropOverlay>
+        </div>
+        <ScoreDisplay total={3} count={score} />
+      </div>
+    </>
   )
 }
 
@@ -168,15 +204,19 @@ const OpponentBoardGrid = ({
   total: number
   cards: ReactNode[]
 }) => (
-  <div className="flex flex-row items-start justify-center gap-2">
-    <ScoreDisplay total={3} count={score} />
-    <div className="flex flex-col items-end justify-end gap-2">
-      <div className="flex w-full flex-row-reverse justify-between">
-        <span className="text-2xl font-bold">{title}</span>
-        <StateDisplay state={state} />
-      </div>
-      <div className="text-lg">
-        Total: <span className="font-bold">{total}</span>
+  <>
+    <div className="flex items-end justify-between gap-2 lg:hidden">
+      <div className="flex items-end justify-center gap-2">
+        <ScoreDisplay total={3} count={score} />
+        <div>
+          <div className="flex w-full flex-col justify-between">
+            <span className="text-2xl font-bold">{title}</span>
+          </div>
+          <div className="text-lg">
+            Total: <span className="font-bold">{total}</span>
+            <StateDisplay state={state} />
+          </div>
+        </div>
       </div>
       <div className="bg-base-200 relative grid grid-cols-3 grid-rows-3 justify-items-center gap-2 rounded-md p-2">
         <GridOfItems length={9}>
@@ -188,7 +228,28 @@ const OpponentBoardGrid = ({
         </GridOfItems>
       </div>
     </div>
-  </div>
+    <div className="hidden flex-row items-start justify-center gap-2 lg:flex">
+      <ScoreDisplay total={3} count={score} />
+      <div className="flex flex-col items-end justify-end gap-2">
+        <div className="flex w-full flex-row-reverse justify-between">
+          <span className="text-2xl font-bold">{title}</span>
+          <StateDisplay state={state} />
+        </div>
+        <div className="text-lg">
+          Total: <span className="font-bold">{total}</span>
+        </div>
+        <div className="bg-base-200 relative grid grid-cols-3 grid-rows-3 justify-items-center gap-2 rounded-md p-2">
+          <GridOfItems length={9}>
+            {cards.map((card, index) => (
+              <div key={index} className="h-full w-full">
+                {card}
+              </div>
+            ))}
+          </GridOfItems>
+        </div>
+      </div>
+    </div>
+  </>
 )
 
 const BoardGrid = ({
@@ -259,7 +320,7 @@ const HandGrid = ({
               <Card card={card} draggable={yourTurn} disabled={!yourTurn} />
               {isConfigurable && (
                 <button
-                  className="btn btn-sm btn-neutral w-full"
+                  className="btn btn-sm btn-neutral w-16 self-center rounded-md lg:w-full"
                   onClick={() => onMagnitudeFlip(card.id)}
                 >
                   <ArrowDownUp size={16} />
@@ -344,14 +405,16 @@ type BoardProps = {
 const TurnIndicator = ({ yourTurn }: { yourTurn: boolean }) => (
   <div className="text-center text-2xl font-bold">
     {yourTurn ? (
-      <span className="flex flex-col items-center justify-center gap-1">
+      <span className="flex flex-row items-center justify-center gap-1 lg:flex-col">
         Your Turn
-        <MoveLeft size={32} className="inline-block" />
+        <MoveLeft size={32} className="hidden lg:inline-block" />
+        <MoveDown size={32} className="inline-block lg:hidden" />
       </span>
     ) : (
-      <span className="flex flex-col items-center justify-center gap-1">
+      <span className="flex flex-row items-center justify-center gap-1 lg:flex-col">
         Opponent's Turn
-        <MoveRight size={32} className="inline-block" />
+        <MoveRight size={32} className="hidden lg:inline-block" />
+        <MoveUp size={32} className="inline-block lg:hidden" />
       </span>
     )}
   </div>
@@ -375,7 +438,7 @@ export const Board = ({
   const [isShaking, setIsShaking] = useState(false)
 
   return (
-    <div className="flex flex-col items-center justify-center">
+    <div className="flex h-full flex-col items-center justify-center">
       <DndContext
         onDragStart={(event) => {
           const { active } = event
@@ -401,23 +464,9 @@ export const Board = ({
           }
         }}
       >
-        <div className="flex items-center justify-between gap-2 py-5">
-          <div className="flex-1">
-            <BoardGrid
-              title="You"
-              yourTurn={yourTurn}
-              state={yourState}
-              score={yourScore}
-              total={yourBoard.total}
-              cards={yourBoard.cards.map((card) => (
-                <Card key={card.id} card={card} />
-              ))}
-            />
-          </div>
-          <div className="flex w-48 justify-center">
-            <TurnIndicator yourTurn={yourTurn} />
-          </div>
-          <div className="flex-1">
+        <div className="flex flex-col items-center justify-around gap-2 lg:hidden">
+          <HiddenHandGrid cardCount={opponentCardCount} />
+          <div className="w-100 items-around flex flex-col justify-around gap-4">
             <BoardGrid
               title="Opponent"
               yourTurn={!yourTurn}
@@ -429,27 +478,87 @@ export const Board = ({
                 <Card key={card.id} card={card} />
               ))}
             />
+            <div className="flex w-full justify-center">
+              <TurnIndicator yourTurn={yourTurn} />
+            </div>
+            <BoardGrid
+              title="You"
+              yourTurn={yourTurn}
+              state={yourState}
+              score={yourScore}
+              total={yourBoard.total}
+              cards={yourBoard.cards.map((card) => (
+                <Card key={card.id} card={card} />
+              ))}
+            />
           </div>
-        </div>
-        <div className="grid grid-cols-2 grid-rows-1 gap-2 p-5">
           <HandGrid
             cards={playerCards}
             onMagnitudeFlip={onMagnitudeFlip}
             yourTurn={yourTurn}
           />
-          <HiddenHandGrid cardCount={opponentCardCount} />
+          <DragOverlay>
+            {draggedCard && (
+              <CardPresentation card={draggedCard} isShaking={isShaking} />
+            )}
+          </DragOverlay>
+          <BoardControls
+            onStand={onStand}
+            onEndTurn={onEndTurn}
+            yourTurn={yourTurn}
+          />
         </div>
-        <DragOverlay>
-          {draggedCard && (
-            <CardPresentation card={draggedCard} isShaking={isShaking} />
-          )}
-        </DragOverlay>
+        <div className="hidden lg:flex lg:flex-col lg:items-center lg:justify-center">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex-1">
+              <BoardGrid
+                title="You"
+                yourTurn={yourTurn}
+                state={yourState}
+                score={yourScore}
+                total={yourBoard.total}
+                cards={yourBoard.cards.map((card) => (
+                  <Card key={card.id} card={card} />
+                ))}
+              />
+            </div>
+            <div className="flex w-48 justify-center">
+              <TurnIndicator yourTurn={yourTurn} />
+            </div>
+            <div className="flex-1">
+              <BoardGrid
+                title="Opponent"
+                yourTurn={!yourTurn}
+                state={opponentState}
+                score={opponentScore}
+                isOpponent
+                total={opponentBoard.total}
+                cards={opponentBoard.cards.map((card) => (
+                  <Card key={card.id} card={card} />
+                ))}
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 grid-rows-1 gap-2 p-5">
+            <HandGrid
+              cards={playerCards}
+              onMagnitudeFlip={onMagnitudeFlip}
+              yourTurn={yourTurn}
+            />
+            <HiddenHandGrid cardCount={opponentCardCount} />
+          </div>
+          <DragOverlay>
+            {draggedCard && (
+              <CardPresentation card={draggedCard} isShaking={isShaking} />
+            )}
+          </DragOverlay>
+          <BoardControls
+            onStand={onStand}
+            onEndTurn={onEndTurn}
+            yourTurn={yourTurn}
+          />
+        </div>
       </DndContext>
-      <BoardControls
-        onStand={onStand}
-        onEndTurn={onEndTurn}
-        yourTurn={yourTurn}
-      />
     </div>
   )
 }

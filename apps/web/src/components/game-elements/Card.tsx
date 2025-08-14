@@ -169,7 +169,7 @@ export const CardPresentation = forwardRef<
     <div
       ref={ref}
       className={clsx(
-        'grid aspect-[2/3] w-20 grid-rows-[0.5fr_4fr_1.5fr_1.5fr] overflow-hidden rounded-lg bg-gray-300 px-2.5 text-center text-xl font-bold shadow-lg lg:w-24 lg:px-3 lg:text-2xl',
+        'grid aspect-[2/3] w-14 grid-rows-[0.5fr_4fr_1.5fr_1.5fr] overflow-hidden rounded-lg bg-gray-300 px-2.5 text-center text-sm font-bold shadow-lg lg:w-20 lg:px-3 lg:text-xl',
         { 'animate-slow-shake': isShaking },
       )}
     >
