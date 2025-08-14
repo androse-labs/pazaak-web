@@ -32,7 +32,7 @@ const Collection = ({
         className="border-3 border-neutral relative flex h-full max-h-full flex-wrap content-start items-start gap-4 overflow-y-scroll rounded-lg border-dashed p-4 lg:max-h-full"
       >
         {cards.map((card) => (
-          <CardComponent key={card.id} card={card} id={card.id} draggable />
+          <CardComponent key={card.id} card={card} draggable />
         ))}
         {showDropOverlay && (
           <DropOverlay
@@ -184,7 +184,7 @@ export function DeckPanel({
           <h3 className="text-center text-lg">Drag cards to your deck</h3>
         ) : (
           draftDeck.map((card) => (
-            <CardComponent key={card.id} card={card} id={card.id} draggable />
+            <CardComponent key={card.id} card={card} draggable />
           ))
         )}
         {showDropOverlay && (

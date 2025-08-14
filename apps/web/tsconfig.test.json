@@ -8,5 +8,6 @@
     "src/**/*.spec.ts",
     "src/**/*.test.tsx",
     "src/**/*.spec.tsx"
-  ]
+  ],
+  "exclude": []
 }

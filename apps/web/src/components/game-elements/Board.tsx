@@ -248,12 +248,7 @@ const HandGrid = ({
             card.type === 'flip' || card.type === 'tiebreaker'
           return (
             <div key={index} className="flex h-full w-full flex-col gap-2">
-              <Card
-                card={card}
-                id={card.id}
-                draggable={yourTurn}
-                disabled={!yourTurn}
-              />
+              <Card card={card} draggable={yourTurn} disabled={!yourTurn} />
               {isConfigurable && (
                 <button
                   className="btn btn-sm btn-neutral w-full"
@@ -389,7 +384,7 @@ export const Board = ({
               score={yourScore}
               total={yourBoard.total}
               cards={yourBoard.cards.map((card) => (
-                <Card key={card.id} card={card} id={card.id} />
+                <Card key={card.id} card={card} />
               ))}
             />
           </div>
@@ -405,7 +400,7 @@ export const Board = ({
               isOpponent
               total={opponentBoard.total}
               cards={opponentBoard.cards.map((card) => (
-                <Card key={card.id} card={card} id={card.id} />
+                <Card key={card.id} card={card} />
               ))}
             />
           </div>

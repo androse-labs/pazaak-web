@@ -5,7 +5,6 @@ import clsx from 'clsx'
 
 type CardProps = {
   card: CardValue
-  id: string
   disabled?: boolean
   draggable?: boolean
 }
@@ -104,10 +103,10 @@ const formatValue = (card: CardValue): string => {
   }
 }
 
-export const Card = ({ card, id, draggable, disabled = false }: CardProps) => {
+export const Card = ({ card, draggable, disabled = false }: CardProps) => {
   const { attributes, listeners, setNodeRef, transform, isDragging, over } =
     useDraggable({
-      id,
+      id: card.id,
       data: { card },
     })
 
