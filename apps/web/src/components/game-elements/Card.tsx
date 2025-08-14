@@ -169,7 +169,7 @@ export const CardPresentation = forwardRef<
     <div
       ref={ref}
       className={clsx(
-        'grid aspect-[2/3] w-14 grid-rows-[0.5fr_4fr_1.5fr_1.5fr] overflow-hidden rounded-lg bg-gray-300 px-2.5 text-center text-sm font-bold shadow-lg lg:w-20 lg:px-3 lg:text-xl',
+        'grid aspect-[2/3] w-12 grid-rows-[0.5fr_4fr_1.5fr_1.5fr] overflow-hidden rounded-sm bg-gray-300 px-1.5 text-center text-sm font-bold shadow-lg lg:w-20 lg:rounded-lg lg:px-3 lg:text-xl',
         { 'animate-slow-shake': isShaking },
       )}
     >
@@ -178,13 +178,13 @@ export const CardPresentation = forwardRef<
       {/* Middle section */}
       <div className="flex h-full w-full flex-col items-center justify-center">
         <div
-          className={`${topColor} h-full w-full justify-self-center rounded-t-md lg:rounded-t-lg`}
+          className={`${topColor} h-full w-full justify-self-center rounded-t-sm lg:rounded-t-lg`}
         />
         <div className="z-10 h-full w-full bg-gray-900 text-white ">
           {formatValue(card)}
         </div>
         <div
-          className={`${middleColor} h-full w-full self-end justify-self-center rounded-b-md lg:rounded-b-lg`}
+          className={`${middleColor} h-full w-full self-end justify-self-center rounded-b-sm lg:rounded-b-lg`}
         />
       </div>
 
@@ -193,12 +193,12 @@ export const CardPresentation = forwardRef<
       {/* Bottom section */}
       <div className="grid grid-cols-2">
         <div
-          className={`${bottomLeft} flex h-full w-full items-center justify-center rounded-tl-lg lg:rounded-tl-lg`}
+          className={`${bottomLeft} flex h-full w-full items-center justify-center rounded-tl-sm lg:rounded-tl-lg`}
         >
           {isFlipOrTiebreaker && <p className="text-black/30">-</p>}
         </div>
         <div
-          className={`${bottomRight} flex h-full w-full items-center justify-center rounded-tr-lg lg:rounded-tr-lg`}
+          className={`${bottomRight} flex h-full w-full items-center justify-center rounded-tr-sm lg:rounded-tr-lg`}
         >
           {isFlipOrTiebreaker && <p className="text-black/30">+</p>}
         </div>

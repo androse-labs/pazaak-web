@@ -326,11 +326,12 @@ const HandGrid = ({
               <Card card={card} draggable={yourTurn} disabled={!yourTurn} />
               {isConfigurable && (
                 <button
-                  className="btn btn-sm btn-neutral w-16 self-center rounded-md lg:w-full"
+                  className="btn btn-xs btn-neutral w-full self-center rounded-md lg:w-full"
                   onClick={() => onMagnitudeFlip(card.id)}
                 >
-                  <ArrowDownUp size={16} />
-                  Flip
+                  <ArrowDownUp size={16} className="hidden lg:inline" />
+                  <ArrowDownUp size={14} className="inline lg:hidden" />
+                  <span className="hidden lg:inline">Flip</span>
                 </button>
               )}
             </div>
@@ -415,16 +416,16 @@ const TurnIndicator = ({
   yourTurn: boolean
   isDesktop: boolean
 }) => (
-  <div className="text-center text-2xl font-bold">
+  <div className="text-center text-lg font-bold lg:text-2xl">
     {yourTurn ? (
       <span className="flex flex-row items-center justify-center gap-1 lg:flex-col">
         Your Turn
-        {isDesktop ? <MoveLeft size={32} /> : <MoveDown size={32} />}
+        {isDesktop ? <MoveLeft size={32} /> : <MoveDown size={20} />}
       </span>
     ) : (
       <span className="flex flex-row items-center justify-center gap-1 lg:flex-col">
         Opponent's Turn
-        {isDesktop ? <MoveRight size={32} /> : <MoveUp size={32} />}
+        {isDesktop ? <MoveRight size={32} /> : <MoveUp size={20} />}
       </span>
     )}
   </div>
