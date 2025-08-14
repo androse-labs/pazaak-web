@@ -103,7 +103,6 @@ const YourBoardGrid = ({
   score,
   total,
   cards,
-  isDesktop,
 }: {
   total: number
   yourTurn: boolean
@@ -111,7 +110,6 @@ const YourBoardGrid = ({
   state: 'playing' | 'standing' | 'busted'
   title: string
   cards: ReactNode[]
-  isDesktop: boolean
 }) => {
   const { setNodeRef, isOver } = useDroppable({ id: 'your-board' })
   const [isDragging, setIsDragging] = useState(false)
@@ -122,8 +120,8 @@ const YourBoardGrid = ({
     onDragCancel: () => setIsDragging(false),
   })
 
-  if (isDesktop) {
-    return (
+  return (
+    <div className="flex flex-row items-start justify-center gap-2">
       <div className="flex flex-col items-start justify-center gap-2">
         <div className="flex w-full justify-between">
           <span className="text-2xl font-bold">{title}</span>
@@ -153,20 +151,56 @@ const YourBoardGrid = ({
           </div>
         </DropOverlay>
       </div>
-    )
-  }
+      <ScoreDisplay total={3} count={score} />
+    </div>
+  )
+}
+
+const MobileYourBoardGrid = ({
+  title,
+  state,
+  score,
+  total,
+  hand,
+  onMagnitudeFlip,
+  cards,
+}: {
+  total: number
+  yourTurn: boolean
+  score: number
+  state: 'playing' | 'standing' | 'busted'
+  title: string
+  hand: CardValue[]
+  onMagnitudeFlip: (cardId: string) => void
+  cards: ReactNode[]
+}) => {
+  const { setNodeRef, isOver } = useDroppable({ id: 'your-board' })
+  const [isDragging, setIsDragging] = useState(false)
+
+  useDndMonitor({
+    onDragStart: () => setIsDragging(true),
+    onDragEnd: () => setIsDragging(false),
+    onDragCancel: () => setIsDragging(false),
+  })
 
   return (
-    <div className="flex items-start justify-between gap-2">
-      <div className="flex items-start justify-center gap-2">
-        <ScoreDisplay total={3} count={score} />
-        <div>
-          <span className="text-2xl font-bold">{title}</span>
-          <div className="text-lg">
-            Total: <span className="font-bold">{total}</span>
-            <StateDisplay state={state} />
+    <div className="flex items-stretch justify-between gap-2">
+      <div className="flex flex-col justify-between gap-2">
+        <div className="justify-left flex items-start gap-2">
+          <ScoreDisplay total={3} count={score} />
+          <div>
+            <span className="text-2xl font-bold">{title}</span>
+            <div className="text-lg">
+              Total: <span className="font-bold">{total}</span>
+              <StateDisplay state={state} />
+            </div>
           </div>
         </div>
+        <HandGrid
+          cards={hand}
+          onMagnitudeFlip={onMagnitudeFlip}
+          yourTurn={true}
+        />
       </div>
       <DropOverlay isOver={isOver} show={isDragging} text="Drop to play a card">
         <div
@@ -188,13 +222,58 @@ const YourBoardGrid = ({
   )
 }
 
+const MobileOpponentBoardGrid = ({
+  title,
+  state,
+  score,
+  total,
+  cards,
+  handCount,
+}: {
+  title: string
+  theirTurn: boolean
+  state: 'playing' | 'standing' | 'busted'
+  score: number
+  total: number
+  handCount: number
+  cards: ReactNode[]
+}) => {
+  return (
+    <div className="flex items-stretch justify-between gap-2">
+      <div className="flex flex-col justify-between gap-2">
+        <HiddenHandGrid cardCount={handCount} />
+        <div className="justify-left flex items-start gap-2">
+          <ScoreDisplay total={3} count={score} />
+          <div>
+            <div className="flex w-full flex-col justify-between">
+              <span className="text-2xl font-bold">{title}</span>
+            </div>
+            <div className="text-lg">
+              Total: <span className="font-bold">{total}</span>
+              <StateDisplay state={state} />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="bg-base-200 relative grid grid-cols-3 grid-rows-3 justify-items-center gap-2 rounded-md p-2">
+        <GridOfItems length={9}>
+          {cards.map((card, index) => (
+            <div key={index} className="h-full w-full">
+              {card}
+            </div>
+          ))}
+        </GridOfItems>
+      </div>
+    </div>
+  )
+}
+
 const OpponentBoardGrid = ({
   title,
   state,
   score,
   total,
   cards,
-  isDesktop,
 }: {
   title: string
   theirTurn: boolean
@@ -202,10 +281,10 @@ const OpponentBoardGrid = ({
   score: number
   total: number
   cards: ReactNode[]
-  isDesktop: boolean
 }) => {
-  if (isDesktop) {
-    return (
+  return (
+    <div className="flex flex-row items-start justify-center gap-2">
+      <ScoreDisplay total={3} count={score} />
       <div className="flex flex-col items-end justify-end gap-2">
         <div className="flex w-full flex-row-reverse justify-between">
           <span className="text-2xl font-bold">{title}</span>
@@ -224,32 +303,6 @@ const OpponentBoardGrid = ({
           </GridOfItems>
         </div>
       </div>
-    )
-  }
-
-  return (
-    <div className="flex items-end justify-between gap-2">
-      <div className="flex items-end justify-center gap-2">
-        <ScoreDisplay total={3} count={score} />
-        <div>
-          <div className="flex w-full flex-col justify-between">
-            <span className="text-2xl font-bold">{title}</span>
-          </div>
-          <div className="text-lg">
-            Total: <span className="font-bold">{total}</span>
-            <StateDisplay state={state} />
-          </div>
-        </div>
-      </div>
-      <div className="bg-base-200 relative grid grid-cols-3 grid-rows-3 justify-items-center gap-2 rounded-md p-2">
-        <GridOfItems length={9}>
-          {cards.map((card, index) => (
-            <div key={index} className="h-full w-full">
-              {card}
-            </div>
-          ))}
-        </GridOfItems>
-      </div>
     </div>
   )
 }
@@ -262,7 +315,6 @@ const BoardGrid = ({
   score,
   total,
   yourTurn,
-  isDesktop,
 }: {
   title: string
   state: 'playing' | 'standing' | 'busted'
@@ -271,7 +323,6 @@ const BoardGrid = ({
   score: number
   yourTurn: boolean
   isOpponent?: boolean
-  isDesktop: boolean
 }) => {
   if (isOpponent)
     return (
@@ -282,7 +333,6 @@ const BoardGrid = ({
         score={score}
         total={total}
         theirTurn={yourTurn}
-        isDesktop={isDesktop}
       />
     )
   return (
@@ -293,7 +343,6 @@ const BoardGrid = ({
       cards={cards}
       total={total}
       yourTurn={yourTurn}
-      isDesktop={isDesktop}
     />
   )
 }
@@ -449,23 +498,16 @@ export const Board = ({
   const [isShaking, setIsShaking] = useState(false)
   const [isDesktop, setIsDesktop] = useState(false)
 
-  // Use effect to check window size once on mount and whenever window is resized
   useEffect(() => {
     const checkIfDesktop = () => {
-      setIsDesktop(window.innerWidth >= 1024) // 1024px is the lg breakpoint in Tailwind
+      setIsDesktop(window.innerWidth > 1024)
     }
-
-    // Initial check
     checkIfDesktop()
-
-    // Add event listener
     window.addEventListener('resize', checkIfDesktop)
 
-    // Clean up
     return () => window.removeEventListener('resize', checkIfDesktop)
   }, [])
 
-  // Prepare card elements only once
   const yourBoardCards = yourBoard.cards.map((card) => (
     <Card key={card.id} card={card} />
   ))
@@ -513,7 +555,6 @@ export const Board = ({
                   score={yourScore}
                   total={yourBoard.total}
                   cards={yourBoardCards}
-                  isDesktop={true}
                 />
               </div>
               <div className="flex w-48 justify-center">
@@ -528,7 +569,6 @@ export const Board = ({
                   isOpponent
                   total={opponentBoard.total}
                   cards={opponentBoardCards}
-                  isDesktop={true}
                 />
               </div>
             </div>
@@ -549,36 +589,30 @@ export const Board = ({
         ) : (
           // Mobile Layout
           <div className="flex flex-col items-center justify-around gap-2">
-            <HiddenHandGrid cardCount={opponentCardCount} />
-            <div className="w-100 items-around flex flex-col justify-around gap-4">
-              <BoardGrid
+            <div className="w-100 flex flex-col justify-around gap-4">
+              <MobileOpponentBoardGrid
                 title="Opponent"
-                yourTurn={!yourTurn}
+                theirTurn={!yourTurn}
                 state={opponentState}
                 score={opponentScore}
-                isOpponent
                 total={opponentBoard.total}
                 cards={opponentBoardCards}
-                isDesktop={false}
+                handCount={opponentCardCount}
               />
               <div className="flex w-full justify-center">
                 <TurnIndicator yourTurn={yourTurn} isDesktop={false} />
               </div>
-              <BoardGrid
+              <MobileYourBoardGrid
                 title="You"
                 yourTurn={yourTurn}
                 state={yourState}
                 score={yourScore}
                 total={yourBoard.total}
                 cards={yourBoardCards}
-                isDesktop={false}
+                onMagnitudeFlip={onMagnitudeFlip}
+                hand={playerCards}
               />
             </div>
-            <HandGrid
-              cards={playerCards}
-              onMagnitudeFlip={onMagnitudeFlip}
-              yourTurn={yourTurn}
-            />
             <BoardControls
               onStand={onStand}
               onEndTurn={onEndTurn}
