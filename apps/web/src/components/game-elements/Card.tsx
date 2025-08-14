@@ -169,34 +169,39 @@ export const CardPresentation = forwardRef<
     <div
       ref={ref}
       className={clsx(
-        'aspect-card relative flex h-36 w-24 origin-[50%_35%] flex-col items-center justify-center overflow-hidden rounded-lg bg-gray-300 p-2 shadow-lg',
+        'grid aspect-[2/3] w-20 grid-rows-[0.5fr_4fr_1.5fr_1.5fr] overflow-hidden rounded-lg bg-gray-300 px-2.5 text-center text-xl font-bold shadow-lg lg:w-24 lg:px-3 lg:text-2xl',
         { 'animate-slow-shake': isShaking },
       )}
     >
-      <div className="flex">
+      <div></div>
+
+      {/* Middle section */}
+      <div className="flex h-full w-full flex-col items-center justify-center">
         <div
-          className={`${topColor} absolute left-1/2 top-0 h-1/6 w-3/4 -translate-x-1/2 translate-y-1/2 transform rounded-t-lg`}
+          className={`${topColor} h-full w-full justify-self-center rounded-t-md lg:rounded-t-lg`}
         />
-        <div className="z-1 absolute flex w-3/4 -translate-x-1/2 -translate-y-10 items-center justify-center bg-gray-900 text-2xl font-bold text-white">
-          <p>{formatValue(card)}</p>
+        <div className="z-10 h-full w-full bg-gray-900 text-white ">
+          {formatValue(card)}
         </div>
         <div
-          className={`${middleColor} absolute left-1/2 h-1/6 w-3/4 -translate-x-1/2 -translate-y-2 transform rounded-b-lg`}
+          className={`${middleColor} h-full w-full self-end justify-self-center rounded-b-md lg:rounded-b-lg`}
         />
       </div>
-      <div
-        className={`${bottomLeft} absolute bottom-0 left-1/4 h-1/5 w-9 -translate-x-1/3 transform items-center justify-center rounded-tl-lg`}
-      >
-        {isFlipOrTiebreaker && (
-          <p className="text-center text-2xl font-bold text-black/30">-</p>
-        )}
-      </div>
-      <div
-        className={`${bottomRight} absolute bottom-0 right-1/4 h-1/5 w-9 translate-x-1/3 transform items-center justify-center rounded-tr-lg`}
-      >
-        {isFlipOrTiebreaker && (
-          <p className="text-center text-2xl font-bold text-black/30">+</p>
-        )}
+
+      <div></div>
+
+      {/* Bottom section */}
+      <div className="grid grid-cols-2">
+        <div
+          className={`${bottomLeft} flex h-full w-full items-center justify-center rounded-tl-lg lg:rounded-tl-lg`}
+        >
+          {isFlipOrTiebreaker && <p className="text-black/30">-</p>}
+        </div>
+        <div
+          className={`${bottomRight} flex h-full w-full items-center justify-center rounded-tr-lg lg:rounded-tr-lg`}
+        >
+          {isFlipOrTiebreaker && <p className="text-black/30">+</p>}
+        </div>
       </div>
     </div>
   )

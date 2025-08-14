@@ -1,5 +1,3 @@
 export const EmptyCard = () => {
-  return (
-    <div className="aspect-card relative flex h-36 w-24 flex-col items-center justify-center overflow-hidden rounded-lg p-2"></div>
-  )
+  return <div className="aspect-[2/3] w-20 rounded-lg lg:w-24"></div>
 }
