@@ -98,4 +98,5 @@ jobs:
           username: ${{ secrets.REMOTE_SERVER_USERNAME }}
           key: ${{ secrets.REMOTE_SERVER_SSH_KEY }}
           script: |
+            export PATH="$HOME/.bun/bin:$PATH"
             pm2 reload pazaak-server || pm2 start bun --name pazaak-server -- run pazaak-server/index.js
