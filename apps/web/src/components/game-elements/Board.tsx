@@ -16,6 +16,7 @@ import {
 import {
   DndContext,
   DragOverlay,
+  MouseSensor,
   TouchSensor,
   useDndMonitor,
   useDroppable,
@@ -508,6 +509,7 @@ export const Board = ({
         tolerance: 5,
       },
     }),
+    useSensor(MouseSensor),
   )
 
   useEffect(() => {

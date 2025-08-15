@@ -1,6 +1,7 @@
 import {
   DndContext,
   DragOverlay,
+  MouseSensor,
   TouchSensor,
   useDroppable,
   useSensor,
@@ -39,6 +40,7 @@ const DeckBuilder = () => {
         tolerance: 5,
       },
     }),
+    useSensor(MouseSensor),
   )
 
   return (
