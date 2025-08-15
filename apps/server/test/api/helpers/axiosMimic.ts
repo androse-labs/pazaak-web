@@ -8,6 +8,7 @@ export function testClient(app: AppType) {
         method: 'GET',
       }),
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     post: (url: string, data?: any, config?: RequestInit) =>
       app.request(url, {
         ...config,
@@ -19,6 +20,7 @@ export function testClient(app: AppType) {
         },
       }),
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     put: (url: string, data?: any, config?: RequestInit) =>
       app.request(url, {
         ...config,

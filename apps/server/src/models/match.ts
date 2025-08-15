@@ -421,7 +421,7 @@ class Match {
     const playerTotal = currentGame.boardTotal(playerBoard)
 
     switch (action.type) {
-      case 'play':
+      case 'play': {
         const cardIndex = player.hand.findIndex(
           (card) =>
             card.type === action.card.type && card.value === action.card.value,
@@ -434,6 +434,7 @@ class Match {
         }
         this.playCard(playerId, action.card)
         break
+      }
 
       case 'end':
         if (playerTotal > 20) {
@@ -478,7 +479,7 @@ class Match {
     }
 
     switch (action.type) {
-      case 'play':
+      case 'play': {
         if (player.hand.length === 0) {
           return { valid: false, reason: 'You have no cards in hand' }
         }
@@ -514,6 +515,7 @@ class Match {
         }
 
         return { valid: true }
+      }
 
       case 'end':
       case 'stand':

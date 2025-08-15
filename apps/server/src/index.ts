@@ -141,7 +141,7 @@ export const createApp = (
             ...match.getPlayerView(player.id),
           })
         },
-        onMessage(event, _) {
+        onMessage(event) {
           console.log(`Message from client: ${event.data}`)
         },
         onClose: () => {

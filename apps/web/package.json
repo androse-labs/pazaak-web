@@ -11,7 +11,7 @@
     "preview": "vite preview",
     "cosmos": "cosmos",
     "cosmos-export": "cosmos-export",
-    "check-lint": "eslint . --ext .ts,.tsx",
+    "check-lint": "eslint .",
     "check-format": "prettier --check .",
     "format": "prettier --write ."
   },
