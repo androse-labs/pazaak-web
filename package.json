@@ -11,7 +11,9 @@
     "dev": "bun --filter web --filter server dev",
     "test:server": "bun run --cwd apps/server test",
     "test:web": "bun run --cwd apps/web test",
-    "build": "bun run --filter web --filter server build"
+    "build": "bun run --filter web --filter server build",
+    "format": "bun run --filter web --filter server format",
+    "lint": "bun run --filter web --filter server lint"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.62.0",

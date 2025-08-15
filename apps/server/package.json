@@ -5,7 +5,8 @@
     "build": "tsc --noEmit && bun build src/index.ts --outdir=dist --target=bun",
     "test": "bun test",
     "check-lint": "eslint . --ext .ts,.tsx",
-    "check-format": "prettier --check ."
+    "check-format": "prettier --check .",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@hono/zod-validator": "^0.7.2",
