@@ -206,7 +206,7 @@ const MobileYourBoardGrid = ({
         <div
           ref={setNodeRef}
           className={clsx(
-            'bg-base-200 relative grid grid-cols-3 grid-rows-3 justify-items-center gap-2 rounded-md p-2',
+            'bg-base-200 relative grid grid-cols-3 grid-rows-3 justify-items-center gap-1 rounded-md p-2 lg:gap-2',
           )}
         >
           <GridOfItems length={9}>
@@ -255,7 +255,7 @@ const MobileOpponentBoardGrid = ({
           </div>
         </div>
       </div>
-      <div className="bg-base-200 relative grid grid-cols-3 grid-rows-3 justify-items-center gap-2 rounded-md p-2">
+      <div className="bg-base-200 relative grid grid-cols-3 grid-rows-3 justify-items-center gap-1 rounded-md p-2 lg:gap-2">
         <GridOfItems length={9}>
           {cards.map((card, index) => (
             <div key={index} className="h-full w-full">
@@ -359,7 +359,7 @@ const HandGrid = ({
   return (
     <div
       className={clsx(
-        'bg-base-200 grid w-fit grid-cols-4 grid-rows-1 gap-2 rounded-md p-2',
+        'bg-base-200 grid w-fit grid-cols-4 grid-rows-1 gap-1 rounded-md p-2 lg:gap-2',
         {
           'cursor-not-allowed': !yourTurn,
           'opacity-50': !yourTurn && cards.length > 0,
@@ -393,7 +393,7 @@ const HandGrid = ({
 
 const HiddenHandGrid = ({ cardCount }: { cardCount: number }) => {
   return (
-    <div className="bg-base-200 grid w-fit grid-cols-4 grid-rows-1 gap-2 rounded-md p-2">
+    <div className="bg-base-200 grid w-fit grid-cols-4 grid-rows-1 gap-1 rounded-md p-2 lg:gap-2">
       <GridOfItems length={4}>
         {Array.from({ length: cardCount }, (_, index) => (
           <div key={index} className="h-full w-full">
@@ -588,8 +588,8 @@ export const Board = ({
           </div>
         ) : (
           // Mobile Layout
-          <div className="flex flex-col items-center justify-around gap-2">
-            <div className="w-100 flex flex-col justify-around gap-4">
+          <div className="flex w-screen flex-col items-center justify-around gap-4 p-4">
+            <div className="flex flex-col justify-around gap-2">
               <MobileOpponentBoardGrid
                 title="Opponent"
                 theirTurn={!yourTurn}
