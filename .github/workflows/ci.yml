@@ -42,34 +42,35 @@ jobs:
 
       - name: Test ${{ matrix.project }}
         run: bun run test
-  # deploy-spa:
-  #   name: Deploy SPA
-  #   runs-on: ubuntu-latest
-  #   needs: build-and-test
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-  #     - name: Install Bun
-  #       uses: oven-sh/setup-bun@v1
-  #     - name: Build SPA
-  #       run: |
-  #         cd apps/web
-  #         bun install
-  #         bun run build
-  #
-  #     - name: Setup AWS CLI
-  #       uses: aws-actions/configure-aws-credentials@v4
-  #       with:
-  #         role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/AndrosePazaakGitHubActions
-  #         aws-region: ap-southeast-2
-  #
-  #     - name: Sync files to S3 bucket
-  #       run: |
-  #         aws s3 sync apps/web/dist s3://androse-pazaak-bucket --delete
-  #
-  #     - name: Invalidate CloudFront cache
-  #       run: |
-  #         aws cloudfront create-invalidation --distribution-id ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
+
+  deploy-spa:
+    name: Deploy SPA
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v1
+      - name: Build SPA
+        run: |
+          cd apps/web
+          bun install
+          bun run build
+
+      - name: Setup AWS CLI
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/AndrosePazaakGitHubActions
+          aws-region: ap-southeast-2
+
+      - name: Sync files to S3 bucket
+        run: |
+          aws s3 sync apps/web/dist s3://androse-pazaak-bucket --delete
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
 
   deploy-server:
     name: Deploy Server
