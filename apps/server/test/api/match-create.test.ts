@@ -19,6 +19,7 @@ describe('Match Creation', () => {
         { id: randomUUIDv7(), type: 'flip', value: 2, magnitude: 'subtract' },
         { id: randomUUIDv7(), type: 'subtract', value: 3 },
       ],
+      unlisted: false,
       matchName: 'Test Match',
     })
 

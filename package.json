@@ -8,7 +8,10 @@
   "scripts": {
     "dev:server": "bun --cwd apps/server dev",
     "dev:web": "bun --cwd apps/web dev",
-    "dev": "bun --filter web --filter server dev"
+    "dev": "bun --filter web --filter server dev",
+    "test:server": "bun run --cwd apps/server test",
+    "test:web": "bun run --cwd apps/web test",
+    "build": "bun run --filter web --filter server build"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.62.0",
