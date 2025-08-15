@@ -42,7 +42,7 @@ const DeckBuilder = () => {
   )
 
   return (
-    <div className="flex h-[calc(100vh-64px)] flex-col lg:flex-1 lg:flex-row">
+    <div className="flex h-[calc(100vh-64px)] flex-col md:flex-row lg:flex-1">
       <DndContext
         sensors={sensors}
         onDragStart={(event) => {
@@ -115,13 +115,13 @@ const DeckBuilder = () => {
           setDragSourceZone(null)
         }}
       >
-        <div className="bg-base-200 flex h-3/5 flex-col overflow-hidden lg:h-auto lg:w-2/3">
+        <div className="bg-base-200 flex h-3/5 flex-col overflow-hidden md:h-auto md:w-2/3">
           <Collection
             cards={collectionCards}
             showDropOverlay={isDragging && dragSourceZone !== 'collection'}
           />
         </div>
-        <div className="bg-base-100 flex h-2/5 flex-col overflow-hidden lg:h-auto lg:w-1/3">
+        <div className="bg-base-100 flex h-2/5 flex-col overflow-hidden md:h-auto md:w-1/3">
           <DeckPanel
             draftDeck={draftDeck}
             validationMessage={deckValidationMessage}
@@ -282,17 +282,17 @@ export function DeckPanel({
         <h1 className="text-2xl font-bold">Deck</h1>
         <div className="flex gap-2">
           <button
-            className="btn btn-accent max-sm:btn-square btn-sm"
+            className="btn btn-accent max-lg:btn-square btn-sm"
             onClick={() => {
               setDraftDeck([])
             }}
           >
             <Trash2 />
-            <span className="hidden sm:inline">Clear Deck</span>
+            <span className="hidden lg:inline">Clear Deck</span>
           </button>
 
           <button
-            className="btn btn-secondary max-sm:btn-square btn-sm"
+            className="btn btn-secondary max-lg:btn-square btn-sm"
             onClick={async () => {
               const modal = document.getElementById('import-deck-code-modal')
               if (modal instanceof HTMLDialogElement) {
@@ -301,7 +301,7 @@ export function DeckPanel({
             }}
           >
             <Import />
-            <span className="hidden sm:inline">Import</span>
+            <span className="hidden lg:inline">Import</span>
           </button>
         </div>
         <ImportDeckCodeModal setDraftDeck={setDraftDeck} />
