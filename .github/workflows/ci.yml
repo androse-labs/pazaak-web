@@ -17,6 +17,9 @@ jobs:
             path: apps/server
           - project: web
             path: apps/web
+    defaults:
+      run:
+        working-directory: ${{ matrix.path }}
 
     steps:
       - name: Checkout code
@@ -28,16 +31,14 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      - name: Run ESLint
-        run: bunx eslint . --ext .js,.ts,.tsx,.jsx
-        working-directory: ${{ matrix.path }}
+      - name: Check Formatting
+        run: bun run check-format
 
-      - name: Run Prettier
-        run: bunx prettier --check .
-        working-directory: ${{ matrix.path }}
+      - name: Check Lint
+        run: bun run check-lint
 
       - name: Build ${{ matrix.project }}
-        run: bun run --cwd ${{ matrix.path }} build
+        run: bun run build
 
       - name: Test ${{ matrix.project }}
-        run: bun run --cwd ${{ matrix.path }} test
+        run: bun run test
