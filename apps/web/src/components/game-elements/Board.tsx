@@ -16,8 +16,11 @@ import {
 import {
   DndContext,
   DragOverlay,
+  TouchSensor,
   useDndMonitor,
   useDroppable,
+  useSensor,
+  useSensors,
 } from '@dnd-kit/core'
 import clsx from 'clsx'
 import { DropOverlay } from './DropOverlay'
@@ -498,6 +501,15 @@ export const Board = ({
   const [isShaking, setIsShaking] = useState(false)
   const [isDesktop, setIsDesktop] = useState(false)
 
+  const sensors = useSensors(
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 0,
+        tolerance: 5,
+      },
+    }),
+  )
+
   useEffect(() => {
     const checkIfDesktop = () => {
       setIsDesktop(window.innerWidth > 1024)
@@ -519,6 +531,7 @@ export const Board = ({
   return (
     <div className="flex h-full flex-col items-center justify-center">
       <DndContext
+        sensors={sensors}
         onDragStart={(event) => {
           const { active } = event
           if (active.data.current && active.data.current.card) {
