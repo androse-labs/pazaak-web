@@ -85,14 +85,12 @@ jobs:
           cd apps/server
           bun install
           bun run build
-      - name: Deploy to remote server
-        uses: appleboy/scp-action@v1
-        with:
-          host: ${{ secrets.REMOTE_SERVER_HOST }}
-          username: ${{ secrets.REMOTE_SERVER_USERNAME }}
-          key: ${{ secrets.REMOTE_SERVER_SSH_KEY }}
-          source: 'apps/server/dist/index.js'
-          target: 'pazaak-server'
+      - name: Deploy to remote server via scp
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.REMOTE_SERVER_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no apps/server/dist/index.js ${{ secrets.REMOTE_SERVER_USERNAME }}@${{ secrets.REMOTE_SERVER_HOST }}:pazaak-server/index.js
       - name: Restart server
         uses: appleboy/ssh-action@v1
         with:
