@@ -30,7 +30,7 @@ These cards are green and are drawn from a shared deck. They are numbered from
 1 to 10.
 
 <div className="not-prose mx-auto grid w-fit">
-  <Card card={{ id: "5", type: 'none', value: 5 }} />
+  <Card card={{ id: '5', type: 'none', value: 5 }} />
 </div>
 
 ### Add Cards
@@ -38,7 +38,7 @@ These cards are green and are drawn from a shared deck. They are numbered from
 These cards are blue and add a value to the board's total score.
 
 <div className="not-prose mx-auto grid w-fit">
-  <Card card={{ id: "5", type: 'add', value: 5 }}  />
+  <Card card={{ id: '5', type: 'add', value: 5 }} />
 </div>
 
 ### Subtract Cards
@@ -46,7 +46,7 @@ These cards are blue and add a value to the board's total score.
 These cards are red and subtract a value from the board's total score.
 
 <div className="not-prose mx-auto grid w-fit">
-  <Card card={{ id: "5", type: 'subtract', value: 5 }}  />
+  <Card card={{ id: '5', type: 'subtract', value: 5 }} />
 </div>
 
 ### Flip Cards
@@ -55,8 +55,8 @@ These cards are both red and blue and can be configured to be played as either
 an add or subtract card.
 
 <div className="not-prose mx-auto grid w-fit grid-cols-2 gap-4">
-  <Card card={{ id: "5", type: 'flip', value: 5, magnitude: 'add' }}  />
-  <Card card={{ id: "5", type: 'flip', value: 5, magnitude: 'subtract' }}  />
+  <Card card={{ id: '5', type: 'flip', value: 5, magnitude: 'add' }} />
+  <Card card={{ id: '5', type: 'flip', value: 5, magnitude: 'subtract' }} />
 </div>
 
 ### Tiebreaker Cards
@@ -66,8 +66,10 @@ last card on your board. They too can be configured like flip cards and will
 give the player an advantage in the event of a tie.
 
 <div className="not-prose mx-auto grid w-fit grid-cols-2 gap-4">
-  <Card card={{ id: "5", type: 'tiebreaker', value: 1, magnitude: 'add' }}  />
-  <Card card={{ id: "5", type: 'tiebreaker', value: 1, magnitude: 'subtract' }}  />
+  <Card card={{ id: '5', type: 'tiebreaker', value: 1, magnitude: 'add' }} />
+  <Card
+    card={{ id: '5', type: 'tiebreaker', value: 1, magnitude: 'subtract' }}
+  />
 </div>
 
 ### Double Cards
@@ -76,7 +78,7 @@ These are yellow cards identified by a "D" as their value. They do not add or su
 the board's total score, but instead double the value of the last played card.
 
 <div className="not-prose mx-auto grid w-fit">
-  <Card card={{ id: "5", type: 'double', value: 'D' }} />
+  <Card card={{ id: '5', type: 'double', value: 'D' }} />
 </div>
 
 ### Invert Cards
@@ -87,7 +89,7 @@ of "2&4" will invert the values of all 2s and 4s played on the board,
 turning them into -2s and -4s respectively.
 
 <div className="not-prose mx-auto grid w-fit">
-  <Card card={{ id: "5", type: 'invert', value: '2&4' }} />
+  <Card card={{ id: '5', type: 'invert', value: '2&4' }} />
 </div>
 
 ## Board Deck
@@ -96,23 +98,22 @@ Players will draw a card each turn from the shared deck. The deck consists of 4
 copies of the below cards:
 
 <div className="not-prose mx-auto grid w-fit grid-cols-5 grid-rows-2 gap-4">
-  <Card card={{ id: "5", type: 'none', value: 1 }} />
-  <Card card={{ id: "5", type: 'none', value: 2 }} />
-  <Card card={{ id: "5", type: 'none', value: 3 }} />
-  <Card card={{ id: "5", type: 'none', value: 4 }} />
-  <Card card={{ id: "5", type: 'none', value: 5 }}  />
-  <Card card={{ id: "5", type: 'none', value: 6 }} />
+  <Card card={{ id: '5', type: 'none', value: 1 }} />
+  <Card card={{ id: '5', type: 'none', value: 2 }} />
+  <Card card={{ id: '5', type: 'none', value: 3 }} />
+  <Card card={{ id: '5', type: 'none', value: 4 }} />
+  <Card card={{ id: '5', type: 'none', value: 5 }} />
+  <Card card={{ id: '5', type: 'none', value: 6 }} />
   <Card
     card={{
-      id: "5", 
+      id: '5',
       type: 'none',
       value: 7,
     }}
-    
   />
-  <Card card={{ id: "5", type: 'none', value: 8 }} />
-  <Card card={{ id: "5", type: 'none', value: 9 }} />
-  <Card card={{ id: "5", type: 'none', value: 10 }} />
+  <Card card={{ id: '5', type: 'none', value: 8 }} />
+  <Card card={{ id: '5', type: 'none', value: 9 }} />
+  <Card card={{ id: '5', type: 'none', value: 10 }} />
 </div>
 
 ## Player Decks
@@ -127,16 +128,16 @@ If you're not sure where to start with your deck, here's an example of a
 balanced deck that you can use:
 
 <div className="not-prose mx-auto grid w-fit grid-cols-5 grid-rows-2 gap-4">
-  <Card card={{ id: "5", type: 'tiebreaker', value: 1, magnitude: 'add' }} />
-  <Card card={{ id: "5", type: 'tiebreaker', value: 1, magnitude: 'add' }} />
-  <Card card={{ id: "5", type: 'flip', value: 1, magnitude: 'add' }} />
-  <Card card={{ id: "5", type: 'flip', value: 2, magnitude: 'add' }} />
-  <Card card={{ id: "5", type: 'flip', value: 2, magnitude: 'add' }} />
-  <Card card={{ id: "5", type: 'flip', value: 3, magnitude: 'add' }} />
-  <Card card={{ id: "5", type: 'flip', value: 3, magnitude: 'add' }} />
-  <Card card={{ id: "5", type: 'double', value: 'D' }} />
-  <Card card={{ id: "5", type: 'invert', value: '2&4' }} />
-  <Card card={{ id: "5", type: 'invert', value: '3&6' }} />
+  <Card card={{ id: '5', type: 'tiebreaker', value: 1, magnitude: 'add' }} />
+  <Card card={{ id: '5', type: 'tiebreaker', value: 1, magnitude: 'add' }} />
+  <Card card={{ id: '5', type: 'flip', value: 1, magnitude: 'add' }} />
+  <Card card={{ id: '5', type: 'flip', value: 2, magnitude: 'add' }} />
+  <Card card={{ id: '5', type: 'flip', value: 2, magnitude: 'add' }} />
+  <Card card={{ id: '5', type: 'flip', value: 3, magnitude: 'add' }} />
+  <Card card={{ id: '5', type: 'flip', value: 3, magnitude: 'add' }} />
+  <Card card={{ id: '5', type: 'double', value: 'D' }} />
+  <Card card={{ id: '5', type: 'invert', value: '2&4' }} />
+  <Card card={{ id: '5', type: 'invert', value: '3&6' }} />
 </div>
 
 You can import this deck into the [Deck Builder](/deck-builder) page by copying
