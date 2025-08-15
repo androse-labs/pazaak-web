@@ -92,7 +92,7 @@ jobs:
           username: ${{ secrets.REMOTE_SERVER_USERNAME }}
           key: ${{ secrets.REMOTE_SERVER_SSH_KEY }}
           source: 'apps/server/dist/index.js'
-          target: '~/index.js'
+          target: 'pazaak-server/index.js'
       - name: Restart server
         uses: appleboy/ssh-action@v1
         with:
@@ -100,4 +100,4 @@ jobs:
           username: ${{ secrets.REMOTE_SERVER_USERNAME }}
           key: ${{ secrets.REMOTE_SERVER_SSH_KEY }}
           script: |
-            pm2 reload pazaak-server || pm2 start bun --name pazaak-server -- run index.js
+            pm2 reload pazaak-server || pm2 start bun --name pazaak-server -- run pazaak-server/index.js
