@@ -139,7 +139,7 @@ export const Card = ({ card, draggable, disabled = false }: CardProps) => {
       {...attributes}
       {...listeners}
       className={clsx(
-        'touch-none select-none',
+        'touch-manipulation select-none',
         { 'cursor-not-allowed': disabled },
         { 'cursor-grab': !disabled },
       )}

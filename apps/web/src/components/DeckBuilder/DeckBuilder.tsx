@@ -1,4 +1,11 @@
-import { DndContext, DragOverlay, useDroppable } from '@dnd-kit/core'
+import {
+  DndContext,
+  DragOverlay,
+  TouchSensor,
+  useDroppable,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
 import { Copy, Import, Trash2 } from 'lucide-react'
 import { DropOverlay } from '../game-elements/DropOverlay'
 import { Modal } from '../Modal'
@@ -25,9 +32,19 @@ const DeckBuilder = () => {
   const [draftDeck, setDraftDeck] = useState<Card[]>(userDeck)
   const [isShaking, setIsShaking] = useState(false)
 
+  const sensors = useSensors(
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 150,
+        tolerance: 5,
+      },
+    }),
+  )
+
   return (
     <div className="flex h-[calc(100vh-64px)] flex-col lg:flex-1 lg:flex-row">
       <DndContext
+        sensors={sensors}
         onDragStart={(event) => {
           setIsDragging(true)
           const card = event.active.data.current?.card as Card | undefined
