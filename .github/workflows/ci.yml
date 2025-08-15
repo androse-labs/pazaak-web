@@ -8,7 +8,7 @@ on:
 
 jobs:
   verify:
-    name: Verify ${{ matrix.project }}
+    name: Build & Test ${{ matrix.project }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
