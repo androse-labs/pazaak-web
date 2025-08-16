@@ -929,4 +929,45 @@ describe('Match', () => {
       expect(notifySpy).toHaveBeenCalled()
     })
   })
+
+  it('marks the game as complete when a player plays a 9th card and does not bust', () => {
+    const match = createTestMatch({
+      players: [
+        {
+          ...createTestPlayer(),
+          id: 'player1',
+          status: 'playing',
+          hand: [{ id: 'test-card-1', type: 'none', value: 1 }],
+        },
+        { ...createTestPlayer(), id: 'player2', status: 'playing' },
+      ],
+      status: 'in-progress',
+    })
+
+    const game = new Game('player1', 'player2')
+    match.addGame(game)
+
+    for (let i = 0; i < 8; i++) {
+      game.boards['player1'].push({ id: `card-${i}`, type: 'none', value: 1 })
+    }
+
+    expect(game.boards['player1']).toHaveLength(8)
+    expect(match.games.length).toBe(1)
+    expect(match.score).toEqual([0, 0])
+    expect(game.determineTooManyConditionWinner()).toBeNull()
+
+    expect(game.winner).toBeNull()
+    expect(match.players[0]!.status).toBe('playing')
+
+    const actionResult = match.performAction('player1', {
+      type: 'play',
+      card: { id: 'test-card-1', type: 'none', value: 1 },
+    })
+
+    expect(actionResult).toEqual({ success: true })
+    expect(game.boards['player1']).toHaveLength(9)
+    expect(game.determineTooManyConditionWinner()).toBe(0)
+    expect(match.games.length).toBe(2)
+    expect(match.score).toEqual([1, 0])
+  })
 })

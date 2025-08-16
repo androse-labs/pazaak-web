@@ -133,8 +133,8 @@ function MatchPage() {
             open: true,
             content: (
               <div className="flex flex-col items-center gap-2">
-                The match is complete! You
-                {message.youWon ? 'won!' : 'lost. Better luck next time!'}
+                The match is complete! You{' '}
+                {message.youWon ? ' won!' : ' lost. Better luck next time!'}
               </div>
             ),
             persistent: false,
@@ -179,7 +179,14 @@ function MatchPage() {
         <Board
           boards={{
             yourBoard: currentGame.boards.yourBoard,
-            opponentBoard: currentGame.boards.opponentBoard,
+            // give opponent cards new random IDs to avoid React key issues
+            opponentBoard: {
+              cards: currentGame.boards.opponentBoard.cards.map((card) => ({
+                ...card,
+                id: crypto.randomUUID(),
+              })),
+              total: currentGame.boards.opponentBoard.total,
+            },
           }}
           yourScore={gameState.score.yourScore}
           opponentScore={gameState.score.opponentScore}

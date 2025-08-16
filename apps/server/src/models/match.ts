@@ -241,7 +241,9 @@ class Match {
       throw new Error('No current game to notify players about winner')
     }
 
-    const winnerIndex = currentGame.determineWinner()
+    const winnerIndex =
+      currentGame.determineWinner() ||
+      currentGame.determineTooManyConditionWinner()
 
     console.log(`winner was ${winnerIndex}`)
 
@@ -323,7 +325,11 @@ class Match {
     if (!currentGame) return
 
     // Determine winner of this game
-    const winnerIndex = currentGame.determineWinner()
+    const winnerIndex =
+      currentGame.determineWinner() ||
+      currentGame.determineTooManyConditionWinner()
+
+    console.log(`Game winner index: ${winnerIndex}`)
 
     if (winnerIndex !== null) {
       this.score[winnerIndex] += 1
@@ -393,6 +399,12 @@ class Match {
         throw new Error('No cards left in game deck')
       }
       currentGame.boards[currentPlayer.id].push(drawnCard)
+
+      const winnerIndex = currentGame.determineTooManyConditionWinner()
+      if (winnerIndex !== null) {
+        this.finalizeGame()
+        return
+      }
     }
   }
 
@@ -433,6 +445,18 @@ class Match {
           throw new Error('Card not found in hand')
         }
         this.playCard(playerId, action.card)
+
+        const currentGame = this.games[this.games.length - 1]
+
+        // Check too many condition
+        const winnerIndex = currentGame.determineTooManyConditionWinner()
+        if (winnerIndex !== null) {
+          console.log(
+            `Player ${playerId} has won the game by too many condition`,
+          )
+          this.finalizeGame()
+          return { success: true }
+        }
         break
       }
 

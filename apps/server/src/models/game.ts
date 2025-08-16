@@ -67,14 +67,35 @@ class Game {
     return 'neither'
   }
 
-  determineWinner(): number | null {
-    const player1_total = this.boardTotal(this.boards[this.player1Id])
-    const player2_total = this.boardTotal(this.boards[this.player2Id])
-    const player1_distance = 20 - player1_total
-    const player2_distance = 20 - player2_total
+  determineTooManyConditionWinner(): number | null {
+    // Check card count win condition
+    const player1Total = this.boardTotal(this.boards[this.player1Id])
+    const player2Total = this.boardTotal(this.boards[this.player2Id])
 
-    const player1Status = this.getBustStatus(player1_distance)
-    const player2Status = this.getBustStatus(player2_distance)
+    const player1CardCount = this.boards[this.player1Id].length
+    const player2CardCount = this.boards[this.player2Id].length
+
+    if (player1CardCount >= 9 && player1Total <= 20) {
+      console.log('Player 1 wins by card count')
+      return 0 // Player 1 wins by card count
+    }
+
+    if (player2CardCount >= 9 && player2Total <= 20) {
+      console.log('Player 2 wins by card count')
+      return 1 // Player 2 wins by card count
+    }
+
+    return null // No winner by card count
+  }
+
+  determineWinner(): number | null {
+    const player1Total = this.boardTotal(this.boards[this.player1Id])
+    const player2Total = this.boardTotal(this.boards[this.player2Id])
+    const player1Distance = 20 - player1Total
+    const player2Distance = 20 - player2Total
+
+    const player1Status = this.getBustStatus(player1Distance)
+    const player2Status = this.getBustStatus(player2Distance)
 
     // Handle bust scenarios
     if (player1Status === 'busted' && player2Status === 'busted') {
@@ -85,7 +106,7 @@ class Game {
     if (player2Status === 'busted') return 0
 
     // Both players are safe - check distances
-    if (player1_distance === player2_distance) {
+    if (player1Distance === player2Distance) {
       // Equal distances - check tiebreakers
       const tiebreakerAdvantage = this.getTiebreakerAdvantage()
 
@@ -102,7 +123,7 @@ class Game {
     }
 
     // Different distances - closer to 20 wins
-    return player1_distance < player2_distance ? 0 : 1
+    return player1Distance < player2Distance ? 0 : 1
   }
 }
 
