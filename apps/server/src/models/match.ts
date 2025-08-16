@@ -166,7 +166,10 @@ class Match {
         if (card.type === 'double' || card.type === 'invert') {
           return
         }
-        if (card.type === 'flip' || card.type === 'tiebreaker') {
+        if (
+          (card.type === 'flip' || card.type === 'tiebreaker') &&
+          invertedValues.includes(card.value)
+        ) {
           card.magnitude = card.magnitude === 'subtract' ? 'add' : 'subtract'
           return
         }
