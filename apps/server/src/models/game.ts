@@ -76,12 +76,10 @@ class Game {
     const player2CardCount = this.boards[this.player2Id].length
 
     if (player1CardCount >= 9 && player1Total <= 20) {
-      console.log('Player 1 wins by card count')
       return 0 // Player 1 wins by card count
     }
 
     if (player2CardCount >= 9 && player2Total <= 20) {
-      console.log('Player 2 wins by card count')
       return 1 // Player 2 wins by card count
     }
 
@@ -117,7 +115,6 @@ class Game {
           return 1
         case 'both':
         case 'neither':
-          console.log('tie baby')
           return null
       }
     }

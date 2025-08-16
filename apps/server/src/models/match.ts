@@ -245,8 +245,6 @@ class Match {
       currentGame.determineWinner() ||
       currentGame.determineTooManyConditionWinner()
 
-    console.log(`winner was ${winnerIndex}`)
-
     this.players.forEach((player) => {
       if (!player) {
         throw new Error('Player not found in match')
@@ -260,7 +258,6 @@ class Match {
       )
 
       if (winnerIndex === null) {
-        console.log('telling the players about the tie')
         player.sendEvent({
           type: 'playerScored',
           opponentScore: this.score[opponentIndex],
