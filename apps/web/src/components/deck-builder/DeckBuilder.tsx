@@ -168,7 +168,7 @@ const Collection = ({
       <DropOverlay
         isOver={isOver}
         show={showDropOverlay}
-        text="Drop cards here to add them to your deck"
+        text="Drop cards here to remove them from your deck"
         className="flex-1 overflow-hidden"
       >
         <div
