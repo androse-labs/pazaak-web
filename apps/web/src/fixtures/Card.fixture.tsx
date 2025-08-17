@@ -1,4 +1,4 @@
-import { Card } from '../components/game-elements/Card'
+import { Card } from '../components/game-elements/card/Card'
 
 export default {
   Add: (

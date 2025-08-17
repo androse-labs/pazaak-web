@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Board } from '../../../components/game-elements/Board'
+import { Board } from '../../../components/game-elements/board/Board'
 import useWebSocket from 'react-use-websocket'
 import { useEffect, useRef, useState } from 'react'
 import type { MatchAction } from '../../../components/game-elements/types'

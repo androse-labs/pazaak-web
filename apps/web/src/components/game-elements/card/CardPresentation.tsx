@@ -1,15 +1,7 @@
-import type { CardType } from './types'
-import type { Card as CardValue } from '@pazaak-web/shared'
-import { useDraggable } from '@dnd-kit/core'
-import clsx from 'clsx'
 import { forwardRef } from 'react'
-import { EmptyCard } from './EmptyCard'
-
-type CardProps = {
-  card: CardValue
-  disabled?: boolean
-  draggable?: boolean
-}
+import clsx from 'clsx'
+import type { Card as CardValue } from '@pazaak-web/shared'
+import type { CardType } from '../types'
 
 type PazaakColor =
   | 'bg-pzk-blue'
@@ -103,52 +95,6 @@ const formatValue = (card: CardValue): string => {
     default:
       return value.toString()
   }
-}
-
-export const Card = ({ card, draggable, disabled = false }: CardProps) => {
-  const { attributes, listeners, setNodeRef, transform, isDragging } =
-    useDraggable({
-      id: card.id,
-      data: { card },
-    })
-
-  const style = transform
-    ? {
-        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-        zIndex: 20,
-      }
-    : undefined
-
-  if (!draggable) {
-    return (
-      <div
-        className={clsx(
-          'select-none',
-          { 'cursor-not-allowed': disabled },
-          { 'cursor-grab': !disabled },
-        )}
-      >
-        <CardPresentation card={card} isShaking={false} />
-      </div>
-    )
-  }
-
-  return !isDragging ? (
-    <div
-      style={style}
-      {...attributes}
-      {...listeners}
-      className={clsx(
-        'touch-manipulation select-none',
-        { 'cursor-not-allowed': disabled },
-        { 'cursor-grab': !disabled },
-      )}
-    >
-      <CardPresentation card={card} ref={setNodeRef} />
-    </div>
-  ) : (
-    <EmptyCard />
-  )
 }
 
 export const CardPresentation = forwardRef<

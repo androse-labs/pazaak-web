@@ -7,7 +7,7 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
-import { Copy, Import, Trash2 } from 'lucide-react'
+import { Import, Trash2 } from 'lucide-react'
 import { DropOverlay } from '../game-elements/DropOverlay'
 import { Modal } from '../Modal'
 import type { Card } from '@pazaak-web/shared'
@@ -15,9 +15,11 @@ import { useState } from 'react'
 import { collectionCards } from './card-collection'
 import { deckSchema } from '../../stores/deckStore'
 import { useDeckStore } from '../../stores/deckStore'
-import { Card as CardComponent, CardPresentation } from '../game-elements/Card'
+import { Card as CardComponent } from '../game-elements/card/Card'
+import { CardPresentation } from '../game-elements/card/CardPresentation'
 import { codeToDeck, deckToCode } from './deck-serializer'
 import clsx from 'clsx'
+import { CopyButton } from '../CopyButton'
 
 const DeckBuilder = () => {
   const userDeck = useDeckStore((s) => s.deck)
@@ -174,7 +176,7 @@ const Collection = ({
           className="flex h-full w-full flex-wrap content-start items-start gap-4 overflow-y-auto p-4"
         >
           {cards.map((card) => (
-            <CardComponent key={card.id} card={card} draggable />
+            <CardComponent key={card.id} card={card} draggable cloneable />
           ))}
         </div>
       </DropOverlay>
@@ -346,17 +348,12 @@ export function DeckPanel({
         >
           Save
         </button>
-        <div className="tooltip tooltip-left" data-tip="Copy deck code">
-          <button
-            className="btn btn-secondary btn-square"
-            disabled={!deckIsChanged}
-            onClick={() => {
-              navigator.clipboard.writeText(deckToCode(draftDeck))
-            }}
-          >
-            <Copy />
-          </button>
-        </div>
+        <CopyButton
+          value={deckToCode(draftDeck)}
+          tooltip="Copy deck code"
+          copiedTooltip="Copied!"
+          tooltipClassName="tooltip-left"
+        />
       </div>
     </div>
   )

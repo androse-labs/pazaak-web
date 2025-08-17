@@ -1,16 +1,16 @@
 import { expect, describe, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { Card as CardComponent } from './Card'
+import { CardPresentation } from './CardPresentation'
 import type { Card as CardType } from '@pazaak-web/shared'
 
-describe('Card', () => {
+describe('CardPresentation', () => {
   it('shows value for add card', () => {
     const card: CardType = {
       id: crypto.randomUUID(),
       type: 'add',
       value: 5,
     }
-    render(<CardComponent card={card} />)
+    render(<CardPresentation card={card} />)
 
     expect(screen.getByText('+5')).toBeInTheDocument()
   })
@@ -21,7 +21,7 @@ describe('Card', () => {
       type: 'add',
       value: -5,
     }
-    render(<CardComponent card={card} />)
+    render(<CardPresentation card={card} />)
 
     expect(screen.getByText('-5')).toBeInTheDocument()
   })
@@ -32,7 +32,7 @@ describe('Card', () => {
       type: 'subtract',
       value: 3,
     }
-    render(<CardComponent card={card} />)
+    render(<CardPresentation card={card} />)
 
     expect(screen.getByText('-3')).toBeInTheDocument()
   })
@@ -43,7 +43,7 @@ describe('Card', () => {
       type: 'subtract',
       value: -3,
     }
-    render(<CardComponent card={card} />)
+    render(<CardPresentation card={card} />)
 
     expect(screen.getByText('+3')).toBeInTheDocument()
   })
@@ -59,7 +59,7 @@ describe('Card', () => {
       magnitude,
     }
 
-    render(<CardComponent card={card} />)
+    render(<CardPresentation card={card} />)
 
     expect(screen.getByText(expectedText)).toBeInTheDocument()
   })
@@ -77,7 +77,7 @@ describe('Card', () => {
         magnitude,
       }
 
-      render(<CardComponent card={card} />)
+      render(<CardPresentation card={card} />)
 
       expect(screen.getByText(expectedText)).toBeInTheDocument()
     },
@@ -89,7 +89,7 @@ describe('Card', () => {
       type: 'double',
       value: 'D',
     }
-    render(<CardComponent card={card} />)
+    render(<CardPresentation card={card} />)
 
     expect(screen.getByText('D')).toBeInTheDocument()
   })

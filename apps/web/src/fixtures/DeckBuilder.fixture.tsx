@@ -1,4 +1,4 @@
-import { DeckBuilder } from '../components/DeckBuilder/DeckBuilder'
+import { DeckBuilder } from '../components/deck-builder/DeckBuilder'
 
 export default {
   'Deck Builder': <DeckBuilder />,

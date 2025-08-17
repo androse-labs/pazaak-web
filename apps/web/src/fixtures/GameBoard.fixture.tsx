@@ -1,4 +1,4 @@
-import { Board } from '../components/game-elements/Board'
+import { Board } from '../components/game-elements/board/Board'
 
 export default {
   GameBoard: (

@@ -1,4 +1,4 @@
-import { Copy } from 'lucide-react'
+import { CopyButton } from './CopyButton'
 
 type WaitingForMatchToStartProps = {
   matchId: string
@@ -25,16 +25,12 @@ const WaitingForMatchToStart = ({ matchId }: WaitingForMatchToStartProps) => {
               onFocus={(e) => e.target.select()}
               readOnly
             />
-            <div className="tooltip tooltip-top" data-tip="Copy match url">
-              <button
-                className="btn btn-secondary btn-square join-item"
-                onClick={() => {
-                  navigator.clipboard.writeText(createMatchURL(matchId))
-                }}
-              >
-                <Copy />
-              </button>
-            </div>
+            <CopyButton
+              value={createMatchURL(matchId)}
+              tooltip="Copy match URL"
+              copiedTooltip="Copied!"
+              className="join-item"
+            />
           </div>
         </div>
       </div>
