@@ -38,12 +38,14 @@ const NavBar = () => {
       >
         Deck Builder
       </Link>
-      <Link
-        to="/how-to-play"
-        className="btn btn-ghost hidden flex-grow-0 text-base normal-case sm:flex lg:text-xl"
-      >
-        How to Play
-      </Link>
+      {showHelpIcon ? null : (
+        <Link
+          to="/how-to-play"
+          className="btn btn-ghost flex-grow-0 text-base normal-case lg:text-xl"
+        >
+          How to Play
+        </Link>
+      )}
       <div className="flex-grow"></div>
       {showHelpIcon && (
         <div className="flex-none">
