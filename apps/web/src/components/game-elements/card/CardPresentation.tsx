@@ -126,7 +126,7 @@ export const CardPresentation = forwardRef<
         <div
           className={`${topColor} h-full w-full justify-self-center rounded-t-sm lg:rounded-t-lg`}
         />
-        <div className="z-10 h-full w-full bg-gray-900 text-white ">
+        <div className=" h-full w-full bg-gray-900 text-white ">
           {formatValue(card)}
         </div>
         <div
