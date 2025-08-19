@@ -12,7 +12,11 @@ export default defineConfig({
   },
   plugins: [
     TanStackRouterVite({ target: 'react', autoCodeSplitting: true }),
-    react(),
+    react({
+      babel: {
+        plugins: ['babel-plugin-react-compiler'],
+      },
+    }),
     mdx(),
     tailwindcss(),
   ],

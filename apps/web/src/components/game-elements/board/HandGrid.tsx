@@ -29,7 +29,12 @@ export const HandGrid = ({
             card.type === 'flip' || card.type === 'tiebreaker'
           return (
             <div key={index} className="flex h-full w-full flex-col gap-2">
-              <Card card={card} draggable={yourTurn} disabled={!yourTurn} />
+              <Card
+                card={card}
+                draggable={yourTurn}
+                disabled={!yourTurn}
+                key={card.id}
+              />
               {isConfigurable && (
                 <button
                   className="btn btn-xs btn-neutral w-full self-center rounded-md lg:w-full"
