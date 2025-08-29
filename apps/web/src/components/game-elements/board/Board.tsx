@@ -193,7 +193,7 @@ export const Board = ({
           </div>
         )}
 
-        <DragOverlay>
+        <DragOverlay dropAnimation={null}>
           {draggedCard && (
             <CardPresentation card={draggedCard} isShaking={isShaking} />
           )}

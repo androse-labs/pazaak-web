@@ -14,6 +14,7 @@ import { GameNotification } from '../../../components/GameNotification'
 import { usePlayerStore } from '../../../stores/playerStore'
 import { CircleX, Crown, Scale } from 'lucide-react'
 import { WaitingForMatchToStart } from '../../../components/WaitingForMatchToStart'
+import { produce } from 'immer'
 
 export const Route = createFileRoute('/match/$matchId/')({
   component: MatchPage,
@@ -44,6 +45,23 @@ function MatchPage() {
           },
         },
       ),
+    // onMutate: (action) => {
+    //   if (action.type === 'play') {
+    //     setPlayerHand((prevHand) =>
+    //       prevHand.filter((card) => card.id !== action.card.id),
+    //     )
+    //
+    //     setGameState(
+    //       produce((draft) => {
+    //         if (!draft) return
+    //         const currentGame = draft.games[draft.round - 1]
+    //         if (!currentGame) return
+    //
+    //         currentGame.boards.yourBoard.cards.push(action.card)
+    //       }),
+    //     )
+    //   }
+    // },
   })
 
   // Notification state
