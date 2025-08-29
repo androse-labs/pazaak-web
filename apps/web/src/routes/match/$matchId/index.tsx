@@ -45,23 +45,23 @@ function MatchPage() {
           },
         },
       ),
-    // onMutate: (action) => {
-    //   if (action.type === 'play') {
-    //     setPlayerHand((prevHand) =>
-    //       prevHand.filter((card) => card.id !== action.card.id),
-    //     )
-    //
-    //     setGameState(
-    //       produce((draft) => {
-    //         if (!draft) return
-    //         const currentGame = draft.games[draft.round - 1]
-    //         if (!currentGame) return
-    //
-    //         currentGame.boards.yourBoard.cards.push(action.card)
-    //       }),
-    //     )
-    //   }
-    // },
+    onMutate: (action) => {
+      if (action.type === 'play') {
+        setPlayerHand((prevHand) =>
+          prevHand.filter((card) => card.id !== action.card.id),
+        )
+
+        setGameState(
+          produce((draft) => {
+            if (!draft) return
+            const currentGame = draft.games[draft.round - 1]
+            if (!currentGame) return
+
+            currentGame.boards.yourBoard.cards.push(action.card)
+          }),
+        )
+      }
+    },
   })
 
   // Notification state
