@@ -13,7 +13,6 @@ export const MobileOpponentBoardGrid = ({
   handCount,
 }: {
   title: string
-  theirTurn: boolean
   state: 'playing' | 'standing' | 'busted'
   score: number
   total: number

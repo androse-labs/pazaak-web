@@ -28,6 +28,7 @@ type BoardProps = {
       total: number
     }
   }
+  opponentConnected: boolean
   yourTurn: boolean
   yourScore: number
   opponentScore: number
@@ -43,6 +44,7 @@ type BoardProps = {
 
 export const Board = ({
   boards: { yourBoard, opponentBoard },
+  opponentConnected,
   yourScore,
   yourTurn,
   yourState,
@@ -122,7 +124,6 @@ export const Board = ({
               <div className="flex-1">
                 <BoardGrid
                   title="You"
-                  yourTurn={yourTurn}
                   state={yourState}
                   score={yourScore}
                   total={yourBoard.total}
@@ -135,8 +136,8 @@ export const Board = ({
               <div className="flex-1">
                 <BoardGrid
                   title="Opponent"
-                  yourTurn={!yourTurn}
                   state={opponentState}
+                  connected={opponentConnected}
                   score={opponentScore}
                   isOpponent
                   total={opponentBoard.total}
@@ -164,7 +165,6 @@ export const Board = ({
             <div className="flex flex-col justify-around gap-2">
               <MobileOpponentBoardGrid
                 title="Opponent"
-                theirTurn={!yourTurn}
                 state={opponentState}
                 score={opponentScore}
                 total={opponentBoard.total}
@@ -176,7 +176,6 @@ export const Board = ({
               </div>
               <MobileYourBoardGrid
                 title="You"
-                yourTurn={yourTurn}
                 state={yourState}
                 score={yourScore}
                 total={yourBoard.total}

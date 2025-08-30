@@ -226,6 +226,7 @@ function MatchPage() {
               total: currentGame.boards.opponentBoard.total,
             },
           }}
+          connected={{ you: true, opponent: gameState.connected.opponent }}
           yourScore={gameState.score.yourScore}
           opponentScore={gameState.score.opponentScore}
           yourTurn={gameState.yourTurn}

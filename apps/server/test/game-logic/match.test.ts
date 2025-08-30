@@ -141,6 +141,10 @@ describe('Match', () => {
           },
         },
       ],
+      connected: {
+        you: false,
+        opponent: false,
+      },
       round: 1,
       score: {
         yourScore: 0,
@@ -174,6 +178,10 @@ describe('Match', () => {
           },
         },
       ],
+      connected: {
+        you: false,
+        opponent: false,
+      },
       round: 1,
       score: {
         yourScore: 0,

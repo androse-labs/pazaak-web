@@ -136,10 +136,8 @@ export const createApp = (
           match.updatePlayerConnection(player.id, ws)
 
           console.log(`Player ${player.id} connected to match ${matchId}`)
-          player.sendEvent({
-            type: 'gameStateUpdate',
-            ...match.getPlayerView(player.id),
-          })
+
+          match.notifyPlayersAboutGameState()
         },
         onMessage(event) {
           console.log(`Message from client: ${event.data}`)
@@ -165,6 +163,7 @@ export const createApp = (
           }
 
           match.clearPlayerConnection(player.id)
+          match.notifyPlayersAboutGameState()
 
           console.log(`Player ${player.id} disconnected from match ${matchId}`)
           // if both players are disconnected and it's been 2 minutes since last activity, delete the match

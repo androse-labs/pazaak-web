@@ -15,7 +15,6 @@ export const YourBoardGrid = ({
   cards,
 }: {
   total: number
-  yourTurn: boolean
   score: number
   state: 'playing' | 'standing' | 'busted'
   title: string
@@ -34,7 +33,9 @@ export const YourBoardGrid = ({
     <div className="flex flex-row items-start justify-center gap-2">
       <div className="flex flex-col items-start justify-center gap-2">
         <div className="flex w-full justify-between">
-          <span className="text-2xl font-bold">{title}</span>
+          <div className="flex items-center gap-2">
+            <span className="text-2xl font-bold">{title}</span>
+          </div>
           <StateDisplay state={state} />
         </div>
         <div className="text-lg">

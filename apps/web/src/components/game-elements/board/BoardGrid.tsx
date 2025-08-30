@@ -2,32 +2,30 @@ import { OpponentBoardGrid } from './OpponentBoardGrid'
 import type { ReactNode } from 'react'
 import { YourBoardGrid } from './YourBoardGrid'
 
-export const BoardGrid = ({
-  title,
-  cards,
-  isOpponent,
-  state,
-  score,
-  total,
-  yourTurn,
-}: {
+type BoardGridBaseProps = {
   title: string
   state: 'playing' | 'standing' | 'busted'
   cards: ReactNode[]
   total: number
   score: number
-  yourTurn: boolean
-  isOpponent?: boolean
-}) => {
+}
+
+type BoardGridProps =
+  | (BoardGridBaseProps & { isOpponent?: false })
+  | (BoardGridBaseProps & { isOpponent: true; connected: boolean })
+
+export const BoardGrid = (props: BoardGridProps) => {
+  const { title, state, cards, total, score, isOpponent } = props
+
   if (isOpponent)
     return (
       <OpponentBoardGrid
         title={title}
+        connected={props.connected}
         state={state}
         cards={cards}
         score={score}
         total={total}
-        theirTurn={yourTurn}
       />
     )
   return (
@@ -37,7 +35,6 @@ export const BoardGrid = ({
       score={score}
       cards={cards}
       total={total}
-      yourTurn={yourTurn}
     />
   )
 }

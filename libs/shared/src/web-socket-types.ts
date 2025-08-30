@@ -16,6 +16,7 @@ export type PlayerView = {
   opponentHandSize: number
   yourTurn: boolean
   round: number
+  opponentConnected: boolean
   score: {
     yourScore: number
     opponentScore: number

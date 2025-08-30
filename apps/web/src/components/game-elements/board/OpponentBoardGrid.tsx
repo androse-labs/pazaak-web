@@ -2,18 +2,20 @@ import { ScoreDisplay } from './ScoreDisplay'
 import { StateDisplay } from './StateDisplay'
 import { GridOfItems } from './GridOfItems'
 import type { ReactNode } from 'react'
+import { CloudOff } from 'lucide-react'
 
 export const OpponentBoardGrid = ({
   title,
   state,
   score,
   total,
+  connected,
   cards,
 }: {
   title: string
-  theirTurn: boolean
   state: 'playing' | 'standing' | 'busted'
   score: number
+  connected: boolean
   total: number
   cards: ReactNode[]
 }) => {
@@ -22,7 +24,12 @@ export const OpponentBoardGrid = ({
       <ScoreDisplay total={3} count={score} />
       <div className="flex flex-col items-end justify-end gap-2">
         <div className="flex w-full flex-row-reverse justify-between">
-          <span className="text-2xl font-bold">{title}</span>
+          <div className="flex items-center gap-2">
+            {!connected && (
+              <CloudOff size={18} strokeWidth={3} className="text-red-300" />
+            )}
+            <span className="text-2xl font-bold">{title}</span>
+          </div>
           <StateDisplay state={state} />
         </div>
         <div className="text-lg">

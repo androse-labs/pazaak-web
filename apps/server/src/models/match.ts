@@ -2,8 +2,8 @@ import { type ServerWebSocket } from 'bun'
 import { Game, type GameState } from './game'
 import { WSContext } from 'hono/ws'
 import { type MatchAction } from './actions'
-import { type Player, type PlayerView } from './players'
-import { type Card } from '@pazaak-web/shared'
+import { type Player } from './players'
+import { type Card, type PlayerView } from '@pazaak-web/shared'
 
 type WaitingMatch = {
   status: 'waiting'
@@ -583,6 +583,7 @@ class Match {
       opponentState: opponent ? opponent.status : 'playing',
       opponentHandSize: opponent ? opponent.hand.length : 0,
       round: this.round,
+      opponentConnected: opponent ? opponent.wsConnected : false,
       score: {
         yourScore: this.score[playerIndex],
         opponentScore: this.score[opponentIndex],

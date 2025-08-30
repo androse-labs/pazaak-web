@@ -31,6 +31,7 @@ export default {
         { id: 'card3', type: 'flip', value: 1, magnitude: 'subtract' },
         { id: 'card4', type: 'invert', value: '2&4' },
       ]}
+      opponentConnected={true}
       opponentState={'standing'}
       onStand={() => {}}
       onEndTurn={() => {}}

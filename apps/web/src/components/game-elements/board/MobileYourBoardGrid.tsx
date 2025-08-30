@@ -19,7 +19,6 @@ export const MobileYourBoardGrid = ({
   cards,
 }: {
   total: number
-  yourTurn: boolean
   score: number
   state: 'playing' | 'standing' | 'busted'
   title: string
