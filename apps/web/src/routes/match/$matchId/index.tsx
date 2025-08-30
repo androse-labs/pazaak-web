@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Board } from '../../../components/game-elements/board/Board'
 import useWebSocket from 'react-use-websocket'
 import { useEffect, useRef, useState } from 'react'
@@ -95,6 +95,7 @@ function MatchPage() {
     persistent: false,
   })
   const notificationTimeout = useRef<NodeJS.Timeout | null>(null)
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (notification.open && !notification.persistent) {
@@ -119,6 +120,12 @@ function MatchPage() {
     `${import.meta.env.VITE_API_SOCKET_URL}/match/${matchId}/subscribe?token=${matchConnection?.token}`,
     {
       retryOnError: true,
+      onClose: (event) => {
+        if ([1404, 1401, 1400].includes(event.code)) {
+          // Match not found or invalid token
+          navigate({ to: '/' })
+        }
+      },
       onMessage: (event) => {
         const message: PazaakSocketEvent = JSON.parse(event.data)
 
@@ -198,7 +205,7 @@ function MatchPage() {
   }
 
   if (!gameState) {
-    return <div>Loading...</div>
+    return null
   }
 
   const currentGame = gameState.games[gameState.round - 1]
@@ -226,7 +233,7 @@ function MatchPage() {
               total: currentGame.boards.opponentBoard.total,
             },
           }}
-          connected={{ you: true, opponent: gameState.connected.opponent }}
+          opponentConnected={gameState.opponentConnected}
           yourScore={gameState.score.yourScore}
           opponentScore={gameState.score.opponentScore}
           yourTurn={gameState.yourTurn}

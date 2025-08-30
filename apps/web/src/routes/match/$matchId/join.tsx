@@ -14,10 +14,8 @@ export function MatchJoinPage() {
   const userDeck = useDeckStore((s) => s.deck)
   const navigate = useNavigate()
   const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
 
   const doJoin = useCallback(async () => {
-    setLoading(true)
     setError(null)
     try {
       const response = await joinMatch(matchId, userDeck)
@@ -31,10 +29,9 @@ export function MatchJoinPage() {
         token: response.data.token,
       })
       navigate({ to: `/match/${matchId}` })
-    } catch (err) {
-      setError((err as Error).message)
-    } finally {
-      setLoading(false)
+    } catch {
+      console.error('Could not join match')
+      setError('Could not join match. Please try again or go back to home.')
     }
   }, [matchId, userDeck, setMatchConnection, navigate])
 
@@ -42,13 +39,22 @@ export function MatchJoinPage() {
     doJoin()
   }, [doJoin])
 
-  if (loading) return <div>Joining match...</div>
-  if (error)
+  if (error) {
     return (
-      <div>
-        Error: {error}
-        <button onClick={doJoin}>Retry</button>
+      <div className="flex flex-col items-center justify-center p-5">
+        <div className="flex flex-col items-center justify-center gap-4">
+          <div className="text-center text-2xl font-bold">
+            <p>{error}</p>
+          </div>
+          {error && (
+            <a href="/" className="btn btn-primary">
+              Go Home
+            </a>
+          )}
+        </div>
       </div>
     )
+  }
+
   return null
 }

@@ -118,18 +118,18 @@ export const createApp = (
           console.log(`WebSocket connection opened for match: ${matchId}`)
           const match = matchManager.getMatch(matchId)
           if (!match) {
-            ws.close(1000, 'Match not found')
+            ws.close(1404, 'Match not found')
             return
           }
 
           if (!playerToken) {
-            ws.close(1000, 'Token is required')
+            ws.close(1401, 'Token is required')
             return
           }
 
           const player = match.getPlayerByToken(playerToken)
           if (!player) {
-            ws.close(1000, 'Invalid player token')
+            ws.close(1400, 'Invalid player token')
             return
           }
 
