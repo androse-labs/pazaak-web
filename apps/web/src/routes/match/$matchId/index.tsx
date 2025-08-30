@@ -62,6 +62,26 @@ function MatchPage() {
         )
       }
     },
+    onError: (_error, action) => {
+      // If there was an error playing a card, return it to the player's hand
+      // and reset the game state to remove the card from the board
+      if (action.type === 'play') {
+        setPlayerHand((prevHand) => [...prevHand, action.card])
+
+        setGameState(
+          produce((draft) => {
+            if (!draft) return
+            const currentGame = draft.games[draft.round - 1]
+            if (!currentGame) return
+
+            currentGame.boards.yourBoard.cards =
+              currentGame.boards.yourBoard.cards.filter(
+                (card) => card.id !== action.card.id,
+              )
+          }),
+        )
+      }
+    },
   })
 
   // Notification state
