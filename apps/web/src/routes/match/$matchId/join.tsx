@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useParams, useNavigate, createFileRoute } from '@tanstack/react-router'
+import {
+  useParams,
+  useNavigate,
+  createFileRoute,
+  Link,
+} from '@tanstack/react-router'
 import { usePlayerStore } from '../../../stores/playerStore'
 import { useDeckStore } from '../../../stores/deckStore'
 import { joinMatch } from '../../../api'
@@ -47,9 +52,9 @@ export function MatchJoinPage() {
             <p>{error}</p>
           </div>
           {error && (
-            <a href="/" className="btn btn-primary">
+            <Link to="/" className="btn btn-primary">
               Go Home
-            </a>
+            </Link>
           )}
         </div>
       </div>
