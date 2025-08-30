@@ -349,7 +349,7 @@ class Match {
 
     // Reset players' status and hands as appropriate
     // Reset turn order
-    this.playersTurn = 1
+    this.playersTurn = winnerIndex === 0 ? 1 : 2
   }
 
   // Swap to the next players turn, unless the next player is standing
