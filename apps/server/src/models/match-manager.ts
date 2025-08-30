@@ -107,7 +107,11 @@ class MatchManager {
       const lastActivity = match.lastModifiedDateUtc
       const isOld = now - lastActivity > 5 * 60 * 1000 // 5 minutes
 
-      if (!isActive || isOld) {
+      if (
+        !isActive ||
+        isOld ||
+        (isActive && isOld && match.status === 'finished')
+      ) {
         console.log(`Cleaning up inactive match: ${match.id}`)
         return false
       }

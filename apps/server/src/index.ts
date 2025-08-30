@@ -167,10 +167,11 @@ export const createApp = (
           match.clearPlayerConnection(player.id)
 
           console.log(`Player ${player.id} disconnected from match ${matchId}`)
-          // if both players are disconnected, end the match
+          // if both players are disconnected and it's been 2 minutes since last activity, delete the match
           if (
             !match.players[0]?.wsConnected &&
-            !match.players[1]?.wsConnected
+            !match.players[1]?.wsConnected &&
+            Date.now() - match.lastModifiedDateUtc > 2 * 60 * 1000
           ) {
             const result = matchManager.deleteMatch(matchId)
             if (!result) {

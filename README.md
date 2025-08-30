@@ -68,3 +68,8 @@ bun run build
 cd apps/web
 bun run build
 ```
+
+### TODO
+
+- [ ] Be looser on player disconnect match cleanup
+- [ ] Show when player is disconnected icon in state
