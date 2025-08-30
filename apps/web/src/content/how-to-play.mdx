@@ -164,8 +164,23 @@ Here's a balanced starter deck:
   <CardPresentation card={{ id: '5', type: 'invert', value: '3&6' }} />
 </div>
 
-To import this deck, copy this code into the [Deck Builder](/deck-builder):  
-`T1-T1-F1-F2-F2-F3-F3-DD-I2&4-I3&6`
+To import this deck, copy this code into the [Deck Builder](/deck-builder):
+
+<div className="join mx-auto flex w-64 items-center">
+  <input
+    type="text"
+    className="input input-bordered join-item"
+    value={'T1-T1-F1-F2-F2-F3-F3-DD-I2&4-I3&6'}
+    onFocus={(e) => e.target.select()}
+    readOnly
+  />
+  <CopyButton
+    value={'T1-T1-F1-F2-F2-F3-F3-DD-I2&4-I3&6'}
+    tooltip="Copy match URL"
+    copiedTooltip="Copied!"
+    className="join-item"
+  />
+</div>
 
 ## Frequently Asked Questions
 
