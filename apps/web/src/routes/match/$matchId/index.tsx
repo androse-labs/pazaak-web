@@ -181,14 +181,27 @@ function MatchPage() {
               <div className="flex flex-col items-center gap-2">
                 The match is complete! You{' '}
                 {message.youWon ? ' won!' : ' lost. Better luck next time!'}
-                <button
+                <div
                   className="btn btn-accent"
-                  onClick={() =>
+                  onClick={() => {
                     rematch(matchId, matchConnection!.token, 'request')
-                  }
+                    setNotification({
+                      open: true,
+                      content: (
+                        <div className="flex flex-col items-center gap-2">
+                          The match is complete! You{' '}
+                          {message.youWon
+                            ? ' won!'
+                            : ' lost. Better luck next time!'}
+                          <span>Waiting for opponent to accept rematch...</span>
+                        </div>
+                      ),
+                      persistent: true,
+                    })
+                  }}
                 >
                   Request Rematch
-                </button>
+                </div>
               </div>
             ),
             persistent: true,
@@ -202,8 +215,8 @@ function MatchPage() {
                 <div className="flex gap-2">
                   <button
                     className="btn btn-primary"
-                    onClick={() =>
-                      rematch(matchId, matchConnection!.token, 'accept')
+                    onClick={async () =>
+                      await rematch(matchId, matchConnection!.token, 'accept')
                     }
                   >
                     Accept
