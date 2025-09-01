@@ -242,8 +242,12 @@ export const createApp = (
 
       if (c.req.valid('query').action === 'request') {
         match.requestRematch(player.id)
+
+        return c.body(null, 204)
       } else {
         match.acceptRematch(player.id)
+
+        return c.body(null, 204)
       }
     },
   )
