@@ -38,12 +38,14 @@ export const GameNotification = ({
 
   return (
     <dialog ref={dialogRef} id={id} className="modal">
-      <form className="modal-box flex flex-col justify-center gap-4">
-        <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
-          ✕
-        </button>
+      <div className="modal-box flex flex-col justify-center gap-4">
+        <form>
+          <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+            ✕
+          </button>
+        </form>
         {children}
-      </form>
+      </div>
     </dialog>
   )
 }

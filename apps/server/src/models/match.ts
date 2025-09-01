@@ -289,6 +289,7 @@ class Match {
     })
     this.addGame(new Game(this.players[0].id, this.players[1]!.id))
     this.startGame(0)
+    this.notifyPlayersAboutRematchAcceptance()
     this.notifyPlayersAboutGameState()
   }
 

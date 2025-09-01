@@ -10,7 +10,7 @@ export const joinMatch = (matchId: string, deck: Card[]) => {
   )
 }
 
-export const rematch = (
+export const rematch = async (
   matchId: string,
   token: string,
   action: 'accept' | 'request',
