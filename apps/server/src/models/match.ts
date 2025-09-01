@@ -57,7 +57,7 @@ class Match {
     this.round += 1
   }
 
-  startGame(index: number): void {
+  startGame(index: number, playerIdFirst: string): void {
     this.touch()
 
     // draw card from board deck to first player's board
@@ -66,12 +66,13 @@ class Match {
       throw new Error('No current game to draw a card for')
     }
 
-    const player1Board = game.boards[this.players[0].id]
+    // todo this should vary
+    const board = game.boards[playerIdFirst]
     const drawnCard = game.deck.cards.pop()
     if (!drawnCard) {
       throw new Error('No cards left in the deck to draw')
     }
-    player1Board.push(drawnCard)
+    board.push(drawnCard)
 
     this.players.forEach((p) => {
       if (p) {
@@ -102,7 +103,7 @@ class Match {
     })
 
     this.addGame(new Game(this.players[0].id, this.players[1].id))
-    this.startGame(0)
+    this.startGame(0, this.players[0].id)
   }
 
   playCard(playerId: string, cardToPlay: Card): void {
@@ -288,7 +289,7 @@ class Match {
       }
     })
     this.addGame(new Game(this.players[0].id, this.players[1]!.id))
-    this.startGame(0)
+    this.startGame(0, this.players[0].id)
     this.notifyPlayersAboutRematchAcceptance()
     this.notifyPlayersAboutGameState()
   }
@@ -408,12 +409,15 @@ class Match {
     this.notifyPlayersAboutGameWinner()
 
     // Prepare next game if not match end
+    this.playersTurn = winnerIndex === 0 ? 1 : 2
     this.addGame(new Game(this.players[0].id, this.players[1].id))
-    this.startGame(this.games.length - 1)
+    this.startGame(
+      this.games.length - 1,
+      this.players[this.playersTurn - 1]!.id,
+    )
 
     // Reset players' status and hands as appropriate
     // Reset turn order
-    this.playersTurn = winnerIndex === 0 ? 1 : 2
   }
 
   // Swap to the next players turn, unless the next player is standing
