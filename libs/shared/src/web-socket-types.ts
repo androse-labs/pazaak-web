@@ -29,6 +29,9 @@ export type PazaakSocketEvent =
       youWon: boolean
     }
   | {
+      type: 'rematchRequested'
+    }
+  | {
       type: 'playerScored'
       who: 'you' | 'opponent' | 'no-one'
       yourScore: number

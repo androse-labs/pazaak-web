@@ -19,6 +19,7 @@ class Match {
   id: string
   matchName: string
   unlisted: boolean
+  rematchRequestedBy: string | null = null
   games: Game[] = []
   players: [Player, Player] | [Player, null]
   playersTurn: 1 | 2 = 1
@@ -227,6 +228,59 @@ class Match {
     } else {
       throw new Error('Player not found in match')
     }
+  }
+
+  requestRematch(playerId: string): void {
+    this.touch()
+    if (this.status !== 'finished') {
+      throw new Error('Match is not finished')
+    }
+
+    this.rematchRequestedBy = playerId
+    this.notifyOpponentsAboutRematchRequest(playerId)
+  }
+
+  notifyOpponentsAboutRematchRequest(requestingPlayerId: string): void {
+    this.players.forEach((player) => {
+      if (player && player.id !== requestingPlayerId) {
+        player.sendEvent({ type: 'rematchRequested' })
+      }
+    })
+  }
+
+  acceptRematch(playerId: string): void {
+    this.touch()
+    if (this.status !== 'finished') {
+      throw new Error('Match is not finished')
+    }
+
+    if (this.rematchRequestedBy === null) {
+      throw new Error('No rematch has been requested')
+    }
+
+    if (this.rematchRequestedBy === playerId) {
+      throw new Error('You cannot accept your own rematch request')
+    }
+
+    // Reset match state
+    this.games = []
+    this.round = 0
+    this.score = [0, 0]
+    this.status = 'in-progress'
+    this.playersTurn = 1
+    this.rematchRequestedBy = null
+    this.players.forEach((p) => {
+      if (p) {
+        p.status = 'playing'
+        p.hand = []
+        p.deck.shuffle()
+        const drawnCards = p.deck.cards.splice(0, 4)
+        p.hand.push(...drawnCards)
+      }
+    })
+    this.addGame(new Game(this.players[0].id, this.players[1]!.id))
+    this.startGame(0)
+    this.notifyPlayersAboutGameState()
   }
 
   notifyPlayersAboutGameState(): void {

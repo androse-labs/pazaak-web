@@ -216,6 +216,38 @@ export const createApp = (
     },
   )
 
+  app.patch(
+    '/match/:matchId/rematch',
+    zValidator(
+      'query',
+      z.object({
+        token: z.string().min(1),
+        action: z.enum(['request', 'accept']),
+      }),
+    ),
+    async (c) => {
+      const { matchId } = c.req.param()
+      const { token } = c.req.valid('query')
+
+      const match = matchManager.getMatch(matchId)
+
+      if (!match) {
+        return c.json({ error: 'Match not found' }, 404)
+      }
+
+      const player = match.getPlayerByToken(token)
+      if (!player) {
+        return c.json({ error: 'Invalid player token' }, 403)
+      }
+
+      if (c.req.valid('query').action === 'request') {
+        match.requestRematch(player.id)
+      } else {
+        match.acceptRematch(player.id)
+      }
+    },
+  )
+
   setInterval(() => {
     console.log('Running scheduled match cleanup...')
     matchManager.cleanUpMatches()

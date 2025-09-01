@@ -5,13 +5,11 @@ export const GameNotification = ({
   id,
   open,
   onClose,
-  persistent,
 }: {
   children: React.ReactNode
   id: string
   open?: boolean
   onClose?: () => void
-  persistent?: boolean
 }) => {
   const dialogRef = useRef<HTMLDialogElement | null>(null)
 
@@ -26,10 +24,9 @@ export const GameNotification = ({
     }
   }, [open])
 
-  // Close via the backdrop or close event, only if not persistent
   useEffect(() => {
     const dialog = dialogRef.current
-    if (!dialog || persistent) return
+    if (!dialog) return
 
     const handleClose = (e: Event) => {
       e.preventDefault()
@@ -37,7 +34,7 @@ export const GameNotification = ({
     }
     dialog.addEventListener('close', handleClose)
     return () => dialog.removeEventListener('close', handleClose)
-  }, [onClose, persistent])
+  }, [onClose])
 
   return (
     <dialog ref={dialogRef} id={id} className="modal">

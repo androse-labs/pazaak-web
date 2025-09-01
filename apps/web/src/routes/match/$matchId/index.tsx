@@ -213,11 +213,7 @@ function MatchPage() {
 
   return (
     <div className="flex flex-col items-center justify-center p-5">
-      <GameNotification
-        id="game-notification"
-        open={notification.open}
-        persistent={notification.persistent}
-      >
+      <GameNotification id="game-notification" open={notification.open}>
         {notification.content}
       </GameNotification>
       {hasStarted ? (
