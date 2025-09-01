@@ -19,6 +19,7 @@ const createTestPlayer = (): Player => ({
   token: generateHexToken(16),
   status: 'playing',
   deck: playerDeck,
+  originalDeck: [...playerDeck.cards],
   hand: [],
 })
 
@@ -49,6 +50,7 @@ const createTestMatch = (
       token: generateHexToken(16),
       status: 'playing',
       deck: playerDeck,
+      originalDeck: [...playerDeck.cards],
       hand: [],
     },
     {
@@ -58,6 +60,7 @@ const createTestMatch = (
       token: generateHexToken(16),
       status: 'playing',
       deck: playerDeck,
+      originalDeck: [...playerDeck.cards],
       hand: [],
     },
   ]

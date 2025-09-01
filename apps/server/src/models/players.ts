@@ -9,6 +9,7 @@ type Player = {
   token: string
   status: 'playing' | 'standing' | 'busted'
   deck: Deck
+  originalDeck: Card[]
   hand: Card[]
 }
 

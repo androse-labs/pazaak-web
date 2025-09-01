@@ -4,6 +4,7 @@ import { WSContext } from 'hono/ws'
 import { type MatchAction } from './actions'
 import { type Player } from './players'
 import { type Card, type PlayerView } from '@pazaak-web/shared'
+import { Deck } from './deck'
 
 type WaitingMatch = {
   status: 'waiting'
@@ -281,7 +282,7 @@ class Match {
       if (p) {
         p.status = 'playing'
         p.hand = []
-        p.deck.shuffle()
+        p.deck = new Deck().fillWithCustomCards(p.originalDeck)
         const drawnCards = p.deck.cards.splice(0, 4)
         p.hand.push(...drawnCards)
       }

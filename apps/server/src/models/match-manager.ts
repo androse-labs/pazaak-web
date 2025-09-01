@@ -31,6 +31,7 @@ class MatchManager {
           token,
           status: 'playing',
           deck: new Deck().fillWithCustomCards(deck),
+          originalDeck: [...deck],
           hand: [],
         },
         unlisted,
@@ -66,6 +67,7 @@ class MatchManager {
       status: 'playing',
       hand: [],
       deck: new Deck().fillWithCustomCards(deck),
+      originalDeck: [...deck],
     })
 
     // notify each player about game state
