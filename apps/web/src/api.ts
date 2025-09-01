@@ -9,3 +9,23 @@ export const joinMatch = (matchId: string, deck: Card[]) => {
     },
   )
 }
+
+export const rematch = (
+  matchId: string,
+  token: string,
+  action: 'accept' | 'request',
+) => {
+  return api.patch(
+    `/match/${matchId}/rematch`,
+    {},
+    {
+      params: {
+        token,
+        action,
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  )
+}

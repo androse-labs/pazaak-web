@@ -248,6 +248,14 @@ class Match {
     })
   }
 
+  notifyPlayersAboutRematchAcceptance(): void {
+    this.players.forEach((player) => {
+      if (player) {
+        player.sendEvent({ type: 'rematchAccepted' })
+      }
+    })
+  }
+
   acceptRematch(playerId: string): void {
     this.touch()
     if (this.status !== 'finished') {

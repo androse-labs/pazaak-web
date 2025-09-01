@@ -32,6 +32,9 @@ export type PazaakSocketEvent =
       type: 'rematchRequested'
     }
   | {
+      type: 'rematchAccepted'
+    }
+  | {
       type: 'playerScored'
       who: 'you' | 'opponent' | 'no-one'
       yourScore: number

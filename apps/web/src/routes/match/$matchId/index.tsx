@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { Board } from '../../../components/game-elements/board/Board'
 import useWebSocket from 'react-use-websocket'
 import { useEffect, useRef, useState } from 'react'
@@ -15,6 +15,7 @@ import { usePlayerStore } from '../../../stores/playerStore'
 import { CircleX, Crown, Scale } from 'lucide-react'
 import { WaitingForMatchToStart } from '../../../components/WaitingForMatchToStart'
 import { produce } from 'immer'
+import { rematch } from '../../../api'
 
 export const Route = createFileRoute('/match/$matchId/')({
   component: MatchPage,
@@ -152,7 +153,7 @@ function MatchPage() {
                   return (
                     <div className="flex flex-col items-center gap-2">
                       <CircleX size={24} className="text-red-500" />
-                      You loss the round!
+                      You lost the round!
                     </div>
                   )
                 case 'you':
@@ -180,10 +181,44 @@ function MatchPage() {
               <div className="flex flex-col items-center gap-2">
                 The match is complete! You{' '}
                 {message.youWon ? ' won!' : ' lost. Better luck next time!'}
+                <button
+                  className="btn btn-accent"
+                  onClick={() =>
+                    rematch(matchId, matchConnection!.token, 'request')
+                  }
+                >
+                  Request Rematch
+                </button>
               </div>
             ),
-            persistent: false,
+            persistent: true,
           })
+        } else if (message.type === 'rematchRequested') {
+          setNotification({
+            open: true,
+            content: (
+              <div className="flex flex-col items-center gap-4">
+                <span>Your opponent has requested a rematch.</span>
+                <div className="flex gap-2">
+                  <button
+                    className="btn btn-primary"
+                    onClick={() =>
+                      rematch(matchId, matchConnection!.token, 'accept')
+                    }
+                  >
+                    Accept
+                  </button>
+                  <Link className="btn btn-ghost underline" to={'/'}>
+                    Return to home
+                  </Link>
+                </div>
+              </div>
+            ),
+            persistent: true,
+          })
+        } else if (message.type === 'rematchAccepted') {
+          // close any existing notification
+          setNotification((n) => ({ ...n, open: false }))
         } else {
           console.warn('Unknown message type:', message)
         }
