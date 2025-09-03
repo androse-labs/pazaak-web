@@ -88,7 +88,7 @@ const codeToDeck = (
   }
 }
 
-const cardTypeMap: Record<Card['type'], string> = {
+const cardTypeMap: Record<Exclude<Card['type'], 'special'>, string> = {
   add: 'A',
   subtract: 'S',
   double: 'D',
@@ -106,6 +106,10 @@ const codeToCardTypeMap: Record<string, Card['type']> = Object.fromEntries(
 )
 
 const cardToCode = (card: Card): string => {
+  if (card.type === 'special') {
+    throw new Error('Special cards cannot be serialized')
+  }
+
   return `${cardTypeMap[card.type]}${card.value}`
 }
 
