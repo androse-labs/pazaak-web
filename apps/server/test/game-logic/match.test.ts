@@ -557,128 +557,188 @@ describe('Match', () => {
       ])
     })
 
-    it('doubles the value of the last card when playing a double card', () => {
-      const match = createTestMatch({
-        players: [
-          {
-            ...createTestPlayer(),
-            id: 'player1',
-            hand: [
-              { id: '1', type: 'flip', value: 5, magnitude: 'subtract' },
-              {
-                id: '2',
-                type: 'double',
-                value: 'D',
-              },
-            ],
-          },
-          {
-            ...createTestPlayer(),
-            id: 'player2',
-            hand: [],
-          },
-        ],
-        status: 'in-progress',
-      })
-
-      const game = new Game('player1', 'player2')
-      game.boards['player1'] = [
-        { id: '1', type: 'flip', value: 5, magnitude: 'subtract' },
-      ]
-      match.addGame(game)
-
-      expect(game.boards['player1']).toHaveLength(1)
-
-      const action: MatchAction = {
-        type: 'play',
-        card: { id: '2', type: 'double', value: 'D' },
-      }
-
-      expect(match.performAction('player1', action)).toEqual({
-        success: true,
-      })
-
-      expect(game.boards['player1']).toEqual([
-        {
+    it.each<{ lastCardPlayed: Card; expectedValue: number }>([
+      {
+        lastCardPlayed: {
           id: '1',
           type: 'flip',
-          value: 10, // Value doubled
+          value: 5,
           magnitude: 'subtract',
         },
-        {
-          id: '2',
-          type: 'double',
-          value: 'D',
+        expectedValue: -5,
+      },
+      {
+        lastCardPlayed: { id: '2', type: 'flip', value: 5, magnitude: 'add' },
+        expectedValue: 5,
+      },
+      {
+        lastCardPlayed: {
+          id: '3',
+          type: 'tiebreaker',
+          value: 3,
+          magnitude: 'subtract',
         },
-      ])
-    })
+        expectedValue: -3,
+      },
+      {
+        lastCardPlayed: {
+          id: '4',
+          type: 'tiebreaker',
+          value: 3,
+          magnitude: 'add',
+        },
+        expectedValue: 3,
+      },
+      {
+        lastCardPlayed: { id: '5', type: 'none', value: 7 },
+        expectedValue: 7,
+      },
+      {
+        lastCardPlayed: { id: '6', type: 'add', value: 4 },
+        expectedValue: 4,
+      },
+      {
+        lastCardPlayed: { id: '7', type: 'subtract', value: 4 },
+        expectedValue: -4,
+      },
+    ])(
+      'assumes the value of the last card played when playing a double card',
+      ({ lastCardPlayed, expectedValue }) => {
+        const match = createTestMatch({
+          players: [
+            {
+              ...createTestPlayer(),
+              id: 'player1',
+              hand: [
+                { id: '1', type: 'flip', value: 5, magnitude: 'subtract' },
+                {
+                  id: '2',
+                  type: 'double',
+                  value: 'D',
+                },
+              ],
+            },
+            {
+              ...createTestPlayer(),
+              id: 'player2',
+              hand: [],
+            },
+          ],
+          status: 'in-progress',
+        })
 
-    it('inverts matching cards when playing an invert card', () => {
-      const match = createTestMatch({
-        players: [
+        const game = new Game('player1', 'player2')
+        game.boards['player1'] = [lastCardPlayed]
+        match.addGame(game)
+
+        expect(game.boards['player1']).toHaveLength(1)
+
+        const action: MatchAction = {
+          type: 'play',
+          card: { id: '2', type: 'double', value: 'D' },
+        }
+
+        expect(match.performAction('player1', action)).toEqual({
+          success: true,
+        })
+
+        expect(game.boards['player1']).toEqual([
+          lastCardPlayed,
           {
-            ...createTestPlayer(),
-            id: 'player1',
-            hand: [
-              { id: '1', type: 'flip', value: 5, magnitude: 'subtract' },
-              {
-                id: '2',
-                type: 'invert',
-                value: '2&4',
-              },
-            ],
+            id: '2',
+            type: 'special',
+            value: expectedValue,
           },
+        ])
+      },
+    )
+
+    it.each<{
+      cardToInvert: Card
+      expectedCard: Card
+    }>([
+      {
+        cardToInvert: { id: '6', type: 'none', value: 2 },
+        expectedCard: { id: '6', type: 'none', value: -2 },
+      },
+      {
+        cardToInvert: { id: '7', type: 'add', value: 4 },
+        expectedCard: { id: '7', type: 'add', value: -4 },
+      },
+      {
+        cardToInvert: { id: '10', type: 'flip', value: 2, magnitude: 'add' },
+        expectedCard: {
+          id: '10',
+          type: 'flip',
+          value: 2,
+          magnitude: 'subtract',
+        },
+      },
+      {
+        cardToInvert: {
+          id: '11',
+          type: 'tiebreaker',
+          value: 4,
+          magnitude: 'subtract',
+        },
+        expectedCard: {
+          id: '11',
+          type: 'tiebreaker',
+          value: 4,
+          magnitude: 'add',
+        },
+      },
+    ])(
+      'changes $cardToInvert to $expectedCard when inverted',
+      ({ cardToInvert, expectedCard }) => {
+        const match = createTestMatch({
+          players: [
+            {
+              ...createTestPlayer(),
+              id: 'player1',
+              hand: [
+                { id: '1', type: 'flip', value: 5, magnitude: 'subtract' },
+                {
+                  id: '2',
+                  type: 'invert',
+                  value: '2&4',
+                },
+              ],
+            },
+            {
+              ...createTestPlayer(),
+              id: 'player2',
+              hand: [],
+            },
+          ],
+          status: 'in-progress',
+        })
+
+        const game = new Game('player1', 'player2')
+        game.boards['player1'] = [cardToInvert]
+        match.addGame(game)
+
+        expect(game.boards['player1']).toHaveLength(1)
+
+        const action: MatchAction = {
+          type: 'play',
+          card: { id: '2', type: 'invert', value: '2&4' },
+        }
+
+        expect(match.performAction('player1', action)).toEqual({
+          success: true,
+        })
+
+        expect(game.boards['player1']).toEqual([
+          expectedCard,
           {
-            ...createTestPlayer(),
-            id: 'player2',
-            hand: [],
+            id: '2',
+            type: 'invert',
+            value: '2&4',
           },
-        ],
-        status: 'in-progress',
-      })
-
-      const game = new Game('player1', 'player2')
-      game.boards['player1'] = [
-        { id: '6', type: 'none', value: 2 },
-        { id: '7', type: 'add', value: 4 },
-        { id: '8', type: 'none', value: 6 },
-      ]
-      match.addGame(game)
-
-      expect(game.boards['player1']).toHaveLength(3)
-
-      const action: MatchAction = {
-        type: 'play',
-        card: { id: '2', type: 'invert', value: '2&4' },
-      }
-
-      expect(match.performAction('player1', action)).toEqual({
-        success: true,
-      })
-
-      expect(game.boards['player1']).toEqual([
-        {
-          id: '6',
-          type: 'none',
-          value: -2, // Inverted value
-        },
-        {
-          id: '7',
-          type: 'add',
-          value: -4, // Inverted value
-        },
-        {
-          id: '8',
-          type: 'none',
-          value: 6,
-        },
-        {
-          id: '2',
-          type: 'invert',
-          value: '2&4',
-        },
-      ])
-    })
+        ])
+      },
+    )
 
     it.each<'end' | 'stand'>(['end', 'stand'])(
       "changes the player's turn after a they perform an '%s' action and increments the turn",
@@ -800,7 +860,7 @@ describe('Match', () => {
       }
 
       expect(() => match.performAction('player1', action)).toThrow(
-        'No current game to perform action in',
+        'No current game in match',
       )
     })
   })
@@ -814,9 +874,7 @@ describe('Match', () => {
     it('throws if no current game exists', () => {
       const match = createTestMatch({ status: 'in-progress' })
       match.games = []
-      expect(() => match.nextTurn()).toThrow(
-        'No current game to proceed to the next turn',
-      )
+      expect(() => match.nextTurn()).toThrow('No current game in match')
     })
 
     it('advances to next player who is not standing', () => {
@@ -971,5 +1029,69 @@ describe('Match', () => {
     expect(game.determineTooManyConditionWinner()).toBe(0)
     expect(match.games.length).toBe(2)
     expect(match.score).toEqual([1, 0])
+  })
+
+  describe('finalizeGame', () => {
+    it.each<{ player1Board: Card[]; player2Board: Card[]; winner: 1 | 2 }>([
+      {
+        player1Board: [
+          { id: '1', type: 'none', value: 5 },
+          { id: '2', type: 'add', value: 4 },
+        ],
+        player2Board: [
+          { id: '3', type: 'none', value: 6 },
+          { id: '4', type: 'subtract', value: 1 },
+        ],
+        winner: 1,
+      },
+      {
+        player1Board: [
+          { id: '1', type: 'none', value: 10 },
+          { id: '2', type: 'subtract', value: 1 },
+        ],
+        player2Board: [
+          { id: '3', type: 'none', value: 10 },
+          { id: '4', type: 'add', value: 1 },
+        ],
+        winner: 2,
+      },
+      {
+        player1Board: [
+          { id: '1', type: 'none', value: 8 },
+          { id: '2', type: 'add', value: 1 },
+        ],
+        player2Board: [
+          { id: '3', type: 'none', value: 7 },
+          { id: '4', type: 'add', value: 4 },
+        ],
+        winner: 2,
+      },
+    ])(
+      'enforces the player with a winning board goes first next game',
+      ({ player1Board, player2Board, winner }) => {
+        const game1 = new Game('player1', 'player2')
+        game1.boards = {
+          player1: player1Board,
+          player2: player2Board,
+        }
+
+        const match = createTestMatch({
+          players: [
+            { ...createTestPlayer(), id: 'player1', status: 'standing' },
+            { ...createTestPlayer(), id: 'player2', status: 'standing' },
+          ],
+          games: [game1],
+          round: 1,
+          status: 'in-progress',
+          playerTurn: 2,
+          score: [0, 0],
+        })
+
+        match.finalizeGame()
+
+        expect(match.playersTurn).toBe(winner)
+        expect(match.round).toBe(2)
+      },
+    )
   })
 })

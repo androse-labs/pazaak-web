@@ -5,6 +5,7 @@ import { type MatchAction } from './actions'
 import { type Player } from './players'
 import { type Card, type PlayerView } from '@pazaak-web/shared'
 import { Deck } from './deck'
+import { processCardEffects } from './card'
 
 type WaitingMatch = {
   status: 'waiting'
@@ -74,10 +75,8 @@ class Match {
     }
     board.push(drawnCard)
 
-    this.players.forEach((p) => {
-      if (p) {
-        p.status = 'playing'
-      }
+    this.forEachPlayer((p) => {
+      p.status = 'playing'
     })
   }
 
@@ -94,12 +93,10 @@ class Match {
     this.status = 'in-progress'
 
     // Each player draws 4 cards from their decks
-    this.players.forEach((player) => {
-      if (player) {
-        player.deck.shuffle()
-        const drawnCards = player.deck.cards.splice(0, 4)
-        player.hand.push(...drawnCards)
-      }
+    this.forEachPlayer((player) => {
+      player.deck.shuffle()
+      const drawnCards = player.deck.cards.splice(0, 4)
+      player.hand.push(...drawnCards)
     })
 
     this.addGame(new Game(this.players[0].id, this.players[1].id))
@@ -128,82 +125,11 @@ class Match {
       throw new Error('Card not found in hand')
     }
 
-    const currentGame = this.games[this.games.length - 1]
-    if (!currentGame) {
-      throw new Error('No current game to play the card in')
-    }
+    const currentGame = this.getCurrentGame()
 
     currentGame.boards[playerId].push(cardToPlay)
 
-    if (cardToPlay.type === 'double') {
-      // If the card is a double, copy it's value and set this card's
-      // value to be the same as the last card on the board
-      const lastCard = currentGame.boards[playerId].at(-2)
-
-      if (
-        lastCard &&
-        lastCard.type !== 'double' &&
-        lastCard.type !== 'invert'
-      ) {
-        let value
-
-        switch (lastCard.type) {
-          case 'flip':
-          case 'tiebreaker':
-            value =
-              lastCard.magnitude === 'subtract'
-                ? lastCard.value * -1
-                : lastCard.value
-            break
-          case 'none':
-          case 'special':
-          case 'add':
-            value = lastCard.value
-            break
-          case 'subtract':
-            value = lastCard.value * -1
-            break
-        }
-
-        const specialDouble: Card = {
-          id: cardToPlay.id,
-          type: 'special',
-          value,
-        }
-
-        currentGame.boards[playerId].splice(-1, 1, specialDouble)
-
-        return
-      }
-
-      throw new Error(
-        'Cannot play double card after another double or invert card',
-      )
-    }
-
-    if (cardToPlay.type === 'invert') {
-      // If the card is an invert, replace all cards on the board
-      // matching the 2 numbers with their inverted values
-      const invertedValues = cardToPlay.value.split('&').map(Number)
-
-      const cardsToModify = currentGame.boards[playerId]
-
-      cardsToModify.map((card) => {
-        if (card.type === 'double' || card.type === 'invert') {
-          return
-        }
-        if (
-          (card.type === 'flip' || card.type === 'tiebreaker') &&
-          invertedValues.includes(card.value)
-        ) {
-          card.magnitude = card.magnitude === 'subtract' ? 'add' : 'subtract'
-          return
-        }
-        if (invertedValues.includes(card.value)) {
-          card.value = card.value * -1
-        }
-      })
-    }
+    processCardEffects(cardToPlay, currentGame.boards[playerId])
   }
 
   // Check which player won the match by reaching 3 points
@@ -266,19 +192,38 @@ class Match {
   }
 
   notifyOpponentsAboutRematchRequest(requestingPlayerId: string): void {
-    this.players.forEach((player) => {
-      if (player && player.id !== requestingPlayerId) {
+    this.forEachPlayer((player) => {
+      if (player.id !== requestingPlayerId) {
         player.sendEvent({ type: 'rematchRequested' })
       }
     })
   }
 
   notifyPlayersAboutRematchAcceptance(): void {
-    this.players.forEach((player) => {
-      if (player) {
-        player.sendEvent({ type: 'rematchAccepted' })
-      }
+    this.forEachPlayer((player) => {
+      player.sendEvent({ type: 'rematchAccepted' })
     })
+  }
+
+  private resetMatchState(): void {
+    this.games = []
+    this.round = 0
+    this.score = [0, 0]
+    this.status = 'in-progress'
+    this.playersTurn = 1
+    this.rematchRequestedBy = null
+
+    this.forEachPlayer((player) => {
+      player.status = 'playing'
+      player.hand = []
+      player.deck = new Deck().fillWithCustomCards(player.originalDeck)
+      const drawnCards = player.deck.cards.splice(0, 4)
+      player.hand.push(...drawnCards)
+    })
+  }
+
+  private forEachPlayer(callback: (player: Player) => void) {
+    this.players.forEach((p) => p && callback(p))
   }
 
   acceptRematch(playerId: string): void {
@@ -296,21 +241,7 @@ class Match {
     }
 
     // Reset match state
-    this.games = []
-    this.round = 0
-    this.score = [0, 0]
-    this.status = 'in-progress'
-    this.playersTurn = 1
-    this.rematchRequestedBy = null
-    this.players.forEach((p) => {
-      if (p) {
-        p.status = 'playing'
-        p.hand = []
-        p.deck = new Deck().fillWithCustomCards(p.originalDeck)
-        const drawnCards = p.deck.cards.splice(0, 4)
-        p.hand.push(...drawnCards)
-      }
-    })
+    this.resetMatchState()
     this.addGame(new Game(this.players[0].id, this.players[1]!.id))
     this.startGame(0, this.players[0].id)
     this.notifyPlayersAboutRematchAcceptance()
@@ -318,8 +249,8 @@ class Match {
   }
 
   notifyPlayersAboutGameState(): void {
-    this.players.forEach((player) => {
-      player?.sendEvent({
+    this.forEachPlayer((player) => {
+      player.sendEvent({
         type: 'gameStateUpdate',
         ...this.getPlayerView(player.id),
       })
@@ -327,20 +258,13 @@ class Match {
   }
 
   notifyPlayersAboutGameWinner(): void {
-    const currentGame = this.games[this.games.length - 1]
-    if (!currentGame) {
-      throw new Error('No current game to notify players about winner')
-    }
+    const currentGame = this.getCurrentGame()
 
     const winnerIndex =
       currentGame.determineTooManyConditionWinner() ||
       currentGame.determineWinner()
 
-    this.players.forEach((player) => {
-      if (!player) {
-        throw new Error('Player not found in match')
-      }
-
+    this.forEachPlayer((player) => {
       const opponent = this.players.find((p) => p?.id !== player.id)
 
       const playerIndex = this.players.findIndex((p) => p?.id === player.id)
@@ -371,8 +295,8 @@ class Match {
   notifyPlayersAboutMatchWinner(): void {
     const winnerId = this.checkMatchWinner()
     if (winnerId) {
-      this.players.forEach((player) => {
-        player?.sendEvent({
+      this.forEachPlayer((player) => {
+        player.sendEvent({
           type: 'matchComplete',
           youWon: player.id === winnerId,
         })
@@ -409,8 +333,7 @@ class Match {
       throw new Error('Match is not ready to finalize the game')
     }
 
-    const currentGame = this.games[this.games.length - 1]
-    if (!currentGame) return
+    const currentGame = this.getCurrentGame()
 
     // Determine winner of this game
     const winnerIndex =
@@ -431,16 +354,18 @@ class Match {
 
     this.notifyPlayersAboutGameWinner()
 
-    // Prepare next game if not match end
-    this.playersTurn = winnerIndex === 0 ? 1 : 2
+    if (winnerIndex !== null) {
+      this.playersTurn = winnerIndex === 0 ? 1 : 2
+    } else {
+      // In case of a tie, randomly select who starts
+      this.playersTurn = Math.random() < 0.5 ? 1 : 2
+    }
+
     this.addGame(new Game(this.players[0].id, this.players[1].id))
     this.startGame(
       this.games.length - 1,
       this.players[this.playersTurn - 1]!.id,
     )
-
-    // Reset players' status and hands as appropriate
-    // Reset turn order
   }
 
   // Swap to the next players turn, unless the next player is standing
@@ -449,10 +374,7 @@ class Match {
       throw new Error('Match is not in progress')
     }
 
-    const currentGame = this.games[this.games.length - 1]
-    if (!currentGame) {
-      throw new Error('No current game to proceed to the next turn')
-    }
+    const currentGame = this.getCurrentGame()
 
     currentGame.turn += 1
 
@@ -515,10 +437,7 @@ class Match {
       throw new Error('Player not found in match')
     }
 
-    const currentGame = this.games[this.games.length - 1]
-    if (!currentGame) {
-      throw new Error('No current game to perform action in')
-    }
+    const currentGame = this.getCurrentGame()
 
     const playerBoard = currentGame.boards[playerId]
     const playerTotal = currentGame.boardTotal(playerBoard)
@@ -536,8 +455,6 @@ class Match {
           throw new Error('Card not found in hand')
         }
         this.playCard(playerId, action.card)
-
-        const currentGame = this.games[this.games.length - 1]
 
         // Check too many condition
         const winnerIndex = currentGame.determineTooManyConditionWinner()
@@ -612,7 +529,7 @@ class Match {
         }
 
         // Check if the card can be played
-        const currentGame = this.games[this.games.length - 1]
+        const currentGame = this.getCurrentGame()
 
         // Double cards can only be played if the last card on the board is not a double, invert cards
         if (action.card.type === 'double') {
@@ -639,6 +556,12 @@ class Match {
       default:
         return { valid: false, reason: 'Invalid action type' }
     }
+  }
+
+  getCurrentGame(): Game {
+    const currentGame = this.games[this.games.length - 1]
+    if (!currentGame) throw new Error('No current game in match')
+    return currentGame
   }
 
   getPlayerView(playerId: string): PlayerView {
