@@ -59,6 +59,12 @@ const colorMap: Record<CardType, CardStyle> = {
     bottomLeft: 'bg-pzk-yellow',
     bottomRight: 'bg-pzk-yellow',
   },
+  special: {
+    top: 'bg-pzk-yellow',
+    middle: 'bg-pzk-yellow',
+    bottomLeft: 'bg-pzk-yellow',
+    bottomRight: 'bg-pzk-yellow',
+  },
 }
 
 const formatValue = (card: CardValue): string => {

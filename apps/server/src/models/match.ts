@@ -136,19 +136,42 @@ class Match {
     currentGame.boards[playerId].push(cardToPlay)
 
     if (cardToPlay.type === 'double') {
-      // If the card is a double, replace the last card on the board
-      // with a new card that has double the value of the last card
-      const lastCard = currentGame.boards[playerId].slice(-2, -1)[0]
+      // If the card is a double, copy it's value and set this card's
+      // value to be the same as the last card on the board
+      const lastCard = currentGame.boards[playerId].at(-2)
+
       if (
         lastCard &&
         lastCard.type !== 'double' &&
         lastCard.type !== 'invert'
       ) {
-        const newCard: Card = {
-          ...lastCard,
-          value: lastCard.value * 2,
+        let value
+
+        switch (lastCard.type) {
+          case 'flip':
+          case 'tiebreaker':
+            value =
+              lastCard.magnitude === 'subtract'
+                ? lastCard.value * -1
+                : lastCard.value
+            break
+          case 'none':
+          case 'special':
+          case 'add':
+            value = lastCard.value
+            break
+          case 'subtract':
+            value = lastCard.value * -1
+            break
         }
-        currentGame.boards[playerId].splice(-2, 1, newCard)
+
+        const specialDouble: Card = {
+          id: cardToPlay.id,
+          type: 'special',
+          value,
+        }
+
+        currentGame.boards[playerId].splice(-1, 1, specialDouble)
 
         return
       }

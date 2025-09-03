@@ -10,6 +10,11 @@ const cardSchema = z.discriminatedUnion('type', [
   }),
   z.object({
     id: z.uuid(),
+    type: z.literal('special'),
+    value: z.number().int(),
+  }),
+  z.object({
+    id: z.uuid(),
     type: z.literal('invert'),
     value: z.templateLiteral([
       z.number().int().positive(),
