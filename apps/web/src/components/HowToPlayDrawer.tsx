@@ -1,7 +1,8 @@
-import { Link, MessageCircleQuestion } from 'lucide-react'
+import { MessageCircleQuestion } from 'lucide-react'
 import HowToPlay from '../content/how-to-play.mdx'
 import { CardPresentation } from './game-elements/card/CardPresentation'
 import { CopyButton } from './CopyButton'
+import { Link } from '@tanstack/react-router'
 
 export const HowToPlayDrawer = () => {
   return (
