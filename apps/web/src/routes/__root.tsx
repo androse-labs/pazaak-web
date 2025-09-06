@@ -6,6 +6,7 @@ import {
 } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import { HowToPlayDrawer } from '../components/HowToPlayDrawer'
+import { Settings } from 'lucide-react'
 
 export const Route = createRootRoute({
   component: () => (
@@ -52,6 +53,9 @@ const NavBar = () => {
           <HowToPlayDrawer />
         </div>
       )}
+      <div className="btn btn-ghost flex-none text-base normal-case lg:text-xl">
+        <Settings />
+      </div>
     </div>
   )
 }

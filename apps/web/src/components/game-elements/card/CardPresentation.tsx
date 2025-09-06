@@ -148,7 +148,7 @@ export const CardPresentation = forwardRef<
           className={`${bottomLeft} flex h-full w-full items-center justify-center rounded-tl-sm lg:rounded-tl-lg`}
         >
           {isFlipOrTiebreaker && (
-            <p className="hidden text-black/30 lg:block">+</p>
+            <p className="hidden text-black/30 lg:block">-</p>
           )}
         </div>
         <div
