@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { RefreshCcw } from 'lucide-react'
+import { CirclePlus, Dices, DoorOpen, RefreshCcw } from 'lucide-react'
 import { Modal } from '../components/Modal'
 import { api } from '../webClient'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -9,6 +9,11 @@ import { useState } from 'react'
 import { usePlayerStore } from '../stores/playerStore'
 import { useDeckStore } from '../stores/deckStore'
 import { joinMatch } from '../api'
+import {
+  uniqueNamesGenerator,
+  adjectives,
+  animals,
+} from 'unique-names-generator'
 
 export const Route = createFileRoute('/')({
   component: Index,
@@ -61,7 +66,10 @@ const JoinMatchModal = () => {
 
   return (
     <Modal id="join-match-modal">
-      <h3 className="text-lg font-bold">Join Match</h3>
+      <h3 className="flex items-center gap-2 text-lg font-bold">
+        <DoorOpen />
+        Join Match
+      </h3>
 
       <div className="flex w-full items-center justify-center gap-2">
         <form className="join w-full" onSubmit={handleSubmit}>
@@ -193,7 +201,7 @@ function Index() {
             )
           }}
         >
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
             <input
               type="text"
               placeholder="Match Name"
@@ -204,6 +212,23 @@ function Index() {
                 setMatchName(e.target.value)
               }}
             />
+            <div className="tooltip" data-tip="Generate Random Name">
+              <button
+                type="button"
+                className="btn btn-square btn-ghost"
+                onClick={() => {
+                  const randomName = uniqueNamesGenerator({
+                    dictionaries: [adjectives, animals],
+                    separator: ' ',
+                    style: 'capital',
+                    length: 2,
+                  })
+                  setMatchName(randomName)
+                }}
+              >
+                <Dices />
+              </button>
+            </div>
             <label className="label">
               <input
                 type="checkbox"
@@ -223,6 +248,7 @@ function Index() {
           )}
 
           <button type="submit" className="btn btn-primary">
+            <CirclePlus />
             Create Match
           </button>
         </form>
@@ -237,6 +263,7 @@ function Index() {
             refetch()
           }}
         >
+          <DoorOpen />
           Join Match
         </button>
         <JoinMatchModal />
