@@ -1,8 +1,10 @@
 import { ScoreDisplay } from './ScoreDisplay'
 import { StateDisplay } from './StateDisplay'
 import { GridOfItems } from './GridOfItems'
-import type { ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 import { CloudOff } from 'lucide-react'
+import { useAudio } from '../../../hooks/useAudio'
+import playCardSound from '../../../../assets/sounds/esmDeal03.wav'
 
 export const OpponentBoardGrid = ({
   title,
@@ -19,6 +21,17 @@ export const OpponentBoardGrid = ({
   total: number
   cards: ReactNode[]
 }) => {
+  const play = useAudio(playCardSound)
+
+  const prevCardCount = useRef(cards.length)
+
+  useEffect(() => {
+    if (cards.length > prevCardCount.current) {
+      play()
+    }
+    prevCardCount.current = cards.length
+  }, [cards.length, play])
+
   return (
     <div className="flex flex-row items-start justify-center gap-2">
       <ScoreDisplay total={3} count={score} />
