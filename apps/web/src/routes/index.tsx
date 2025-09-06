@@ -222,11 +222,9 @@ function Index() {
                     separator: ' ',
                     style: 'capital',
                     length: 2,
-                    seed: Math.floor(Math.random() * 1000),
                   })
                   setMatchName(randomName)
                 }}
-                title="Generate Random Name"
               >
                 <Dices />
               </button>
