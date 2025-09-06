@@ -194,7 +194,7 @@ export default (matchManager: MatchManager) => {
 
       const result = match.performAction(player.id, action)
 
-      if (!result) {
+      if (!result || result.success === false) {
         return c.json({ error: 'Invalid action' }, 400)
       }
 
