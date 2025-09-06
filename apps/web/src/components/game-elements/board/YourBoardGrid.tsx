@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useDroppable, useDndMonitor } from '@dnd-kit/core'
 import clsx from 'clsx'
 import { GridOfItems } from './GridOfItems'
@@ -6,6 +6,8 @@ import { ScoreDisplay } from './ScoreDisplay'
 import { StateDisplay } from './StateDisplay'
 import type { ReactNode } from 'react'
 import { DropOverlay } from '../DropOverlay'
+import { useAudio } from '../../../hooks/useAudio'
+import playCardSound from '../../../../assets/sounds/esmDeal03.wav'
 
 export const YourBoardGrid = ({
   title,
@@ -22,12 +24,21 @@ export const YourBoardGrid = ({
 }) => {
   const { setNodeRef, isOver } = useDroppable({ id: 'your-board' })
   const [isDragging, setIsDragging] = useState(false)
+  const play = useAudio(playCardSound)
+  const prevCardCount = useRef(cards.length)
 
   useDndMonitor({
     onDragStart: () => setIsDragging(true),
     onDragEnd: () => setIsDragging(false),
     onDragCancel: () => setIsDragging(false),
   })
+
+  useEffect(() => {
+    if (cards.length > prevCardCount.current) {
+      play()
+    }
+    prevCardCount.current = cards.length
+  }, [cards.length, play])
 
   return (
     <div className="flex flex-row items-start justify-center gap-2">

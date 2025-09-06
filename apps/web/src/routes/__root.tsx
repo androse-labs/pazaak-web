@@ -6,6 +6,7 @@ import {
 } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import { HowToPlayDrawer } from '../components/HowToPlayDrawer'
+import { SettingsMenu } from '../components/SettingsMenu'
 
 export const Route = createRootRoute({
   component: () => (
@@ -52,6 +53,9 @@ const NavBar = () => {
           <HowToPlayDrawer />
         </div>
       )}
+      <div className="flex-none">
+        <SettingsMenu />
+      </div>
     </div>
   )
 }
