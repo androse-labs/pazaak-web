@@ -9,7 +9,7 @@ interface AudioConfigStore {
 
 export const useAudioConfigStore = create<AudioConfigStore>((set) => ({
   isMuted: false,
-  volume: 1,
+  volume: 100,
   toggleMute: () => set((state) => ({ isMuted: !state.isMuted })),
   setVolume: (volume: number) => set({ volume }),
 }))

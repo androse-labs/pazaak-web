@@ -13,7 +13,7 @@ export function useAudio(url: string) {
     if (!audioRef.current) return
 
     audioRef.current.currentTime = 0
-    audioRef.current.volume = volume
+    audioRef.current.volume = volume / 100
     if (!isMuted) {
       audioRef.current.play()
     }
