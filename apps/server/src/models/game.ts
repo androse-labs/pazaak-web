@@ -8,6 +8,29 @@ type GameState = {
   winner: string | null
 }
 
+export function boardTotal(board: Card[]): number {
+  return board.reduce((total, card) => {
+    if (card.type === 'double') {
+      return total
+    } else if (card.type === 'flip') {
+      const sign = card.magnitude === 'subtract' ? -1 : 1
+      return total + sign * card.value
+    } else if (card.type === 'invert') {
+      return total
+    } else if (card.type === 'subtract') {
+      return total - card.value
+    } else if (card.type === 'tiebreaker') {
+      const sign = card.magnitude === 'subtract' ? -1 : 1
+      return total + sign * card.value
+    }
+    return total + card.value
+  }, 0)
+}
+
+export function boardHasActiveTiebreaker(board: Card[]): boolean {
+  return board.length > 0 && board.at(-1)?.type === 'tiebreaker'
+}
+
 class Game {
   boards: Record<string, Card[]> = {}
   deck: Deck = new Deck()
@@ -26,38 +49,15 @@ class Game {
     this.boards[player2Id] = []
   }
 
-  boardTotal(board: Card[]): number {
-    return board.reduce((total, card) => {
-      if (card.type === 'double') {
-        return total
-      } else if (card.type === 'flip') {
-        const sign = card.magnitude === 'subtract' ? -1 : 1
-        return total + sign * card.value
-      } else if (card.type === 'invert') {
-        return total
-      } else if (card.type === 'subtract') {
-        return total - card.value
-      } else if (card.type === 'tiebreaker') {
-        const sign = card.magnitude === 'subtract' ? -1 : 1
-        return total + sign * card.value
-      }
-      return total + card.value
-    }, 0)
-  }
-
-  boardHasActiveTiebreaker(board: Card[]): boolean {
-    return board.length > 0 && board.at(-1)?.type === 'tiebreaker'
-  }
-
   getBustStatus(distance: number): 'busted' | 'safe' {
     return distance < 0 ? 'busted' : 'safe'
   }
 
   private getTiebreakerAdvantage(): 'player1' | 'player2' | 'both' | 'neither' {
-    const player1HasTiebreaker = this.boardHasActiveTiebreaker(
+    const player1HasTiebreaker = boardHasActiveTiebreaker(
       this.boards[this.player1Id],
     )
-    const player2HasTiebreaker = this.boardHasActiveTiebreaker(
+    const player2HasTiebreaker = boardHasActiveTiebreaker(
       this.boards[this.player2Id],
     )
 
@@ -69,8 +69,8 @@ class Game {
 
   determineTooManyConditionWinner(): number | null {
     // Check card count win condition
-    const player1Total = this.boardTotal(this.boards[this.player1Id])
-    const player2Total = this.boardTotal(this.boards[this.player2Id])
+    const player1Total = boardTotal(this.boards[this.player1Id])
+    const player2Total = boardTotal(this.boards[this.player2Id])
 
     const player1CardCount = this.boards[this.player1Id].length
     const player2CardCount = this.boards[this.player2Id].length
@@ -87,8 +87,8 @@ class Game {
   }
 
   determineWinner(): number | null {
-    const player1Total = this.boardTotal(this.boards[this.player1Id])
-    const player2Total = this.boardTotal(this.boards[this.player2Id])
+    const player1Total = boardTotal(this.boards[this.player1Id])
+    const player2Total = boardTotal(this.boards[this.player2Id])
     const player1Distance = 20 - player1Total
     const player2Distance = 20 - player2Total
 

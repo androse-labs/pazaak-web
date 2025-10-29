@@ -1,5 +1,5 @@
 import { type ServerWebSocket } from 'bun'
-import { Game, type GameState } from './game'
+import { boardTotal, Game, type GameState } from './game'
 import { WSContext } from 'hono/ws'
 import { type MatchAction } from './actions'
 import { type Player } from './players'
@@ -440,7 +440,7 @@ class Match {
     const currentGame = this.getCurrentGame()
 
     const playerBoard = currentGame.boards[playerId]
-    const playerTotal = currentGame.boardTotal(playerBoard)
+    const playerTotal = boardTotal(playerBoard)
 
     switch (action.type) {
       case 'play': {
@@ -581,11 +581,11 @@ class Match {
         boards: {
           yourBoard: {
             cards: game.boards[player.id] || [],
-            total: game.boardTotal(game.boards[player.id] || []),
+            total: boardTotal(game.boards[player.id] || []),
           },
           opponentBoard: {
             cards: game.boards[opponent?.id || ''] || [],
-            total: game.boardTotal(game.boards[opponent?.id || ''] || []),
+            total: boardTotal(game.boards[opponent?.id || ''] || []),
           },
         },
         turn: game.turn,

@@ -1,7 +1,7 @@
 import type { Card } from '@pazaak-web/shared'
 
 // Expect card to already be on the board
-export function processCardEffects(cardToPlay: Card, board: Card[]) {
+export function processCardEffects(cardToPlay: Card, board: Card[]): Card[] {
   if (cardToPlay.type === 'double') {
     // If the card is a double, copy it's value and set this card's
     // value to be the same as the last card on the board
@@ -36,7 +36,7 @@ export function processCardEffects(cardToPlay: Card, board: Card[]) {
 
       board.splice(-1, 1, specialDouble)
 
-      return
+      return board
     }
 
     throw new Error(
@@ -65,4 +65,6 @@ export function processCardEffects(cardToPlay: Card, board: Card[]) {
       }
     })
   }
+
+  return board
 }
