@@ -88,45 +88,95 @@ describe('Player AI', () => {
     })
   })
 
-  it('plays a card with configurable magnitude correctly', () => {
-    const gameState: PlayerView = {
-      games: [
-        {
-          boards: {
-            yourBoard: {
-              cards: [{ id: 'none-1', type: 'none', value: 15 }],
-              total: 15,
+  it.each<{ magnitude: 'add' | 'subtract'; total: number }>([
+    { magnitude: 'subtract', total: 24 },
+    { magnitude: 'add', total: 16 },
+  ])(
+    'plays a flip card with configurable magnitude correctly',
+    ({ magnitude, total }) => {
+      const gameState: PlayerView = {
+        games: [
+          {
+            boards: {
+              yourBoard: {
+                cards: [{ id: 'none-1', type: 'none', value: total }],
+                total: total,
+              },
+              opponentBoard: { cards: [], total: 0 },
             },
-            opponentBoard: { cards: [], total: 0 },
+            turn: 1,
+            winner: null,
           },
-          turn: 1,
-          winner: null,
-        },
-      ],
-      yourHand: [
-        { id: 'flip-1', type: 'flip', value: 4, magnitude: 'add' },
-        {
-          id: 'tiebreaker-1',
-          type: 'tiebreaker',
-          value: 6,
-          magnitude: 'subtract',
-        },
-      ],
-      score: { yourScore: 0, opponentScore: 0 },
-      yourTurn: true,
-      matchName: 'Test Match',
-      yourState: 'playing',
-      opponentState: 'playing',
-      opponentHandSize: 0,
-      round: 1,
-      opponentConnected: true,
-    }
+        ],
+        yourHand: [
+          { id: 'flip-1', type: 'flip', value: 4, magnitude: magnitude },
+          {
+            id: 'tiebreaker-1',
+            type: 'tiebreaker',
+            value: 6,
+            magnitude: 'subtract',
+          },
+        ],
+        score: { yourScore: 0, opponentScore: 0 },
+        yourTurn: true,
+        matchName: 'Test Match',
+        yourState: 'playing',
+        opponentState: 'playing',
+        opponentHandSize: 0,
+        round: 1,
+        opponentConnected: true,
+      }
 
-    const action = decideBotAction(gameState)
+      const action = decideBotAction(gameState)
 
-    expect(action).toEqual({
-      type: 'play',
-      card: { id: 'flip-1', type: 'flip', value: 4, magnitude: 'add' },
-    })
-  })
+      expect(action).toEqual({
+        type: 'play',
+        card: { id: 'flip-1', type: 'flip', value: 4, magnitude: magnitude },
+      })
+    },
+  )
+
+  it.each([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])(
+    'ends turn when no good plays (%i)',
+    (startTotal) => {
+      const gameState: PlayerView = {
+        games: [
+          {
+            boards: {
+              yourBoard: {
+                cards: [{ id: 'none-1', type: 'none', value: startTotal }],
+                total: startTotal,
+              },
+              opponentBoard: { cards: [], total: 0 },
+            },
+            turn: 1,
+            winner: null,
+          },
+        ],
+        yourHand: [
+          { id: 'add-1', type: 'add', value: 2 },
+          { id: 'subtract-1', type: 'subtract', value: 1 },
+          { id: 'flip-1', type: 'flip', value: 2, magnitude: 'add' },
+          {
+            id: 'tiebreaker-1',
+            type: 'tiebreaker',
+            value: 1,
+            magnitude: 'subtract',
+          },
+        ],
+        score: { yourScore: 0, opponentScore: 0 },
+        yourTurn: true,
+        matchName: 'Test Match',
+        yourState: 'playing',
+        opponentState: 'playing',
+        opponentHandSize: 0,
+        round: 1,
+        opponentConnected: true,
+      }
+
+      const action = decideBotAction(gameState)
+
+      expect(action).toEqual({ type: 'end' })
+    },
+  )
 })
