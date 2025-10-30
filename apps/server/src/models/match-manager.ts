@@ -41,6 +41,36 @@ class MatchManager {
     return { matchId, playerId, token }
   }
 
+  startMatchWithBot(matchId: string, deck: Card[]): void {
+    const match = this.matches.find((m) => m.id === matchId)
+    if (!match) {
+      throw new HTTPException(404, { message: 'Match not found' })
+    }
+
+    if (match.players[1]) {
+      throw new HTTPException(409, { message: 'Match already has two players' })
+    }
+
+    match.startMatch({
+      id: 'bot',
+      wsConnected: true,
+      sendEvent: () => {},
+      token: 'bot-token',
+      status: 'playing',
+      hand: [],
+      deck: new Deck().fillWithCustomCards(deck),
+      originalDeck: [...deck],
+    })
+
+    // notify each player about game state
+    match.players.forEach((player) => {
+      player?.sendEvent({
+        type: 'gameStateUpdate',
+        ...match.getPlayerView(player.id),
+      })
+    })
+  }
+
   joinMatch(
     matchId: string,
     deck: Card[],

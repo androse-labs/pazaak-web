@@ -6,6 +6,7 @@ import { type Player } from './players'
 import { type Card, type PlayerView } from '@pazaak-web/shared'
 import { Deck } from './deck'
 import { processCardEffects } from './card'
+import { decideBotAction } from '../ai'
 
 type WaitingMatch = {
   status: 'waiting'
@@ -29,6 +30,7 @@ class Match {
   lastModifiedDateUtc: number
   score: [number, number]
   status: 'waiting' | 'in-progress' | 'finished'
+  isAiMatch: boolean = false
 
   constructor(
     id: string,
@@ -413,6 +415,15 @@ class Match {
       }
       currentGame.boards[currentPlayer.id].push(drawnCard)
 
+      // if bot game, let the bot play its turn automatically
+      if (currentPlayer.id === 'bot') {
+        console.log('Bot is taking its turn')
+        const botView = this.getPlayerView('bot')
+        const botAction = decideBotAction(botView)
+
+        this.performAction('bot', botAction)
+      }
+
       const winnerIndex = currentGame.determineTooManyConditionWinner()
       if (winnerIndex !== null) {
         this.finalizeGame()
@@ -421,10 +432,10 @@ class Match {
     }
   }
 
-  performAction(
+  async performAction(
     playerId: string,
     action: MatchAction,
-  ): { success: true } | { success: false; reason: string } {
+  ): Promise<{ success: true } | { success: false; reason: string }> {
     this.touch()
 
     const validation = this.isActionValid(playerId, action)
@@ -441,6 +452,10 @@ class Match {
 
     const playerBoard = currentGame.boards[playerId]
     const playerTotal = boardTotal(playerBoard)
+
+    if (playerId === 'bot') {
+      await new Promise((resolve) => setTimeout(resolve, 750))
+    }
 
     switch (action.type) {
       case 'play': {
@@ -472,7 +487,7 @@ class Match {
         if (playerTotal > 20) {
           player.status = 'busted'
         }
-        this.nextTurn()
+        await this.nextTurn()
         break
 
       case 'stand':
@@ -481,7 +496,7 @@ class Match {
         } else {
           player.status = 'standing'
         }
-        this.nextTurn()
+        await this.nextTurn()
         break
 
       default:

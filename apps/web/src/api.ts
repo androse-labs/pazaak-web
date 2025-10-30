@@ -29,3 +29,9 @@ export const rematch = async (
     },
   )
 }
+
+export const startMatchWithBot = (matchId: string, deck: Card[]) => {
+  return api.post(`/match/${matchId}/play-against-bot`, {
+    deck: deck,
+  })
+}

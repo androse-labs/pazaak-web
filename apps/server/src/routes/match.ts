@@ -70,6 +70,26 @@ export default (matchManager: MatchManager) => {
     },
   )
 
+  match.post(
+    '/match/:matchId/play-against-bot',
+    zValidator(
+      'json',
+      z.object({
+        deck: z.array(cardSchema),
+      }),
+    ),
+    async (c) => {
+      const { matchId } = c.req.param()
+      const { deck } = c.req.valid('json')
+
+      matchManager.startMatchWithBot(matchId, deck)
+
+      console.log(`Bot joined match ${matchId}`)
+
+      return c.body(null, 204)
+    },
+  )
+
   match.get('/match/joinable', async (c) => {
     const matches = matchManager.getAllMatches()
     if (matches.length === 0) {
@@ -192,7 +212,7 @@ export default (matchManager: MatchManager) => {
         return c.json({ error: 'Invalid player token' }, 403)
       }
 
-      const result = match.performAction(player.id, action)
+      const result = await match.performAction(player.id, action)
 
       if (!result || result.success === false) {
         return c.json({ error: 'Invalid action' }, 400)

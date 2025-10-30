@@ -1,3 +1,5 @@
+import { startMatchWithBot } from '../api'
+import { useDeckStore } from '../stores/deckStore'
 import { CopyButton } from './CopyButton'
 
 type WaitingForMatchToStartProps = {
@@ -9,6 +11,8 @@ const createMatchURL = (matchId: string) => {
 }
 
 const WaitingForMatchToStart = ({ matchId }: WaitingForMatchToStartProps) => {
+  const userDeck = useDeckStore((s) => s.deck)
+
   return (
     <div className="flex flex-col items-center justify-center gap-16">
       <div className="text-center text-2xl font-bold">
@@ -32,6 +36,17 @@ const WaitingForMatchToStart = ({ matchId }: WaitingForMatchToStartProps) => {
               className="join-item"
             />
           </div>
+        </div>
+        <div className="divider">or</div>
+        <div className="flex items-center justify-center gap-2">
+          <button
+            className="btn btn-neutral btn-wide"
+            onClick={async () => {
+              await startMatchWithBot(matchId, userDeck)
+            }}
+          >
+            Play Against a Bot
+          </button>
         </div>
       </div>
     </div>
