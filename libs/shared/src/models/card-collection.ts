@@ -1,4 +1,4 @@
-import type { Card } from '@pazaak-web/shared'
+import type { Card } from './card'
 
 const blueCards: Card[] = Array.from({ length: 6 }, (_, i) => ({
   id: `blue-${i + 1}`,

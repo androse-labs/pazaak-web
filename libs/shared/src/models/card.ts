@@ -52,5 +52,6 @@ const cardSchema = z.discriminatedUnion('type', [
 ])
 
 type Card = z.infer<typeof cardSchema>
+type CardMagnitude = z.infer<typeof cardMagnitudeSchema>
 
-export { type Card, cardSchema }
+export { type Card, cardSchema, type CardMagnitude }
