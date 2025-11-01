@@ -550,7 +550,10 @@ class Match {
         plays < MAX_BOT_PLAYS_PER_TURN
       ) {
         const botPlayer = this.getPlayerById(BOT_ID)
-        if (!botPlayer || botPlayer.status !== 'playing') break
+        if (!botPlayer || botPlayer.status !== 'playing') {
+          console.log('Bot is no longer active, ending bot loop')
+          break
+        }
         const view = this.getPlayerView(BOT_ID)
         const action = decideMonteCarloAction(view, {
           simulations: 500,
@@ -559,10 +562,16 @@ class Match {
         console.log(`Bot decided to ${JSON.stringify(action)}`)
         await this.performAction(BOT_ID, action)
         // If action ended turn or bot is no longer active, stop
-        if (action.type !== 'play') break
+        if (action.type !== 'play') {
+          console.log('Bot ended its turn, exiting bot loop')
+          break
+        }
         plays++
       }
+    } catch (e) {
+      console.log('Error during bot turn loop:', e)
     } finally {
+      console.log('Bot turn loop ended')
       this.botLoopRunning = false
     }
   }
