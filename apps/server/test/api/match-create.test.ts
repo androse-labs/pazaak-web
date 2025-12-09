@@ -34,6 +34,7 @@ describe('Match Creation', () => {
     })
 
     expect(matchManager.getMatch(data.matchId)).toBeDefined()
+
     expect(matchManager.getMatch(data.matchId)!.matchName).toBe('Test Match')
   })
 
