@@ -1,12 +1,9 @@
-import { randomUUIDv7 } from 'bun'
-import { collectionCards, type Card, type PlayerView } from '@pazaak-web/shared'
+import { type Card, type PlayerView } from '@pazaak-web/shared'
 import { boardHasActiveTiebreaker, boardTotal } from '../models/game'
 import { processCardEffects } from '../models/card'
 import type { MatchAction } from '../models/actions'
+import { Deck } from '../models/deck'
 
-// --------------------------------------------------------------------------------------
-// Configuration
-// --------------------------------------------------------------------------------------
 interface MonteCarloConfig {
   simulations: number
   opponentPolicy: 'heuristic' | 'random'
@@ -25,9 +22,6 @@ interface DeckModel {
   ): Card[]
 }
 
-// --------------------------------------------------------------------------------------
-// Internal Simulation State
-// --------------------------------------------------------------------------------------
 interface InternalState {
   yourBoard: Card[]
   opponentBoard: Card[]
@@ -49,9 +43,6 @@ interface InternalState {
   depth: number
 }
 
-// --------------------------------------------------------------------------------------
-// RNG
-// --------------------------------------------------------------------------------------
 interface RNG {
   next(): number // uniform [0,1)
 }
@@ -72,9 +63,6 @@ class SeededRNG implements RNG {
   }
 }
 
-// --------------------------------------------------------------------------------------
-// Utility
-// --------------------------------------------------------------------------------------
 function cloneCard(card: Card): Card {
   return { ...card }
 }
@@ -97,9 +85,6 @@ function deepCloneState(s: InternalState): InternalState {
   }
 }
 
-// --------------------------------------------------------------------------------------
-// Terminal & Outcome Logic
-// --------------------------------------------------------------------------------------
 function resolveWinnerOnStanding(state: InternalState): void {
   const a = state.yourTotal
   const b = state.opponentTotal
@@ -158,17 +143,12 @@ function heuristicValue(state: InternalState): number {
   return 1 / (1 + Math.exp(-raw / 5))
 }
 
-// --------------------------------------------------------------------------------------
-// Card Play Mechanics
-// IMPORTANT: For double/invert you must append the card THEN call processCardEffects.
-// --------------------------------------------------------------------------------------
 function playCardOntoBoard(board: Card[], card: Card): Card[] {
   // Clone board so we don't mutate original during hypothetical evaluation
   const newBoard = board.map(cloneCard)
   newBoard.push(cloneCard(card))
   // Apply mutation effects
-  const transformed = processCardEffects(newBoard.at(-1)!, newBoard)
-  return transformed
+  return processCardEffects(newBoard.at(-1)!, newBoard)
 }
 
 function applyPlayCard(
@@ -201,9 +181,6 @@ function canLegallyPlayDouble(board: Card[]): boolean {
   return true
 }
 
-// --------------------------------------------------------------------------------------
-// Action Generation
-// --------------------------------------------------------------------------------------
 function expandPlayableVariants(card: Card): Card[] {
   if (card.type === 'flip' || card.type === 'tiebreaker') {
     return [
@@ -251,25 +228,25 @@ function generateLegalActions(
   const boardRef = state.yourBoard
 
   for (const card of state.yourHand) {
-    if (card.type === 'double' && !canLegallyPlayDouble(boardRef)) {
-      continue
-    }
+    // if (card.type === 'double' && !canLegallyPlayDouble(boardRef)) {
+    //   continue
+    // }
     for (const variant of expandPlayableVariants(card)) {
-      if (
-        variant.type === 'invert' &&
-        !doesInvertHaveEffect(variant, boardRef)
-      ) {
-        continue // Skip useless invert
-      }
+      // if (
+      //   variant.type === 'invert' &&
+      //   !doesInvertHaveEffect(variant, boardRef)
+      // ) {
+      //   continue // Skip useless invert
+      // }
       const currentTotal = boardTotal(boardRef)
       const newTotal = hypotheticalTotalAfterPlay(boardRef, variant)
       // NEW: If already over 20, only allow plays that bring you to 20 or under
       if (currentTotal > 20 && newTotal > 20) {
         continue
       }
-      if (cfg.forbidImmediateBust && newTotal > 20) {
-        continue
-      }
+      // if (cfg.forbidImmediateBust && newTotal > 20) {
+      //   continue
+      // }
       if (Number.isFinite(newTotal)) {
         actions.push({ type: 'play', card: variant })
       }
@@ -302,36 +279,58 @@ function chooseRolloutAction(
       // Don't play if you're busted and this card can't unbust you
       if (total > 20 && tAfter > 20) score -= 100
       // Penalize playing if total is very low
-      if (total < 10) score -= 3.5
-      // Reward getting above the opponent (without busting)
-      if (tAfter <= 20 && tAfter > oppTotal) score += 3.0
-      // Small bonus for getting close to 20
-      if (tAfter >= 18 && tAfter <= 20) score += 1.0
-      // Weak penalty for getting further away from opponent (without busting)
-      score += 1.0 - Math.abs(tAfter - oppTotal) * 0.25
-      // Special card heuristics
-      if (
-        (a.card.type === 'invert' || a.card.type === 'double') &&
-        total < 14 &&
-        tAfter < 18
-      ) {
-        score -= 1.5
-      }
-      if (a.card.type === 'flip' && total < 12) {
-        score -= 0.75
-      }
+      // prefer to end turn and draw more cards
+      if (total < 12) score -= 5.0
+      // HIGH bonus for hitting exactly 20
+      if (tAfter === 20) score += 20.0
+      // Medium bonus for 18-19
+      else if (tAfter >= 18 && tAfter < 20) score += 2.0
+
       // Don't waste invert if it has no effect
       if (
         a.card.type === 'invert' &&
         !doesInvertHaveEffect(a.card, state.yourBoard)
       ) {
-        score -= 3.0
+        score -= 10.0
+      }
+      // If you can hit 20 with any card, prefer it strongly
+      const canHit20 = state.yourHand.some(
+        (h) => hypotheticalTotalAfterPlay(state.yourBoard, h) === 20,
+      )
+      if (canHit20 && tAfter < 20) score += 20.0
+
+      if (
+        tAfter >= 18 &&
+        tAfter <= 20 && // Would achieve a good score
+        state.yourTotal >= 18 &&
+        state.yourTotal <= 20 // You're already close
+      ) {
+        // Penalize playing a card with no strong improvement
+        score -= 5.0 // adjust the penalty magnitude as needed
       }
     }
-    // ... (rest of your scoring for 'end' and 'stand' actions)
+    if (a.type === 'stand') {
+      // Reward standing if you're ahead and your opponent is standing
+      if (total > oppTotal && state.opponentState === 'standing') {
+        score += 5.0
+      }
+      // Reward standing if you're in a "safe" range
+      if (state.yourTotal >= 18 && state.yourTotal <= 20) score += 2.5
+      // Reward for having more cards left in hand
+      score += state.yourHand.length * 0.5
+    }
+    if (a.type === 'end') {
+      // reward ending turn if your score is low
+      if (total < 12) {
+        score += 3.0
+      }
+      // slight penalty for ending turn with many cards left
+      score += handSize * 0.2
+    }
     return { action: a, raw: score }
   })
 
+  // softmax selection
   const temperature = 1.4
   const weights = scored.map((s) => Math.exp(s.raw / temperature))
   let r = rng.next() * weights.reduce((a, b) => a + b, 0)
@@ -353,13 +352,13 @@ function maybeDrawOnTurnStart(
   if (state.yourTurn) {
     if (state.playerEndedLastTurn && state.yourState === 'playing') {
       const c = deck.drawRandomCard(state, rng)
-      if (c) state.yourHand.push(c)
+      if (c) state.yourBoard.push(c)
     }
     state.playerEndedLastTurn = false
   } else {
     if (state.opponentEndedLastTurn && state.opponentState === 'playing') {
       const c = deck.drawRandomCard(state, rng)
-      if (c) state.opponentHand.push(c)
+      if (c) state.opponentBoard.push(c)
     }
     state.opponentEndedLastTurn = false
   }
@@ -541,7 +540,7 @@ export function decideMonteCarloAction(
     simulations: cfg?.simulations ?? 750,
     opponentPolicy: cfg?.opponentPolicy ?? 'heuristic',
     deckModel: cfg?.deckModel ?? defaultDeckModel(),
-    maxPlayoutDepth: cfg?.maxPlayoutDepth ?? 150,
+    maxPlayoutDepth: cfg?.maxPlayoutDepth ?? 20,
     forbidImmediateBust: cfg?.forbidImmediateBust ?? true,
   }
 
@@ -621,6 +620,29 @@ export function decideMonteCarloAction(
     }
   }
 
+  for (const { value, count, action } of totals.values()) {
+    if (action.type === 'play') {
+      if (action.card.type == 'flip' || action.card.type == 'tiebreaker') {
+        console.log(
+          `Action: play ${action.card.type}(${action.card.value},${action.card.magnitude}) avg=${(
+            value / count
+          ).toFixed(3)} sims=${count}`,
+        )
+      } else {
+        console.log(
+          `Action: play ${action.card.type}(${action.card.value}) avg=${(
+            value / count
+          ).toFixed(3)} sims=${count}`,
+        )
+      }
+    } else {
+      // "stand" or "end"
+      console.log(
+        `Action: ${action.type} avg=${(value / count).toFixed(3)} sims=${count}`,
+      )
+    }
+  }
+
   return best
 }
 
@@ -642,21 +664,33 @@ function actionKey(a: MatchAction): string {
 // --------------------------------------------------------------------------------------
 function defaultDeckModel(): DeckModel {
   // Example pool; ensure values obey your schema constraints (positive ints for most)
-  const pool = collectionCards.map((c) => {
-    const { id, ...rest } = c
-    return rest
-  })
+  const pool = new Deck().defaultFill().shuffle().cards
+
+  const demoDeck: Card[] = [
+    {
+      id: crypto.randomUUID(),
+      type: 'tiebreaker',
+      value: 1,
+      magnitude: 'add',
+    },
+    { id: crypto.randomUUID(), type: 'double', value: 'D' },
+    { id: crypto.randomUUID(), type: 'invert', value: '2&4' },
+    { id: crypto.randomUUID(), type: 'add', value: 1 },
+    { id: crypto.randomUUID(), type: 'add', value: 1 },
+    { id: crypto.randomUUID(), type: 'subtract', value: 1 },
+    { id: crypto.randomUUID(), type: 'invert', value: '3&6' },
+    { id: crypto.randomUUID(), type: 'subtract', value: 3 },
+    { id: crypto.randomUUID(), type: 'flip', value: 2, magnitude: 'add' },
+    { id: crypto.randomUUID(), type: 'tiebreaker', value: 2, magnitude: 'add' },
+  ]
+
+  const opponentDeck = new Deck().fillWithCustomCards(demoDeck).shuffle()
 
   return {
     drawRandomCard(_state: InternalState, rng: RNG): Card | null {
+      if (pool.length === 0) return null
       const idx = Math.floor(rng.next() * pool.length)
-      const base = pool[idx]
-      // For flip/tiebreaker we randomize initial magnitude
-      if (base.type === 'flip' || base.type === 'tiebreaker') {
-        const mag = rng.next() < 0.5 ? 'add' : 'subtract'
-        return { ...base, id: randomUUIDv7(), magnitude: mag }
-      }
-      return { ...base, id: randomUUIDv7() }
+      return cloneCard(pool[idx])
     },
 
     sampleOpponentHand(
@@ -666,7 +700,7 @@ function defaultDeckModel(): DeckModel {
     ): Card[] {
       const hand: Card[] = []
       for (let i = 0; i < desiredSize; i++) {
-        const c = this.drawRandomCard(_state, rng)
+        const c = opponentDeck.cards.pop()
         if (c) hand.push(c)
       }
       return hand

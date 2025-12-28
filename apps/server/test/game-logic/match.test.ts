@@ -509,7 +509,7 @@ describe('Match', () => {
   })
 
   describe('performAction', () => {
-    it("plays a card from the player's hand", () => {
+    it("plays a card from the player's hand", async () => {
       const match = createTestMatch({
         players: [
           {
@@ -543,7 +543,7 @@ describe('Match', () => {
         card: { id: '1', type: 'flip', value: 5, magnitude: 'subtract' },
       }
 
-      expect(match.performAction('player1', action)).toEqual({
+      expect(await match.performAction('player1', action)).toEqual({
         success: true,
       })
 
@@ -603,7 +603,7 @@ describe('Match', () => {
       },
     ])(
       'assumes the value of the last card played when playing a double card',
-      ({ lastCardPlayed, expectedValue }) => {
+      async ({ lastCardPlayed, expectedValue }) => {
         const match = createTestMatch({
           players: [
             {
@@ -638,7 +638,7 @@ describe('Match', () => {
           card: { id: '2', type: 'double', value: 'D' },
         }
 
-        expect(match.performAction('player1', action)).toEqual({
+        expect(await match.performAction('player1', action)).toEqual({
           success: true,
         })
 
@@ -690,7 +690,7 @@ describe('Match', () => {
       },
     ])(
       'changes $cardToInvert to $expectedCard when inverted',
-      ({ cardToInvert, expectedCard }) => {
+      async ({ cardToInvert, expectedCard }) => {
         const match = createTestMatch({
           players: [
             {
@@ -725,7 +725,7 @@ describe('Match', () => {
           card: { id: '2', type: 'invert', value: '2&4' },
         }
 
-        expect(match.performAction('player1', action)).toEqual({
+        expect(await match.performAction('player1', action)).toEqual({
           success: true,
         })
 
@@ -742,7 +742,7 @@ describe('Match', () => {
 
     it.each<'end' | 'stand'>(['end', 'stand'])(
       "changes the player's turn after a they perform an '%s' action and increments the turn",
-      (actionType) => {
+      async (actionType) => {
         const match = createTestMatch({
           players: [
             {
@@ -778,7 +778,7 @@ describe('Match', () => {
           type: actionType,
         }
 
-        expect(match.performAction('player1', action)).toEqual({
+        expect(await match.performAction('player1', action)).toEqual({
           success: true,
         })
         expect(match.playersTurn).toBe(2)
@@ -786,7 +786,7 @@ describe('Match', () => {
       },
     )
 
-    it('stays the players turn after they play a card and does not increment the turn', () => {
+    it('stays the players turn after they play a card and does not increment the turn', async () => {
       const match = createTestMatch({
         players: [
           {
@@ -823,7 +823,7 @@ describe('Match', () => {
         card: { id: '1', type: 'flip', value: 5, magnitude: 'subtract' },
       }
 
-      expect(match.performAction('player1', action)).toEqual({
+      expect(await match.performAction('player1', action)).toEqual({
         success: true,
       })
       expect(match.playersTurn).toBe(1)
@@ -990,7 +990,7 @@ describe('Match', () => {
     })
   })
 
-  it('marks the game as complete when a player plays a 9th card and does not bust', () => {
+  it('marks the game as complete when a player plays a 9th card and does not bust', async () => {
     const match = createTestMatch({
       players: [
         {
@@ -1024,7 +1024,7 @@ describe('Match', () => {
       card: { id: 'test-card-1', type: 'none', value: 1 },
     })
 
-    expect(actionResult).toEqual({ success: true })
+    expect(await actionResult).toEqual({ success: true })
     expect(game.boards['player1']).toHaveLength(9)
     expect(game.determineTooManyConditionWinner()).toBe(0)
     expect(match.games.length).toBe(2)

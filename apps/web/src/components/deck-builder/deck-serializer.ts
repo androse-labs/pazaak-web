@@ -1,5 +1,5 @@
 import type { Card } from '@pazaak-web/shared'
-import { collectionCards } from './card-collection'
+import { collectionCards } from '@pazaak-web/shared'
 
 const deckToCode = (deck: Card[]): string => {
   return deck.map(cardToCode).join('-')
