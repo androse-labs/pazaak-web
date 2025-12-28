@@ -17,7 +17,7 @@ class Deck {
 
   defaultFill(matchType: MatchType = 'standard'): Deck {
     if (matchType === 'standard') {
-      // Fill the deck with 40 cards, 10 of each type (1-10)
+      // Fill the deck with 40 cards: 4 sets of values 1-10 (4 cards of each value)
       this.cards = Array.from({ length: 4 }).flatMap(() =>
         Array.from(
           { length: 10 },
@@ -31,7 +31,7 @@ class Deck {
       )
     } else if (matchType === 'exotic') {
       // Fill the deck with exotic cards: higher values and special cards
-      // 3 sets of 1-10, plus 10 special cards with values 11-15
+      // 3 sets of 1-10 (30 cards), plus 10 special cards with values 11-15 (2 of each value)
       this.cards = [
         ...Array.from({ length: 3 }).flatMap(() =>
           Array.from(
@@ -50,7 +50,7 @@ class Deck {
             ({
               id: crypto.randomUUID(),
               type: 'special',
-              value: 11 + (i % 5), // Values 11-15
+              value: Math.floor(i / 2) + 11, // Values 11-15, 2 of each
             }) satisfies Card,
         ),
       ]

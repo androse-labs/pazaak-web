@@ -29,14 +29,14 @@ describe('Deck', () => {
     // Count normal cards and special cards
     let normalCards = 0
     let specialCards = 0
-    const specialValues = new Set<number>()
+    const specialValueCounts: Record<number, number> = {}
 
     deck.cards.forEach((card) => {
       if (card.type === 'none') {
         normalCards++
       } else if (card.type === 'special') {
         specialCards++
-        specialValues.add(card.value)
+        specialValueCounts[card.value] = (specialValueCounts[card.value] || 0) + 1
       }
     })
 
@@ -44,11 +44,10 @@ describe('Deck', () => {
     expect(normalCards).toBe(30)
     expect(specialCards).toBe(10)
 
-    // Special cards should have values in range 11-15
-    specialValues.forEach((value) => {
-      expect(value).toBeGreaterThanOrEqual(11)
-      expect(value).toBeLessThanOrEqual(15)
-    })
+    // Each special value 11-15 should appear exactly 2 times
+    for (let i = 11; i <= 15; i++) {
+      expect(specialValueCounts[i]).toBe(2)
+    }
   })
 
   it('defaults to standard deck when no type specified', () => {
