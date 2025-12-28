@@ -10,6 +10,7 @@ describe('Match List', () => {
 
     const { matchId: matchId1 } = matchManager.createMatch(
       'Test Match',
+      'standard',
       false,
       [
         { id: randomUUIDv7(), type: 'double', value: 'D' },
@@ -21,6 +22,7 @@ describe('Match List', () => {
 
     const { matchId: matchId2 } = matchManager.createMatch(
       'Other Test Match',
+      'exotic',
       false,
       [
         { id: randomUUIDv7(), type: 'double', value: 'D' },
@@ -41,10 +43,12 @@ describe('Match List', () => {
       {
         matchId: matchId1,
         matchName: 'Test Match',
+        matchType: 'standard',
       },
       {
         matchId: matchId2,
         matchName: 'Other Test Match',
+        matchType: 'exotic',
       },
     ])
   })
@@ -61,7 +65,7 @@ describe('Match List', () => {
   it('does not list matches that are full', async () => {
     const matchManager = new MatchManager()
 
-    const { matchId } = matchManager.createMatch('Full Match', false, [
+    const { matchId } = matchManager.createMatch('Full Match', 'standard', false, [
       { id: randomUUIDv7(), type: 'double', value: 'D' },
       { id: randomUUIDv7(), type: 'invert', value: '2&4' },
       { id: randomUUIDv7(), type: 'flip', value: 2, magnitude: 'subtract' },
@@ -78,6 +82,7 @@ describe('Match List', () => {
 
     const { matchId: matchId2 } = matchManager.createMatch(
       'Another Match',
+      'standard',
       false,
       [
         { id: randomUUIDv7(), type: 'double', value: 'D' },
@@ -97,6 +102,7 @@ describe('Match List', () => {
       {
         matchId: matchId2,
         matchName: 'Another Match',
+        matchType: 'standard',
       },
     ])
   })

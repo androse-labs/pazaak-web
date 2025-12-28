@@ -26,6 +26,7 @@ const createTestPlayer = (): Player => ({
 const createTestMatch = (
   options: {
     matchName?: string
+    matchType?: 'standard' | 'exotic'
     players?: [Player, Player | null]
     status?: 'in-progress' | 'waiting' | 'finished'
     games?: Game[]
@@ -37,6 +38,7 @@ const createTestMatch = (
   const match = new Match(
     randomUUIDv7(),
     'Test Match',
+    options.matchType || 'standard',
     createTestPlayer(),
     false,
   )
