@@ -9,6 +9,7 @@ describe('Match Manager', () => {
 
     const { matchId, playerId, token } = matchManager.createMatch(
       'Test Match',
+      'standard',
       false,
       [
         { id: randomUUIDv7(), type: 'double', value: 'D' },
@@ -30,7 +31,7 @@ describe('Match Manager', () => {
   it('joins a match successfully', async () => {
     const matchManager = new MatchManager()
 
-    const { matchId } = matchManager.createMatch('Test Match', false, [
+    const { matchId } = matchManager.createMatch('Test Match', 'standard', false, [
       { id: randomUUIDv7(), type: 'double', value: 'D' },
       { id: randomUUIDv7(), type: 'invert', value: '2&4' },
       { id: randomUUIDv7(), type: 'flip', value: 2, magnitude: 'subtract' },
@@ -77,7 +78,7 @@ describe('Match Manager', () => {
   it('gets a match by ID', () => {
     const matchManager = new MatchManager()
 
-    const { matchId } = matchManager.createMatch('Test Match', false, [
+    const { matchId } = matchManager.createMatch('Test Match', 'standard', false, [
       { id: randomUUIDv7(), type: 'double', value: 'D' },
       { id: randomUUIDv7(), type: 'invert', value: '2&4' },
       { id: randomUUIDv7(), type: 'flip', value: 2, magnitude: 'subtract' },
@@ -101,7 +102,7 @@ describe('Match Manager', () => {
   it('deletes a match and returns true', () => {
     const matchManager = new MatchManager()
 
-    const { matchId } = matchManager.createMatch('Test Match', false, [
+    const { matchId } = matchManager.createMatch('Test Match', 'standard', false, [
       { id: randomUUIDv7(), type: 'double', value: 'D' },
       { id: randomUUIDv7(), type: 'invert', value: '2&4' },
       { id: randomUUIDv7(), type: 'flip', value: 2, magnitude: 'subtract' },

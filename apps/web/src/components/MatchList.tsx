@@ -1,6 +1,9 @@
+import type { MatchType } from '@pazaak-web/shared'
+
 type Match = {
   matchId: string
   matchName: string
+  matchType: MatchType
 }
 
 type MatchListProps = {
@@ -38,10 +41,15 @@ export function MatchList({
 
   return (
     <div className="flex max-h-60 flex-col gap-2 overflow-y-auto">
-      {matches.map(({ matchId, matchName }) => (
+      {matches.map(({ matchId, matchName, matchType }) => (
         <div key={matchId} className="flex justify-between gap-2">
           <div>
-            <p className="text-md">{matchName}</p>
+            <div className="flex items-center gap-2">
+              <p className="text-md">{matchName}</p>
+              <span className="badge badge-primary badge-sm capitalize">
+                {matchType}
+              </span>
+            </div>
             <p className="text-base-content text-sm italic text-opacity-50">
               {matchId}
             </p>

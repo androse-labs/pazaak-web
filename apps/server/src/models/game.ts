@@ -1,5 +1,5 @@
 import { Deck, type DeckState } from './deck'
-import { type Card } from '@pazaak-web/shared'
+import { type Card, type MatchType } from '@pazaak-web/shared'
 
 type GameState = {
   boards: Record<string, Card[]>
@@ -17,8 +17,8 @@ class Game {
   private player1Id: string
   private player2Id: string
 
-  constructor(player1Id: string, player2Id: string) {
-    this.deck.defaultFill()
+  constructor(player1Id: string, player2Id: string, matchType: MatchType = 'standard') {
+    this.deck.defaultFill(matchType)
     this.deck.shuffle()
     this.player1Id = player1Id
     this.player2Id = player2Id

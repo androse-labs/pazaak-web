@@ -3,7 +3,7 @@ import { Game, type GameState } from './game'
 import { WSContext } from 'hono/ws'
 import { type MatchAction } from './actions'
 import { type Player } from './players'
-import { type Card, type PlayerView } from '@pazaak-web/shared'
+import { type Card, type PlayerView, type MatchType } from '@pazaak-web/shared'
 import { Deck } from './deck'
 import { processCardEffects } from './card'
 
@@ -20,6 +20,7 @@ type InProgressMatch = {
 class Match {
   id: string
   matchName: string
+  matchType: MatchType
   unlisted: boolean
   rematchRequestedBy: string | null = null
   games: Game[] = []
@@ -33,10 +34,12 @@ class Match {
   constructor(
     id: string,
     matchName: string,
+    matchType: MatchType,
     firstPlayer: Player,
     unlisted: boolean,
   ) {
     this.id = id
+    this.matchType = matchType
     this.round = 0
     this.score = [0, 0]
     this.status = 'waiting'
@@ -99,7 +102,7 @@ class Match {
       player.hand.push(...drawnCards)
     })
 
-    this.addGame(new Game(this.players[0].id, this.players[1].id))
+    this.addGame(new Game(this.players[0].id, this.players[1].id, this.matchType))
     this.startGame(0, this.players[0].id)
   }
 
@@ -242,7 +245,7 @@ class Match {
 
     // Reset match state
     this.resetMatchState()
-    this.addGame(new Game(this.players[0].id, this.players[1]!.id))
+    this.addGame(new Game(this.players[0].id, this.players[1]!.id, this.matchType))
     this.startGame(0, this.players[0].id)
     this.notifyPlayersAboutRematchAcceptance()
     this.notifyPlayersAboutGameState()
@@ -361,7 +364,7 @@ class Match {
       this.playersTurn = Math.random() < 0.5 ? 1 : 2
     }
 
-    this.addGame(new Game(this.players[0].id, this.players[1].id))
+    this.addGame(new Game(this.players[0].id, this.players[1].id, this.matchType))
     this.startGame(
       this.games.length - 1,
       this.players[this.playersTurn - 1]!.id,
