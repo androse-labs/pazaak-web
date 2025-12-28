@@ -3,7 +3,7 @@ import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { upgradeWebSocket } from 'hono/bun'
 import { MatchActionSchema } from '../models/actions'
-import { cardSchema } from '@pazaak-web/shared'
+import { cardSchema, matchTypeSchema } from '@pazaak-web/shared'
 import type { MatchManager } from '../models/match-manager'
 
 export default (matchManager: MatchManager) => {
@@ -16,14 +16,16 @@ export default (matchManager: MatchManager) => {
       z.object({
         deck: z.array(cardSchema),
         matchName: z.string().min(5),
+        matchType: matchTypeSchema.default('standard'),
         unlisted: z.boolean(),
       }),
     ),
     async (c) => {
-      const { deck, matchName, unlisted } = c.req.valid('json')
+      const { deck, matchName, matchType, unlisted } = c.req.valid('json')
 
       const { matchId, token, playerId } = matchManager.createMatch(
         matchName,
+        matchType,
         unlisted,
         deck,
       )
@@ -88,6 +90,7 @@ export default (matchManager: MatchManager) => {
       joinableMatches.map((match) => ({
         matchId: match.id,
         matchName: match.matchName,
+        matchType: match.matchType,
       })),
     )
   })

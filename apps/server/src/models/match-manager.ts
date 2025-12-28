@@ -2,7 +2,7 @@ import { HTTPException } from 'hono/http-exception'
 import { generateHexToken } from '../utils'
 import { Match } from './match'
 import { Deck } from './deck'
-import { type Card } from '@pazaak-web/shared'
+import { type Card, type MatchType } from '@pazaak-web/shared'
 
 class MatchManager {
   private matches: Match[] = []
@@ -13,6 +13,7 @@ class MatchManager {
 
   createMatch(
     matchName: string,
+    matchType: MatchType,
     unlisted: boolean,
     deck: Card[],
   ): { matchId: string; playerId: string; token: string } {
@@ -24,6 +25,7 @@ class MatchManager {
       new Match(
         matchId,
         matchName,
+        matchType,
         {
           id: playerId,
           wsConnected: false,

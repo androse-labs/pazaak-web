@@ -3,7 +3,7 @@ import { CirclePlus, Dices, DoorOpen, RefreshCcw } from 'lucide-react'
 import { Modal } from '../components/Modal'
 import { api } from '../webClient'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import type { Card } from '@pazaak-web/shared'
+import type { Card, MatchType } from '@pazaak-web/shared'
 import { MatchList } from '../components/MatchList'
 import { useState } from 'react'
 import { usePlayerStore } from '../stores/playerStore'
@@ -22,6 +22,7 @@ export const Route = createFileRoute('/')({
 type JoinableMatchesResponse = {
   matchId: string
   matchName: string
+  matchType: MatchType
 }[]
 
 function useGetJoinableMatches() {
@@ -137,12 +138,14 @@ function useCreateMatchMutation() {
     mutationFn: async (data: {
       deck: Card[]
       matchName: string
+      matchType: MatchType
       unlisted: boolean
     }) => {
       // drop the id from each card in the deck
       const response = await api.post<CreateMatchResponse>('/match/create', {
         deck: data.deck,
         matchName: data.matchName,
+        matchType: data.matchType,
         unlisted: data.unlisted,
       })
       if (response.status !== 200) {
@@ -164,6 +167,7 @@ function Index() {
   const userDeck = useDeckStore((s) => s.deck)
   const [unlisted, setUnlisted] = useState<boolean>(true)
   const [matchName, setMatchName] = useState<string>('')
+  const [matchType, setMatchType] = useState<MatchType>('standard')
   const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
   const setMatchConnection = usePlayerStore((s) => s.setMatchConnection)
@@ -186,6 +190,7 @@ function Index() {
               {
                 deck: userDeck,
                 matchName: matchName,
+                matchType: matchType,
                 unlisted: unlisted,
               },
               {
@@ -240,6 +245,33 @@ function Index() {
               />
               Unlisted
             </label>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-semibold">Match Type</label>
+            <div className="flex gap-4">
+              <label className="flex cursor-pointer items-center gap-2">
+                <input
+                  type="radio"
+                  name="matchType"
+                  className="radio radio-primary"
+                  value="standard"
+                  checked={matchType === 'standard'}
+                  onChange={(e) => setMatchType(e.target.value as MatchType)}
+                />
+                <span>Standard</span>
+              </label>
+              <label className="flex cursor-pointer items-center gap-2">
+                <input
+                  type="radio"
+                  name="matchType"
+                  className="radio radio-primary"
+                  value="exotic"
+                  checked={matchType === 'exotic'}
+                  onChange={(e) => setMatchType(e.target.value as MatchType)}
+                />
+                <span>Exotic</span>
+              </label>
+            </div>
           </div>
           {error && (
             <div className="text-error max-w-2xs shrink-0 break-words">

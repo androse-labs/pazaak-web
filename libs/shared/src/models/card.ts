@@ -53,4 +53,8 @@ const cardSchema = z.discriminatedUnion('type', [
 
 type Card = z.infer<typeof cardSchema>
 
-export { type Card, cardSchema }
+const matchTypeSchema = z.enum(['standard', 'exotic'])
+
+type MatchType = z.infer<typeof matchTypeSchema>
+
+export { type Card, cardSchema, type MatchType, matchTypeSchema }
