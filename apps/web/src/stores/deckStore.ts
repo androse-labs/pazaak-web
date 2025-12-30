@@ -13,9 +13,11 @@ interface DeckStore {
   decks: Deck[]
   setDeck: (deck: Card[], name: string, id: string) => void
   selectedDeckId: string
-  getDeck: (name: string) => Deck | undefined
+  getDeck: (id: string) => Deck | undefined
+  getDeckByName: (name: string) => Deck | undefined
+  deleteDeck: (id: string) => void
   selectedDeck: () => Deck
-  setSelectedDeckId: (name: string) => void
+  setSelectedDeckId: (id: string) => void
 }
 
 const demoDeck: Card[] = [
@@ -84,17 +86,24 @@ export const useDeckStore = create<DeckStore>()(
 
           return { decks }
         }),
-      getDeck: (name: string) => {
+      getDeck: (id: string) => {
+        return get().decks.find((deck) => deck.id === id)
+      },
+      getDeckByName: (name: string) => {
         return get().decks.find((deck) => deck.name === name)
       },
-      selectedDeckId: 'Default Deck',
+      deleteDeck: (id: string) =>
+        set((state) => ({
+          decks: state.decks.filter((deck) => deck.id !== id),
+        })),
+      selectedDeckId: 'default',
       setSelectedDeckId: (id: string) =>
         set(() => ({
           selectedDeckId: id,
         })),
       selectedDeck: () => {
         return (
-          get().decks.find((deck) => deck.name === get().selectedDeckId) ||
+          get().decks.find((deck) => deck.id === get().selectedDeckId) ||
           get().decks[0]
         )
       },

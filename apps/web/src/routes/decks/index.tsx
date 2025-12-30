@@ -55,6 +55,7 @@ function DeckList({
 function DeckPreview({
   deck,
   onEdit,
+  onDelete,
 }: {
   deck: Deck | undefined
   onEdit: () => void
@@ -76,7 +77,7 @@ function DeckPreview({
           <button className="btn btn-accent btn-square" onClick={onEdit}>
             <Pencil />
           </button>
-          <button className="btn btn-error btn-square" onClick={() => {}}>
+          <button className="btn btn-error btn-square" onClick={onDelete}>
             <Trash />
           </button>
           <CopyButton
@@ -177,6 +178,7 @@ const ImportDeckCodeModal = () => {
 export default function RouteComponent() {
   const navigate = useNavigate()
   const userDecks = useDeckStore((s) => s.decks)
+  const deleteDeck = useDeckStore((s) => s.deleteDeck)
   const selectedDeckName = useDeckStore((s) => s.selectedDeckId)
   const setSelectedDeckName = useDeckStore((s) => s.setSelectedDeckId)
   const [previewDeckName, setPreviewDeckName] = useState<string | null>(null)
@@ -240,10 +242,22 @@ export default function RouteComponent() {
             <DeckPreview
               deck={previewDeck}
               onEdit={() =>
-                previewDeck &&
-                navigate({ to: `/decks/${previewDeck.name}/edit` })
+                previewDeck && navigate({ to: `/decks/${previewDeck.id}/edit` })
               }
-              onDelete={() => {}}
+              onDelete={() => {
+                if (
+                  previewDeck &&
+                  confirm(
+                    `Are you sure you want to delete the deck "${previewDeck.name}"? This action cannot be undone.`,
+                  )
+                ) {
+                  deleteDeck(previewDeck.name)
+                  setPreviewDeckName(null)
+                  if (selectedDeckName === previewDeck.name) {
+                    setSelectedDeckName('')
+                  }
+                }
+              }}
             />
           </div>
         </div>
