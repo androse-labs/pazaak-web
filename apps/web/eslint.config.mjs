@@ -1,27 +1,50 @@
 import js from '@eslint/js'
 import globals from 'globals'
 import reactRefresh from 'eslint-plugin-react-refresh'
-import reactQuery from '@tanstack/eslint-plugin-query'
+import reactHooks from 'eslint-plugin-react-hooks'
+import eslint from '@eslint/js'
+import pluginQuery from '@tanstack/eslint-plugin-query'
+import { defineConfig } from 'eslint/config'
 import tseslint from 'typescript-eslint'
 
-export default tseslint.config(
+export default defineConfig([
   { ignores: ['dist'] },
   {
-    extends: [js.configs.recommended, ...tseslint.configs.recommended],
-    files: ['**/*.{ts,tsx}'],
+    files: ['*.ts', '*.tsx'],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
     },
-    plugins: {
-      'react-refresh': reactRefresh,
-      'react-query': reactQuery,
-    },
-    rules: {
-      'react-refresh/only-export-components': [
-        'warn',
-        { allowConstantExport: true },
-      ],
-    },
   },
-)
+  js.configs.recommended,
+  eslint.configs.recommended,
+  tseslint.configs.recommended,
+  reactRefresh.configs.recommended,
+  reactHooks.configs.flat.recommended,
+  pluginQuery.configs['flat/recommended'],
+])
+
+// export default tseslint.config(
+//   { ignores: ['dist'] },
+//   {
+//     extends: [js.configs.recommended, ...tseslint.configs.recommended],
+//     files: ['**/*.{ts,tsx}'],
+//     languageOptions: {
+//       ecmaVersion: 2020,
+//       globals: globals.browser,
+//     },
+//     plugins: {
+//       'react-hooks': reactHooks,
+//       'react-refresh': reactRefresh,
+//       'react-query': reactQuery,
+//     },
+//     rules: {
+//       ...reactHooks.configs.recommended.rules,
+//       'react-refresh/only-export-components': [
+//         'warn',
+//         { allowConstantExport: true },
+//       ],
+//     },
+//   },
+// )
+//

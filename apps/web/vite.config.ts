@@ -1,7 +1,7 @@
-/// <reference types="vitest" />
+/// <reference types="vitest/config" />
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
+import tanstackRouter from '@tanstack/router-plugin/vite'
 import mdx from '@mdx-js/rollup'
 import tailwindcss from '@tailwindcss/vite'
 
@@ -11,7 +11,10 @@ export default defineConfig({
     setupFiles: ['./vitest-setup.ts'],
   },
   plugins: [
-    TanStackRouterVite({ target: 'react', autoCodeSplitting: true }),
+    tanstackRouter({
+      target: 'react',
+      autoCodeSplitting: true,
+    }),
     react({
       babel: {
         plugins: ['babel-plugin-react-compiler'],
