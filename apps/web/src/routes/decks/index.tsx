@@ -182,7 +182,7 @@ export default function RouteComponent() {
   const selectedDeckId = useDeckStore((s) => s.selectedDeckId)
   const setSelectedDeckId = useDeckStore((s) => s.setSelectedDeckId)
   const [previewDeckId, setPreviewDeckId] = useState<string | null>(null)
-  const previewDeck = userDecks.find((d) => d.name === previewDeckId)
+  const previewDeck = userDecks.find((d) => d.id === previewDeckId)
 
   return (
     <>
