@@ -45,7 +45,7 @@ const JoinMatchModal = () => {
   const setMatchConnection = usePlayerStore((s) => s.setMatchConnection)
   const navigate = useNavigate()
   const [matchId, setMatchId] = useState<string>('')
-  const userDeck = useDeckStore((s) => s.deck)
+  const userDeck = useDeckStore((s) => s.selectedDeck().cards)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -161,7 +161,7 @@ function useCreateMatchMutation() {
 function Index() {
   const { refetch } = useGetJoinableMatches()
   const { mutate } = useCreateMatchMutation()
-  const userDeck = useDeckStore((s) => s.deck)
+  const userDeck = useDeckStore((s) => s.selectedDeck().cards)
   const [unlisted, setUnlisted] = useState<boolean>(true)
   const [matchName, setMatchName] = useState<string>('')
   const [error, setError] = useState<string | null>(null)

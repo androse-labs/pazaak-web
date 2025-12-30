@@ -8,48 +8,118 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-// Import Routes
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as HowToPlayIndexRouteImport } from './routes/how-to-play/index'
+import { Route as DecksIndexRouteImport } from './routes/decks/index'
+import { Route as DecksNewRouteImport } from './routes/decks/new'
+import { Route as MatchMatchIdIndexRouteImport } from './routes/match/$matchId/index'
+import { Route as MatchMatchIdJoinRouteImport } from './routes/match/$matchId/join'
+import { Route as DecksDeckIdEditRouteImport } from './routes/decks/$deckId/edit'
 
-import { Route as rootRoute } from './routes/__root'
-import { Route as IndexImport } from './routes/index'
-import { Route as HowToPlayIndexImport } from './routes/how-to-play/index'
-import { Route as DeckBuilderIndexImport } from './routes/deck-builder/index'
-import { Route as MatchMatchIdIndexImport } from './routes/match/$matchId/index'
-import { Route as MatchMatchIdJoinImport } from './routes/match/$matchId/join'
-
-// Create/Update Routes
-
-const IndexRoute = IndexImport.update({
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const HowToPlayIndexRoute = HowToPlayIndexImport.update({
+const HowToPlayIndexRoute = HowToPlayIndexRouteImport.update({
   id: '/how-to-play/',
   path: '/how-to-play/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const DeckBuilderIndexRoute = DeckBuilderIndexImport.update({
-  id: '/deck-builder/',
-  path: '/deck-builder/',
-  getParentRoute: () => rootRoute,
+const DecksIndexRoute = DecksIndexRouteImport.update({
+  id: '/decks/',
+  path: '/decks/',
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const MatchMatchIdIndexRoute = MatchMatchIdIndexImport.update({
+const DecksNewRoute = DecksNewRouteImport.update({
+  id: '/decks/new',
+  path: '/decks/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MatchMatchIdIndexRoute = MatchMatchIdIndexRouteImport.update({
   id: '/match/$matchId/',
   path: '/match/$matchId/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const MatchMatchIdJoinRoute = MatchMatchIdJoinImport.update({
+const MatchMatchIdJoinRoute = MatchMatchIdJoinRouteImport.update({
   id: '/match/$matchId/join',
   path: '/match/$matchId/join',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DecksDeckIdEditRoute = DecksDeckIdEditRouteImport.update({
+  id: '/decks/$deckId/edit',
+  path: '/decks/$deckId/edit',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
-// Populate the FileRoutesByPath interface
+export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
+  '/decks/new': typeof DecksNewRoute
+  '/decks': typeof DecksIndexRoute
+  '/how-to-play': typeof HowToPlayIndexRoute
+  '/decks/$deckId/edit': typeof DecksDeckIdEditRoute
+  '/match/$matchId/join': typeof MatchMatchIdJoinRoute
+  '/match/$matchId': typeof MatchMatchIdIndexRoute
+}
+export interface FileRoutesByTo {
+  '/': typeof IndexRoute
+  '/decks/new': typeof DecksNewRoute
+  '/decks': typeof DecksIndexRoute
+  '/how-to-play': typeof HowToPlayIndexRoute
+  '/decks/$deckId/edit': typeof DecksDeckIdEditRoute
+  '/match/$matchId/join': typeof MatchMatchIdJoinRoute
+  '/match/$matchId': typeof MatchMatchIdIndexRoute
+}
+export interface FileRoutesById {
+  __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/decks/new': typeof DecksNewRoute
+  '/decks/': typeof DecksIndexRoute
+  '/how-to-play/': typeof HowToPlayIndexRoute
+  '/decks/$deckId/edit': typeof DecksDeckIdEditRoute
+  '/match/$matchId/join': typeof MatchMatchIdJoinRoute
+  '/match/$matchId/': typeof MatchMatchIdIndexRoute
+}
+export interface FileRouteTypes {
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths:
+    | '/'
+    | '/decks/new'
+    | '/decks'
+    | '/how-to-play'
+    | '/decks/$deckId/edit'
+    | '/match/$matchId/join'
+    | '/match/$matchId'
+  fileRoutesByTo: FileRoutesByTo
+  to:
+    | '/'
+    | '/decks/new'
+    | '/decks'
+    | '/how-to-play'
+    | '/decks/$deckId/edit'
+    | '/match/$matchId/join'
+    | '/match/$matchId'
+  id:
+    | '__root__'
+    | '/'
+    | '/decks/new'
+    | '/decks/'
+    | '/how-to-play/'
+    | '/decks/$deckId/edit'
+    | '/match/$matchId/join'
+    | '/match/$matchId/'
+  fileRoutesById: FileRoutesById
+}
+export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
+  DecksNewRoute: typeof DecksNewRoute
+  DecksIndexRoute: typeof DecksIndexRoute
+  HowToPlayIndexRoute: typeof HowToPlayIndexRoute
+  DecksDeckIdEditRoute: typeof DecksDeckIdEditRoute
+  MatchMatchIdJoinRoute: typeof MatchMatchIdJoinRoute
+  MatchMatchIdIndexRoute: typeof MatchMatchIdIndexRoute
+}
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
@@ -57,140 +127,63 @@ declare module '@tanstack/react-router' {
       id: '/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/deck-builder/': {
-      id: '/deck-builder/'
-      path: '/deck-builder'
-      fullPath: '/deck-builder'
-      preLoaderRoute: typeof DeckBuilderIndexImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/how-to-play/': {
       id: '/how-to-play/'
       path: '/how-to-play'
       fullPath: '/how-to-play'
-      preLoaderRoute: typeof HowToPlayIndexImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof HowToPlayIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/match/$matchId/join': {
-      id: '/match/$matchId/join'
-      path: '/match/$matchId/join'
-      fullPath: '/match/$matchId/join'
-      preLoaderRoute: typeof MatchMatchIdJoinImport
-      parentRoute: typeof rootRoute
+    '/decks/': {
+      id: '/decks/'
+      path: '/decks'
+      fullPath: '/decks'
+      preLoaderRoute: typeof DecksIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/decks/new': {
+      id: '/decks/new'
+      path: '/decks/new'
+      fullPath: '/decks/new'
+      preLoaderRoute: typeof DecksNewRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/match/$matchId/': {
       id: '/match/$matchId/'
       path: '/match/$matchId'
       fullPath: '/match/$matchId'
-      preLoaderRoute: typeof MatchMatchIdIndexImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof MatchMatchIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/match/$matchId/join': {
+      id: '/match/$matchId/join'
+      path: '/match/$matchId/join'
+      fullPath: '/match/$matchId/join'
+      preLoaderRoute: typeof MatchMatchIdJoinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/decks/$deckId/edit': {
+      id: '/decks/$deckId/edit'
+      path: '/decks/$deckId/edit'
+      fullPath: '/decks/$deckId/edit'
+      preLoaderRoute: typeof DecksDeckIdEditRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
-}
-
-// Create and export the route tree
-
-export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/deck-builder': typeof DeckBuilderIndexRoute
-  '/how-to-play': typeof HowToPlayIndexRoute
-  '/match/$matchId/join': typeof MatchMatchIdJoinRoute
-  '/match/$matchId': typeof MatchMatchIdIndexRoute
-}
-
-export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/deck-builder': typeof DeckBuilderIndexRoute
-  '/how-to-play': typeof HowToPlayIndexRoute
-  '/match/$matchId/join': typeof MatchMatchIdJoinRoute
-  '/match/$matchId': typeof MatchMatchIdIndexRoute
-}
-
-export interface FileRoutesById {
-  __root__: typeof rootRoute
-  '/': typeof IndexRoute
-  '/deck-builder/': typeof DeckBuilderIndexRoute
-  '/how-to-play/': typeof HowToPlayIndexRoute
-  '/match/$matchId/join': typeof MatchMatchIdJoinRoute
-  '/match/$matchId/': typeof MatchMatchIdIndexRoute
-}
-
-export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/deck-builder'
-    | '/how-to-play'
-    | '/match/$matchId/join'
-    | '/match/$matchId'
-  fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/deck-builder'
-    | '/how-to-play'
-    | '/match/$matchId/join'
-    | '/match/$matchId'
-  id:
-    | '__root__'
-    | '/'
-    | '/deck-builder/'
-    | '/how-to-play/'
-    | '/match/$matchId/join'
-    | '/match/$matchId/'
-  fileRoutesById: FileRoutesById
-}
-
-export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  DeckBuilderIndexRoute: typeof DeckBuilderIndexRoute
-  HowToPlayIndexRoute: typeof HowToPlayIndexRoute
-  MatchMatchIdJoinRoute: typeof MatchMatchIdJoinRoute
-  MatchMatchIdIndexRoute: typeof MatchMatchIdIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  DeckBuilderIndexRoute: DeckBuilderIndexRoute,
+  DecksNewRoute: DecksNewRoute,
+  DecksIndexRoute: DecksIndexRoute,
   HowToPlayIndexRoute: HowToPlayIndexRoute,
+  DecksDeckIdEditRoute: DecksDeckIdEditRoute,
   MatchMatchIdJoinRoute: MatchMatchIdJoinRoute,
   MatchMatchIdIndexRoute: MatchMatchIdIndexRoute,
 }
-
-export const routeTree = rootRoute
+export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-/* ROUTE_MANIFEST_START
-{
-  "routes": {
-    "__root__": {
-      "filePath": "__root.tsx",
-      "children": [
-        "/",
-        "/deck-builder/",
-        "/how-to-play/",
-        "/match/$matchId/join",
-        "/match/$matchId/"
-      ]
-    },
-    "/": {
-      "filePath": "index.tsx"
-    },
-    "/deck-builder/": {
-      "filePath": "deck-builder/index.tsx"
-    },
-    "/how-to-play/": {
-      "filePath": "how-to-play/index.tsx"
-    },
-    "/match/$matchId/join": {
-      "filePath": "match/$matchId/join.tsx"
-    },
-    "/match/$matchId/": {
-      "filePath": "match/$matchId/index.tsx"
-    }
-  }
-}
-ROUTE_MANIFEST_END */

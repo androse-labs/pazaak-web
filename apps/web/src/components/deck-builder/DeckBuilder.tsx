@@ -7,22 +7,29 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
-import { Import, Trash2 } from 'lucide-react'
+import { Trash2 } from 'lucide-react'
 import { DropOverlay } from '../game-elements/DropOverlay'
-import { Modal } from '../Modal'
 import type { Card } from '@pazaak-web/shared'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { collectionCards } from './card-collection'
-import { deckSchema } from '../../stores/deckStore'
+import { deckSchema, type Deck } from '../../stores/deckStore'
 import { useDeckStore } from '../../stores/deckStore'
 import { Card as CardComponent } from '../game-elements/card/Card'
 import { CardPresentation } from '../game-elements/card/CardPresentation'
-import { codeToDeck, deckToCode } from './deck-serializer'
 import clsx from 'clsx'
-import { CopyButton } from '../CopyButton'
+import { useNavigate } from '@tanstack/react-router'
 
-const DeckBuilder = () => {
-  const userDeck = useDeckStore((s) => s.deck)
+const DeckBuilder = ({
+  initialDeck,
+}: {
+  initialDeck: { name: string; id?: string; cards: Card[] }
+}) => {
+  const navigate = useNavigate()
+  const [draftDeck, setDraftDeck] = useState({
+    name: initialDeck.name,
+    id: initialDeck.id || crypto.randomUUID(),
+    cards: initialDeck.cards,
+  })
   const setUserDeck = useDeckStore((s) => s.setDeck)
   const [deckValidationMessage, setDeckValidationMessage] = useState<
     string | null
@@ -32,7 +39,6 @@ const DeckBuilder = () => {
   const [isDragging, setIsDragging] = useState(false)
   const [draggedCard, setDraggedCard] = useState<Card | null>(null)
 
-  const [draftDeck, setDraftDeck] = useState<Card[]>(userDeck)
   const [isShaking, setIsShaking] = useState(false)
 
   const sensors = useSensors(
@@ -55,7 +61,7 @@ const DeckBuilder = () => {
           // Determine where the drag started by card id
           if (card) {
             // If card is in draftDeck, zone is "your-deck"
-            if (draftDeck.some((c) => c.id === card.id)) {
+            if (draftDeck.cards.some((c) => c.id === card.id)) {
               setDragSourceZone('your-deck')
             } else {
               setDragSourceZone('collection')
@@ -90,25 +96,29 @@ const DeckBuilder = () => {
               setDeckValidationMessage(null)
               setDraftDeck((prevDeck) => {
                 if (
-                  prevDeck.length < 10 &&
-                  !prevDeck.some((c) => c.id === card.id)
+                  prevDeck.cards.length < 10 &&
+                  !prevDeck.cards.some((c) => c.id === card.id)
                 ) {
-                  return [
+                  return {
                     ...prevDeck,
-                    {
-                      ...card,
-                      id: crypto.randomUUID(),
-                    },
-                  ]
+                    cards: [
+                      ...prevDeck.cards,
+                      {
+                        ...card,
+                        id: crypto.randomUUID(),
+                      },
+                    ],
+                  }
                 }
                 return prevDeck
               })
             } else if (over.id === 'collection' && active.data.current.card) {
               const card = active.data.current.card as Card
               setDeckValidationMessage(null)
-              setDraftDeck((prevDeck) =>
-                prevDeck.filter((c) => c.id !== card.id),
-              )
+              setDraftDeck((prevDeck) => ({
+                ...prevDeck,
+                cards: prevDeck.cards.filter((c) => c.id !== card.id),
+              }))
             }
             // Reset dragged card
             setDraggedCard(null)
@@ -132,14 +142,33 @@ const DeckBuilder = () => {
             showDropOverlay={isDragging && dragSourceZone !== 'your-deck'}
             setDraftDeck={setDraftDeck}
             onSave={() => {
-              const validDeck = deckSchema.safeParse(draftDeck)
+              const validDeck = deckSchema.safeParse(draftDeck.cards)
 
               if (!validDeck.success) {
                 setDeckValidationMessage(validDeck.error.issues[0].message)
                 return
               }
 
-              setUserDeck(validDeck.data)
+              if (draftDeck.name.trim() === '') {
+                setDeckValidationMessage('Deck must have a name')
+                return
+              }
+
+              // name must be unique
+              const allDecks = useDeckStore.getState().decks
+              const nameExists = allDecks.some(
+                (d) =>
+                  d.name === draftDeck.name.trim() &&
+                  d.name !== initialDeck.name,
+              )
+              if (nameExists) {
+                setDeckValidationMessage('Deck name must be unique')
+                return
+              }
+
+              setUserDeck(validDeck.data, draftDeck.name.trim(), draftDeck.id)
+
+              navigate({ to: '/decks' })
             }}
           />
         </div>
@@ -185,10 +214,10 @@ const Collection = ({
 }
 
 interface DeckPanelProps {
-  draftDeck: Card[]
+  draftDeck: Deck
   validationMessage: string | null
   showDropOverlay: boolean
-  setDraftDeck: (deck: Card[]) => void
+  setDraftDeck: (deck: Deck) => void
   onSave: () => void
 }
 
@@ -198,76 +227,6 @@ const decksAreEqual = (a: Card[], b: Card[]) =>
     (card, idx) => card.type === b[idx].type && card.value === b[idx].value,
   )
 
-const ImportDeckCodeModal = ({
-  setDraftDeck,
-}: {
-  setDraftDeck: (deck: Card[]) => void
-}) => {
-  const [deckCode, setDeckCode] = useState<string>('')
-  const [deckValidationMessage, setDeckValidationMessage] = useState<
-    string | null
-  >(null)
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    const deckResult = codeToDeck(deckCode)
-    if (!deckResult.success) {
-      setDeckValidationMessage('Invalid deck code format')
-      return
-    }
-
-    const validDeck = deckSchema.safeParse(deckResult.result)
-
-    if (!validDeck.success) {
-      setDeckValidationMessage('Invalid deck code format')
-      return
-    }
-
-    setDraftDeck(validDeck.data)
-    setDeckCode('')
-    setDeckValidationMessage(null)
-
-    const modal = document.getElementById('import-deck-code-modal')
-    if (modal instanceof HTMLDialogElement) {
-      modal.close()
-    }
-  }
-
-  return (
-    <Modal
-      id="import-deck-code-modal"
-      withExitButton
-      onClose={() => {
-        setDeckValidationMessage(null)
-      }}
-    >
-      <h3 className="text-lg font-bold">Import Deck Code</h3>
-
-      {deckValidationMessage && (
-        <div role="alert" className="alert alert-error alert-soft">
-          <span>{deckValidationMessage}</span>
-        </div>
-      )}
-      <div className="flex w-full items-center justify-center gap-2">
-        <form className="join w-full" onSubmit={handleSubmit}>
-          <input
-            id="deck-code-input"
-            type="text"
-            value={deckCode}
-            onChange={(e) => setDeckCode(e.target.value)}
-            placeholder="Enter Deck Code"
-            className="input join-item input-bordered w-full"
-          />
-          <button className="btn btn-primary join-item" type="submit">
-            Submit
-          </button>
-        </form>
-      </div>
-    </Modal>
-  )
-}
-
 export function DeckPanel({
   draftDeck,
   validationMessage,
@@ -276,39 +235,36 @@ export function DeckPanel({
   onSave,
 }: DeckPanelProps) {
   const { setNodeRef, isOver } = useDroppable({ id: 'your-deck' })
-  const userDeck = useDeckStore((s) => s.deck)
+  const allDecks = useDeckStore((s) => s.decks)
 
-  const deckIsChanged = decksAreEqual(userDeck, draftDeck)
+  const savedVersion = useMemo(() => {
+    return allDecks.find((d) => d.name === draftDeck.name)?.cards || []
+  }, [allDecks, draftDeck.name])
+
+  const deckIsChanged = decksAreEqual(savedVersion, draftDeck.cards)
 
   return (
     <div className="flex flex-1 flex-col gap-2 overflow-hidden p-4">
       <div className="flex shrink-0 items-center justify-between">
-        <h1 className="text-2xl font-bold">Deck</h1>
+        <input
+          className="input input-ghost text-2xl font-bold"
+          placeholder="Deck Name"
+          value={draftDeck.name}
+          onChange={(e) => {
+            setDraftDeck({ ...draftDeck, name: e.target.value })
+          }}
+        />
         <div className="flex gap-2">
           <button
             className="btn btn-accent max-lg:btn-square btn-sm"
             onClick={() => {
-              setDraftDeck([])
+              setDraftDeck({ ...draftDeck, cards: [] })
             }}
           >
             <Trash2 />
             <span className="hidden lg:inline">Clear Deck</span>
           </button>
-
-          <button
-            className="btn btn-secondary max-lg:btn-square btn-sm"
-            onClick={async () => {
-              const modal = document.getElementById('import-deck-code-modal')
-              if (modal instanceof HTMLDialogElement) {
-                modal.showModal()
-              }
-            }}
-          >
-            <Import />
-            <span className="hidden lg:inline">Import</span>
-          </button>
         </div>
-        <ImportDeckCodeModal setDraftDeck={setDraftDeck} />
       </div>
       <DropOverlay
         isOver={isOver}
@@ -320,15 +276,15 @@ export function DeckPanel({
           ref={setNodeRef}
           className={clsx(
             'h-full w-full overflow-y-auto p-4',
-            draftDeck.length === 0
+            draftDeck.cards.length === 0
               ? 'flex min-h-[120px] flex-col justify-center'
               : 'flex flex-wrap content-start items-start gap-4',
           )}
         >
-          {draftDeck.length === 0 ? (
+          {draftDeck.cards.length === 0 ? (
             <h3 className="text-center text-lg">Drag cards to your deck</h3>
           ) : (
-            draftDeck.map((card) => (
+            draftDeck.cards.map((card) => (
               <CardComponent key={card.id} card={card} draggable />
             ))
           )}
@@ -340,20 +296,16 @@ export function DeckPanel({
         </div>
       )}
       <div className="flex shrink-0 items-center justify-between gap-2">
-        <h2 className="flex-1/6 text-center text-xl">{draftDeck.length}/10</h2>
+        <h2 className="flex-1/6 text-center text-xl">
+          {draftDeck.cards.length}/10
+        </h2>
         <button
           className="btn btn-primary flex-2/3"
           onClick={onSave}
           disabled={deckIsChanged}
         >
-          Save
+          Save & Close
         </button>
-        <CopyButton
-          value={deckToCode(draftDeck)}
-          tooltip="Copy deck code"
-          copiedTooltip="Copied!"
-          tooltipClassName="tooltip-left"
-        />
       </div>
     </div>
   )

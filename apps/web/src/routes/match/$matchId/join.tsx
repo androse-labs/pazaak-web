@@ -16,7 +16,7 @@ export const Route = createFileRoute('/match/$matchId/join')({
 export function MatchJoinPage() {
   const { matchId } = useParams({ from: '/match/$matchId/join' })
   const setMatchConnection = usePlayerStore((s) => s.setMatchConnection)
-  const userDeck = useDeckStore((s) => s.deck)
+  const userDeck = useDeckStore((s) => s.selectedDeck().cards)
   const navigate = useNavigate()
   const [error, setError] = useState<string | null>(null)
 

@@ -3,9 +3,19 @@ import { z } from 'zod'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
+export type Deck = {
+  id: string
+  name: string
+  cards: Card[]
+}
+
 interface DeckStore {
-  deck: Card[]
-  setDeck: (deck: Card[]) => void
+  decks: Deck[]
+  setDeck: (deck: Card[], name: string, id: string) => void
+  selectedDeckId: string
+  getDeck: (name: string) => Deck | undefined
+  selectedDeck: () => Deck
+  setSelectedDeckId: (name: string) => void
 }
 
 const demoDeck: Card[] = [
@@ -48,9 +58,46 @@ export const deckSchema = z
 
 export const useDeckStore = create<DeckStore>()(
   persist(
-    (set) => ({
-      deck: demoDeck,
-      setDeck: (deck) => set({ deck }),
+    (set, get) => ({
+      decks: [
+        { id: 'default', name: 'Default Deck', cards: demoDeck },
+        {
+          id: 'reversed',
+          name: 'Reversed Deck',
+          cards: [...demoDeck].reverse(),
+        },
+      ],
+      setDeck: (deck: Card[], name: string, id: string) =>
+        set((state) => {
+          const decks = [...state.decks]
+          const deckIndex = decks.find((d) => d.id === id)
+          if (deckIndex) {
+            console.log('updating deck', id)
+            // update existing deck
+            deckIndex.cards = deck
+            deckIndex.name = name
+          } else {
+            // add new deck
+            console.log('adding deck', id)
+            decks.push({ cards: deck, name, id })
+          }
+
+          return { decks }
+        }),
+      getDeck: (name: string) => {
+        return get().decks.find((deck) => deck.name === name)
+      },
+      selectedDeckId: 'Default Deck',
+      setSelectedDeckId: (id: string) =>
+        set(() => ({
+          selectedDeckId: id,
+        })),
+      selectedDeck: () => {
+        return (
+          get().decks.find((deck) => deck.name === get().selectedDeckId) ||
+          get().decks[0]
+        )
+      },
     }),
     {
       name: 'pazaakDeck',

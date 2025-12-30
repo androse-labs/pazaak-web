@@ -34,10 +34,10 @@ const NavBar = () => {
         Home
       </Link>
       <Link
-        to="/deck-builder"
+        to="/decks"
         className="btn btn-ghost flex-grow-0 text-base normal-case lg:text-xl"
       >
-        Deck Builder
+        Decks
       </Link>
       {showHelpIcon ? null : (
         <Link

@@ -1,16 +1,29 @@
 import type { Card } from '@pazaak-web/shared'
 import { collectionCards } from './card-collection'
 
-const deckToCode = (deck: Card[]): string => {
-  return deck.map(cardToCode).join('-')
+const deckToCode = ({ deck, name }: { deck: Card[]; name: string }): string => {
+  const deckString = deck.map(cardToCode).join('-')
+  const nameString = encodeURIComponent(name)
+
+  return `${nameString}$${deckString}`
 }
 
 const codeToDeck = (
   code: string,
-): { success: true; result: Card[] } | { success: false; error: string } => {
+):
+  | {
+      success: true
+      result: {
+        cards: Card[]
+        name: string
+      }
+    }
+  | { success: false; error: string } => {
   const cards: Card[] = []
 
-  for (const cardCode of code.split('-')) {
+  const [namePart, codePart] = code.split('$')
+
+  for (const cardCode of codePart.split('-')) {
     const type = codeToCardTypeMap[cardCode[0]]
 
     if (!type) {
@@ -84,7 +97,10 @@ const codeToDeck = (
 
   return {
     success: true,
-    result: cards,
+    result: {
+      cards,
+      name: decodeURIComponent(namePart),
+    },
   }
 }
 
