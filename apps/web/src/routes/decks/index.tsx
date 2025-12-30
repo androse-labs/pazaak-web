@@ -251,9 +251,9 @@ export default function RouteComponent() {
                     `Are you sure you want to delete the deck "${previewDeck.name}"? This action cannot be undone.`,
                   )
                 ) {
-                  deleteDeck(previewDeck.name)
+                  deleteDeck(previewDeck.id)
                   setPreviewDeckId(null)
-                  if (selectedDeckId === previewDeck.name) {
+                  if (selectedDeckId === previewDeck.id) {
                     setSelectedDeckId('')
                   }
                 }
