@@ -1,4 +1,5 @@
 import { expect, describe, it } from 'vitest'
+import '@testing-library/jest-dom/vitest'
 import { render, screen } from '@testing-library/react'
 import { CardPresentation } from './CardPresentation'
 import type { Card as CardType } from '@pazaak-web/shared'
