@@ -233,7 +233,7 @@ export default function RouteComponent() {
               previewedDeckId={previewDeckId}
               selectedDeckId={selectedDeckId}
               setPreviewId={setPreviewDeckId}
-              setSelectedDeckName={setSelectedDeckId}
+              setSelectedDeckId={setSelectedDeckId}
             />
           </div>
         </div>
