@@ -18,16 +18,16 @@ export const Route = createFileRoute('/decks/')({
 
 function DeckList({
   decks,
-  selectedDeckName,
-  previewedDeckName,
+  selectedDeckId,
+  previewedDeckId,
   setPreviewId,
-  setSelectedDeckName,
+  setSelectedDeckId,
 }: {
   decks: Deck[]
-  selectedDeckName: string | null
-  previewedDeckName: string | null
+  selectedDeckId: string | null
+  previewedDeckId: string | null
   setPreviewId: (id: string) => void
-  setSelectedDeckName: (id: string) => void
+  setSelectedDeckId: (id: string) => void
 }) {
   if (decks.length === 0)
     return <div className="m-4">You have no decks. Create one!</div>
@@ -35,15 +35,15 @@ function DeckList({
     <div className="flex min-h-0 flex-wrap gap-8 overflow-auto p-4">
       {decks.map((deck) => (
         <div
-          key={deck.name}
+          key={deck.id}
           className="cursor-pointer"
-          onClick={() => setPreviewId(deck.name)}
+          onClick={() => setPreviewId(deck.id)}
         >
           <DeckTile
             deck={deck}
-            selectedForPreview={deck.name === previewedDeckName}
-            selectedForPlay={deck.name === selectedDeckName}
-            setSelectedForPlay={setSelectedDeckName}
+            selectedForPreview={deck.id === previewedDeckId}
+            selectedForPlay={deck.id === selectedDeckId}
+            setSelectedForPlay={setSelectedDeckId}
             setSelectedForPreview={setPreviewId}
           />
         </div>
@@ -92,7 +92,7 @@ function DeckPreview({
         className={clsx(
           'h-full w-full overflow-y-auto p-4',
           deck.cards.length === 0
-            ? 'flex min-h-[120px] flex-col justify-center'
+            ? 'min-h-30 flex flex-col justify-center'
             : 'flex flex-wrap content-start items-start gap-4',
         )}
       >
@@ -179,10 +179,10 @@ export default function RouteComponent() {
   const navigate = useNavigate()
   const userDecks = useDeckStore((s) => s.decks)
   const deleteDeck = useDeckStore((s) => s.deleteDeck)
-  const selectedDeckName = useDeckStore((s) => s.selectedDeckId)
-  const setSelectedDeckName = useDeckStore((s) => s.setSelectedDeckId)
-  const [previewDeckName, setPreviewDeckName] = useState<string | null>(null)
-  const previewDeck = userDecks.find((d) => d.name === previewDeckName)
+  const selectedDeckId = useDeckStore((s) => s.selectedDeckId)
+  const setSelectedDeckId = useDeckStore((s) => s.setSelectedDeckId)
+  const [previewDeckId, setPreviewDeckId] = useState<string | null>(null)
+  const previewDeck = userDecks.find((d) => d.name === previewDeckId)
 
   return (
     <>
@@ -230,10 +230,10 @@ export default function RouteComponent() {
             </div>
             <DeckList
               decks={userDecks}
-              previewedDeckName={previewDeckName}
-              selectedDeckName={selectedDeckName}
-              setPreviewId={setPreviewDeckName}
-              setSelectedDeckName={setSelectedDeckName}
+              previewedDeckId={previewDeckId}
+              selectedDeckId={selectedDeckId}
+              setPreviewId={setPreviewDeckId}
+              setSelectedDeckName={setSelectedDeckId}
             />
           </div>
         </div>
@@ -252,9 +252,9 @@ export default function RouteComponent() {
                   )
                 ) {
                   deleteDeck(previewDeck.name)
-                  setPreviewDeckName(null)
-                  if (selectedDeckName === previewDeck.name) {
-                    setSelectedDeckName('')
+                  setPreviewDeckId(null)
+                  if (selectedDeckId === previewDeck.name) {
+                    setSelectedDeckId('')
                   }
                 }
               }}

@@ -39,7 +39,7 @@ export const DeckTile = ({
     >
       <div
         className="flex h-full w-full flex-col items-center justify-center"
-        onClick={() => setSelectedForPreview(deck.name)}
+        onClick={() => setSelectedForPreview(deck.id)}
       >
         <div className="flex w-full justify-between">
           <h2 className=" text-lg font-bold">{deck.name}</h2>
@@ -52,7 +52,7 @@ export const DeckTile = ({
                 },
               )}
               onClick={(event) => {
-                setSelectedForPlay(deck.name)
+                setSelectedForPlay(deck.id)
                 event.stopPropagation()
               }}
             >
