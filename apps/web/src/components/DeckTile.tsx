@@ -46,9 +46,10 @@ export const DeckTile = ({
           <div className="tooltip tooltip-left" data-tip={tooltip}>
             <button
               className={clsx(
-                'btn btn-sm btn-square btn-neutral opacity-0 transition-all group-hover:opacity-100',
+                'btn btn-sm btn-circle btn-square btn-neutral transition-all',
                 {
-                  'btn-ghost text-green-400 opacity-100': selectedForPlay,
+                  'btn-ghost text-green-400': selectedForPlay,
+                  'btn-neutral btn-outline': !selectedForPlay,
                 },
               )}
               onClick={(event) => {
@@ -60,7 +61,7 @@ export const DeckTile = ({
             </button>
           </div>
         </div>
-        <div className="relative flex h-40 w-80 items-center justify-center">
+        <div className="relative flex h-28 w-72 items-center justify-center md:h-40 md:w-80">
           {topCards.map((card, index) => {
             const rotation =
               ((index - mid) * totalSpread) / (topCards.length - 1)

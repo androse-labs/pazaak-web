@@ -237,7 +237,7 @@ export default function RouteComponent() {
             />
           </div>
         </div>
-        <div className="bg-base-100 flex h-2/5 flex-col overflow-hidden md:h-auto md:w-1/3">
+        <div className="bg-base-100 flex h-2/5 flex-col overflow-hidden md:h-3/5 md:w-1/3">
           <div className="flex h-full min-h-0 flex-1 flex-col justify-start p-4 md:h-auto md:w-full">
             <DeckPreview
               deck={previewDeck}
