@@ -47,7 +47,7 @@ const JoinMatchModal = () => {
   const [matchId, setMatchId] = useState<string>('')
   const userDeck = useDeckStore((s) => s.selectedDeck().cards)
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.ChangeEvent) => {
     e.preventDefault()
 
     const response = await joinMatch(matchId, userDeck)
@@ -242,7 +242,7 @@ function Index() {
             </label>
           </div>
           {error && (
-            <div className="text-error max-w-2xs shrink-0 break-words">
+            <div className="text-error max-w-2xs shrink-0 wrap-break-word">
               <p>{error}</p>
             </div>
           )}

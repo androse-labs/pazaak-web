@@ -29,25 +29,25 @@ const NavBar = () => {
     <div className="navbar bg-base-300 flex w-full items-center">
       <Link
         to="/"
-        className="btn btn-ghost flex-grow-0 text-base normal-case lg:text-xl"
+        className="btn btn-ghost grow-0 text-base normal-case lg:text-xl"
       >
         Home
       </Link>
       <Link
         to="/decks"
-        className="btn btn-ghost flex-grow-0 text-base normal-case lg:text-xl"
+        className="btn btn-ghost grow-0 text-base normal-case lg:text-xl"
       >
         Decks
       </Link>
       {showHelpIcon ? null : (
         <Link
           to="/how-to-play"
-          className="btn btn-ghost flex-grow-0 text-base normal-case lg:text-xl"
+          className="btn btn-ghost grow-0 text-base normal-case lg:text-xl"
         >
           How to Play
         </Link>
       )}
-      <div className="flex-grow"></div>
+      <div className="grow"></div>
       {showHelpIcon && (
         <div className="flex-none">
           <HowToPlayDrawer />
