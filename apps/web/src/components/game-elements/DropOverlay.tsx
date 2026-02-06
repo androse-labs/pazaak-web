@@ -17,7 +17,7 @@ export const DropOverlay = ({
   return (
     <div
       className={clsx(
-        'border-3 border-neutral relative rounded-lg border-dashed',
+        'border-neutral relative rounded-lg border-3 border-dashed',
         className,
       )}
     >

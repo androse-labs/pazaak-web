@@ -14,7 +14,7 @@ export const Modal = ({
       <div className="modal-box flex flex-col justify-center gap-4">
         {withExitButton && (
           <button
-            className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+            className="btn btn-sm btn-circle btn-ghost absolute top-2 right-2"
             onClick={() => {
               const modal = document.getElementById(id)
               if (modal instanceof HTMLDialogElement) {

@@ -56,11 +56,11 @@ const DecksDeckIdEditRoute = DecksDeckIdEditRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/decks/new': typeof DecksNewRoute
-  '/decks': typeof DecksIndexRoute
-  '/how-to-play': typeof HowToPlayIndexRoute
+  '/decks/': typeof DecksIndexRoute
+  '/how-to-play/': typeof HowToPlayIndexRoute
   '/decks/$deckId/edit': typeof DecksDeckIdEditRoute
   '/match/$matchId/join': typeof MatchMatchIdJoinRoute
-  '/match/$matchId': typeof MatchMatchIdIndexRoute
+  '/match/$matchId/': typeof MatchMatchIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -86,11 +86,11 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/decks/new'
-    | '/decks'
-    | '/how-to-play'
+    | '/decks/'
+    | '/how-to-play/'
     | '/decks/$deckId/edit'
     | '/match/$matchId/join'
-    | '/match/$matchId'
+    | '/match/$matchId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -133,14 +133,14 @@ declare module '@tanstack/react-router' {
     '/how-to-play/': {
       id: '/how-to-play/'
       path: '/how-to-play'
-      fullPath: '/how-to-play'
+      fullPath: '/how-to-play/'
       preLoaderRoute: typeof HowToPlayIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/decks/': {
       id: '/decks/'
       path: '/decks'
-      fullPath: '/decks'
+      fullPath: '/decks/'
       preLoaderRoute: typeof DecksIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
@@ -154,7 +154,7 @@ declare module '@tanstack/react-router' {
     '/match/$matchId/': {
       id: '/match/$matchId/'
       path: '/match/$matchId'
-      fullPath: '/match/$matchId'
+      fullPath: '/match/$matchId/'
       preLoaderRoute: typeof MatchMatchIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }

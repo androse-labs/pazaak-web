@@ -13,7 +13,7 @@ export const StateDisplay = ({
           strokeWidth={3}
           className="inline-block align-middle leading-none"
         />
-        <span className="align-middle text-xl font-bold leading-none">
+        <span className="align-middle text-xl leading-none font-bold">
           Busted
         </span>
       </span>
@@ -27,7 +27,7 @@ export const StateDisplay = ({
           strokeWidth={3}
           className="inline-block align-middle leading-none"
         />
-        <span className="align-middle text-xl font-bold leading-none">
+        <span className="align-middle text-xl leading-none font-bold">
           Standing
         </span>
       </span>

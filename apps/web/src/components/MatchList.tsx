@@ -30,7 +30,7 @@ export function MatchList({
 
   if (!matches || matches.length === 0) {
     return (
-      <p className="text-base-content text-sm italic text-opacity-50">
+      <p className="text-base-content text-opacity-50 text-sm italic">
         No matches available
       </p>
     )
@@ -42,7 +42,7 @@ export function MatchList({
         <div key={matchId} className="flex justify-between gap-2">
           <div>
             <p className="text-md">{matchName}</p>
-            <p className="text-base-content text-sm italic text-opacity-50">
+            <p className="text-base-content text-opacity-50 text-sm italic">
               {matchId}
             </p>
           </div>

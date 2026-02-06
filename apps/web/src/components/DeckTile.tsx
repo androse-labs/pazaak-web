@@ -42,7 +42,7 @@ export const DeckTile = ({
         onClick={() => setSelectedForPreview(deck.id)}
       >
         <div className="flex w-full justify-between">
-          <h2 className=" text-lg font-bold">{deck.name}</h2>
+          <h2 className="text-lg font-bold">{deck.name}</h2>
           <div className="tooltip tooltip-left" data-tip={tooltip}>
             <button
               className={clsx(

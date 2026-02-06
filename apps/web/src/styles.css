@@ -1,12 +1,12 @@
 @import 'tailwindcss';
-@plugin "daisyui" {
+@plugin 'daisyui' {
   exclude: rootscrollgutter;
   themes:
     dracula --default,
     dracula --prefersdark;
 }
 
-@plugin "@tailwindcss/typography";
+@plugin '@tailwindcss/typography';
 
 @theme {
   --color-pzk-red: rgb(209, 38, 57);

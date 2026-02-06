@@ -121,7 +121,7 @@ export const CardPresentation = forwardRef<
     <div
       ref={ref}
       className={clsx(
-        'grid aspect-[2/3] w-10 select-none grid-rows-[0.5fr_4fr_1.5fr_1.5fr] overflow-hidden rounded-sm bg-gray-300 px-1 text-center text-xs font-bold shadow-lg lg:w-20 lg:rounded-lg lg:px-3 lg:text-xl',
+        'grid aspect-[2/3] w-10 grid-rows-[0.5fr_4fr_1.5fr_1.5fr] overflow-hidden rounded-sm bg-gray-300 px-1 text-center text-xs font-bold shadow-lg select-none lg:w-20 lg:rounded-lg lg:px-3 lg:text-xl',
         { 'animate-slow-shake': isShaking },
       )}
     >
@@ -132,7 +132,7 @@ export const CardPresentation = forwardRef<
         <div
           className={`${topColor} h-full w-full justify-self-center rounded-t-sm lg:rounded-t-lg`}
         />
-        <div className=" h-full w-full bg-gray-900 text-white ">
+        <div className="h-full w-full bg-gray-900 text-white">
           {formatValue(card)}
         </div>
         <div

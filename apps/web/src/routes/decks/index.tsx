@@ -92,7 +92,7 @@ function DeckPreview({
         className={clsx(
           'h-full w-full overflow-y-auto p-4',
           deck.cards.length === 0
-            ? 'min-h-30 flex flex-col justify-center'
+            ? 'flex min-h-30 flex-col justify-center'
             : 'flex flex-wrap content-start items-start gap-4',
         )}
       >

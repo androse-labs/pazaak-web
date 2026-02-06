@@ -6,7 +6,6 @@ import mdx from '@mdx-js/rollup'
 import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
-  // @ts-expect-error Vitest types are not up to date
   test: {
     environment: 'jsdom',
     setupFiles: ['./vitest-setup.ts'],

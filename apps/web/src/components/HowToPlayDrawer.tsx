@@ -23,7 +23,7 @@ export const HowToPlayDrawer = () => {
           className="drawer-overlay"
         ></label>
 
-        <div className="prose bg-base-200 prose-sm dark:prose-invert md:w-124 md:prose-lg w-80 overflow-y-auto p-6 text-left">
+        <div className="prose bg-base-200 prose-sm dark:prose-invert md:prose-lg w-80 overflow-y-auto p-6 text-left md:w-124">
           <HowToPlay components={{ CardPresentation, CopyButton, Link }} />
         </div>
       </div>
