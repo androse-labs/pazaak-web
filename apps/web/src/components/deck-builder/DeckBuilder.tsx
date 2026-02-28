@@ -7,7 +7,7 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
-import { Trash2 } from 'lucide-react'
+import { Trash2, ChevronLeft } from 'lucide-react'
 import { DropOverlay } from '../game-elements/DropOverlay'
 import type { Card } from '@pazaak-web/shared'
 import { useMemo, useState } from 'react'
@@ -52,7 +52,7 @@ const DeckBuilder = ({
   )
 
   return (
-    <div className="flex h-[calc(100vh-64px)] flex-col md:flex-row lg:flex-1">
+    <div className="flex h-full flex-col sm:flex-row">
       <DndContext
         sensors={sensors}
         onDragStart={(event) => {
@@ -129,18 +129,35 @@ const DeckBuilder = ({
           setDragSourceZone(null)
         }}
       >
-        <div className="bg-base-200 flex h-3/5 flex-col overflow-hidden md:h-auto md:w-2/3">
+        <div className="bg-base-200 flex h-3/5 flex-col overflow-hidden sm:h-auto sm:w-2/3">
           <Collection
             cards={collectionCards}
             showDropOverlay={isDragging && dragSourceZone !== 'collection'}
           />
         </div>
-        <div className="bg-base-100 flex h-2/5 flex-col overflow-hidden md:h-auto md:w-1/3">
+        <div className="bg-base-100 flex h-2/5 flex-col overflow-hidden sm:h-auto sm:w-1/3">
           <DeckPanel
             draftDeck={draftDeck}
             validationMessage={deckValidationMessage}
             showDropOverlay={isDragging && dragSourceZone !== 'your-deck'}
             setDraftDeck={setDraftDeck}
+            onBack={() => {
+              const hasUnsavedChanges =
+                draftDeck.name !== initialDeck.name ||
+                !decksAreEqual(draftDeck.cards, initialDeck.cards)
+              if (
+                hasUnsavedChanges &&
+                !confirm(
+                  'You have unsaved changes. Are you sure you want to go back?',
+                )
+              ) {
+                return
+              }
+              navigate({
+                to: '/decks',
+                search: { previewId: initialDeck.id ?? undefined },
+              })
+            }}
             onSave={() => {
               const validDeck = deckSchema.safeParse(draftDeck.cards)
 
@@ -167,8 +184,6 @@ const DeckBuilder = ({
               }
 
               setUserDeck(validDeck.data, draftDeck.name.trim(), draftDeck.id)
-
-              navigate({ to: '/decks' })
             }}
           />
         </div>
@@ -193,7 +208,9 @@ const Collection = ({
 
   return (
     <div className="flex flex-1 flex-col gap-2 overflow-hidden p-4">
-      <h1 className="shrink-0 text-2xl font-bold">Collection</h1>
+      <div className="flex shrink-0 items-center gap-2">
+        <h1 className="text-2xl font-bold">Collection</h1>
+      </div>
       <DropOverlay
         isOver={isOver}
         show={showDropOverlay}
@@ -218,6 +235,7 @@ interface DeckPanelProps {
   validationMessage: string | null
   showDropOverlay: boolean
   setDraftDeck: (deck: Deck) => void
+  onBack: () => void
   onSave: () => void
 }
 
@@ -232,6 +250,7 @@ export function DeckPanel({
   validationMessage,
   showDropOverlay,
   setDraftDeck,
+  onBack,
   onSave,
 }: DeckPanelProps) {
   const { setNodeRef, isOver } = useDroppable({ id: 'your-deck' })
@@ -247,7 +266,7 @@ export function DeckPanel({
     <div className="flex flex-1 flex-col gap-2 overflow-hidden p-4">
       <div className="flex shrink-0 items-center justify-between">
         <input
-          className="input input-ghost text-2xl font-bold"
+          className="input input-ghost h-auto p-0 text-2xl font-bold"
           placeholder="Deck Name"
           value={draftDeck.name}
           onChange={(e) => {
@@ -256,12 +275,12 @@ export function DeckPanel({
         />
         <div className="flex gap-2">
           <button
-            className="btn btn-accent max-lg:btn-square btn-sm"
+            className="btn btn-accent btn-sm max-lg:btn-square sm:btn-md landscape-short:btn-sm"
             onClick={() => {
               setDraftDeck({ ...draftDeck, cards: [] })
             }}
           >
-            <Trash2 />
+            <Trash2 className="size-4 sm:size-5" />
             <span className="hidden lg:inline">Clear Deck</span>
           </button>
         </div>
@@ -277,7 +296,7 @@ export function DeckPanel({
           className={clsx(
             'h-full w-full overflow-y-auto p-4',
             draftDeck.cards.length === 0
-              ? 'flex min-h-[120px] flex-col justify-center'
+              ? 'flex min-h-30 flex-col justify-center'
               : 'flex flex-wrap content-start items-start gap-4',
           )}
         >
@@ -295,17 +314,30 @@ export function DeckPanel({
           <span>{validationMessage}</span>
         </div>
       )}
-      <div className="flex shrink-0 items-center justify-between gap-2">
-        <h2 className="flex-1/6 text-center text-xl">
-          {draftDeck.cards.length}/10
-        </h2>
-        <button
-          className="btn btn-primary flex-2/3"
-          onClick={onSave}
-          disabled={deckIsChanged}
-        >
-          Save & Close
-        </button>
+      <div className="flex shrink-0 items-center">
+        <div className="flex flex-1 justify-start">
+          <button
+            className="btn btn-ghost btn-sm sm:btn-md landscape-short:btn-sm"
+            onClick={onBack}
+          >
+            <ChevronLeft size={20} />
+            Back
+            <span className="landscape-short:hidden hidden sm:inline">
+              {' '}
+              to Decks
+            </span>
+          </button>
+        </div>
+        <h2 className="text-md text-center">{draftDeck.cards.length}/10</h2>
+        <div className="flex flex-1 justify-end">
+          <button
+            className="btn btn-primary btn-sm sm:btn-md landscape-short:btn-sm"
+            onClick={onSave}
+            disabled={deckIsChanged}
+          >
+            Save
+          </button>
+        </div>
       </div>
     </div>
   )

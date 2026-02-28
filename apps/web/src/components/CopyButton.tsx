@@ -32,11 +32,11 @@ export const CopyButton = ({
       data-tip={showCopied ? copiedTooltip : tooltip}
     >
       <button
-        className={clsx('btn btn-secondary btn-square', className)}
+        className={clsx('btn btn-secondary btn-square btn-sm sm:btn-md landscape-short:btn-sm', className)}
         onClick={handleCopy}
         type="button"
       >
-        {showCopied ? <Check /> : <Copy />}
+        {showCopied ? <Check className="size-4 sm:size-5" /> : <Copy className="size-4 sm:size-5" />}
       </button>
     </div>
   )

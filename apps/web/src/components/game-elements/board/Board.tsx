@@ -73,7 +73,7 @@ export const Board = ({
 
   useEffect(() => {
     const checkIfDesktop = () => {
-      setIsDesktop(window.innerWidth > 1024)
+      setIsDesktop(window.innerWidth >= 640)
     }
     checkIfDesktop()
     window.addEventListener('resize', checkIfDesktop)
@@ -161,8 +161,8 @@ export const Board = ({
           </div>
         ) : (
           // Mobile Layout
-          <div className="flex w-screen flex-col items-center justify-around gap-4 p-4">
-            <div className="flex flex-col justify-around gap-2">
+          <div className="flex h-full w-screen flex-col items-center justify-between gap-4 p-4">
+            <div className="flex flex-1 flex-col justify-around gap-2">
               <MobileOpponentBoardGrid
                 title="Opponent"
                 state={opponentState}

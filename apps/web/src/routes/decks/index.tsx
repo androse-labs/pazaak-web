@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router'
 import { deckSchema, useDeckStore, type Deck } from '../../stores/deckStore'
 import { DeckTile } from '../../components/DeckTile'
 import { useState } from 'react'
@@ -13,6 +13,10 @@ import {
 import { Modal } from '../../components/Modal'
 
 export const Route = createFileRoute('/decks/')({
+  validateSearch: (search: Record<string, unknown>) => ({
+    previewId:
+      typeof search.previewId === 'string' ? search.previewId : undefined,
+  }),
   component: RouteComponent,
 })
 
@@ -32,7 +36,7 @@ function DeckList({
   if (decks.length === 0)
     return <div className="m-4">You have no decks. Create one!</div>
   return (
-    <div className="flex min-h-0 flex-wrap gap-8 overflow-auto p-4">
+    <div className="flex min-h-0 flex-wrap gap-8 overflow-auto rounded-lg border-3 border-dashed border-transparent p-4">
       {decks.map((deck) => (
         <div
           key={deck.id}
@@ -71,14 +75,20 @@ function DeckPreview({
 
   return (
     <>
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">{deck.name}</h2>
-        <div className="flex gap-2">
-          <button className="btn btn-accent btn-square" onClick={onEdit}>
-            <Pencil />
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="truncate text-2xl font-bold">{deck.name}</h2>
+        <div className="flex shrink-0 gap-1">
+          <button
+            className="btn btn-accent btn-square btn-sm sm:btn-md landscape-short:btn-sm"
+            onClick={onEdit}
+          >
+            <Pencil className="size-4 sm:size-5" />
           </button>
-          <button className="btn btn-error btn-square" onClick={onDelete}>
-            <Trash />
+          <button
+            className="btn btn-error btn-square btn-sm sm:btn-md landscape-short:btn-sm"
+            onClick={onDelete}
+          >
+            <Trash className="size-4 sm:size-5" />
           </button>
           <CopyButton
             value={deckToCode({ deck: deck.cards, name: deck.name })}
@@ -90,7 +100,7 @@ function DeckPreview({
       </div>
       <div
         className={clsx(
-          'h-full w-full overflow-y-auto p-4',
+          'relative h-full w-full overflow-y-auto rounded-lg border-3 border-dashed border-transparent p-4',
           deck.cards.length === 0
             ? 'flex min-h-30 flex-col justify-center'
             : 'flex flex-wrap content-start items-start gap-4',
@@ -166,7 +176,10 @@ const ImportDeckCodeModal = () => {
             placeholder="Enter Deck Code"
             className="input join-item input-bordered w-full"
           />
-          <button className="btn btn-primary join-item" type="submit">
+          <button
+            className="btn btn-primary btn-sm join-item sm:btn-md landscape-short:btn-sm"
+            type="submit"
+          >
             Submit
           </button>
         </form>
@@ -181,22 +194,30 @@ export default function RouteComponent() {
   const deleteDeck = useDeckStore((s) => s.deleteDeck)
   const selectedDeckId = useDeckStore((s) => s.selectedDeckId)
   const setSelectedDeckId = useDeckStore((s) => s.setSelectedDeckId)
-  const [previewDeckId, setPreviewDeckId] = useState<string | null>(null)
-  const previewDeck = userDecks.find((d) => d.id === previewDeckId)
+  const { previewId: previewDeckId } = useSearch({ from: '/decks/' })
+  const setPreviewDeckId = (id: string | null) =>
+    navigate({
+      to: '/decks',
+      search: { previewId: id ?? undefined },
+      replace: true,
+    })
+  const previewDeck = previewDeckId
+    ? userDecks.find((d) => d.id === previewDeckId)
+    : undefined
 
   return (
     <>
       <ImportDeckCodeModal />
-      <div className="flex max-h-[calc(100vh-64px)] flex-col md:flex-row lg:flex-1">
-        <div className="bg-base-200 flex h-3/5 flex-col overflow-hidden p-4 md:h-auto md:w-2/3">
-          <div className="flex h-full min-h-0 flex-1 flex-col gap-2 md:h-auto md:w-full">
+      <div className="flex h-full flex-col sm:flex-row lg:flex-1">
+        <div className="bg-base-200 flex h-3/5 flex-col overflow-hidden p-4 sm:h-full sm:w-2/3">
+          <div className="flex h-full min-h-0 flex-1 flex-col gap-2 sm:h-auto sm:w-full">
             <div className="flex justify-between">
               <h1 className="text-2xl font-bold">Decks</h1>
               <div className="dropdown dropdown-hover dropdown-end">
                 <div
                   tabIndex={0}
                   role="button"
-                  className="btn btn-primary mb-2"
+                  className="btn btn-primary btn-sm sm:btn-md landscape-short:btn-sm mb-2"
                 >
                   <Plus /> New Deck
                 </div>
@@ -230,15 +251,15 @@ export default function RouteComponent() {
             </div>
             <DeckList
               decks={userDecks}
-              previewedDeckId={previewDeckId}
+              previewedDeckId={previewDeckId ?? null}
               selectedDeckId={selectedDeckId}
               setPreviewId={setPreviewDeckId}
               setSelectedDeckId={setSelectedDeckId}
             />
           </div>
         </div>
-        <div className="bg-base-100 flex h-2/5 flex-col overflow-hidden md:h-3/5 md:w-1/3">
-          <div className="flex h-full min-h-0 flex-1 flex-col justify-start p-4 md:h-auto md:w-full">
+        <div className="bg-base-100 flex h-2/5 flex-col overflow-hidden p-4 sm:h-full sm:w-1/3">
+          <div className="flex h-full min-h-0 flex-1 flex-col justify-start sm:h-auto sm:w-full">
             <DeckPreview
               deck={previewDeck}
               onEdit={() =>

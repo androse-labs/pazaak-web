@@ -260,7 +260,7 @@ function MatchPage() {
   const hasStarted = !!currentGame?.boards
 
   return (
-    <div className="flex flex-col items-center justify-center p-5">
+    <div className="flex h-full flex-col items-center justify-center">
       <GameNotification id="game-notification" open={notification.open}>
         {notification.content}
       </GameNotification>

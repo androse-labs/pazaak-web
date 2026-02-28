@@ -169,13 +169,13 @@ function Index() {
   const setMatchConnection = usePlayerStore((s) => s.setMatchConnection)
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-24">
-      <h1 className="font-mono text-5xl font-semibold uppercase md:text-6xl">
+    <div className="landscape-short:gap-6 flex flex-1 flex-col items-center justify-center gap-24">
+      <h1 className="landscape-short:text-4xl font-mono text-5xl font-semibold uppercase md:text-6xl">
         Pazaak-Web
       </h1>
-      <div className="flex flex-col gap-4">
+      <div className="landscape-short:gap-2 flex flex-col gap-4">
         <form
-          className="flex flex-col gap-4"
+          className="landscape-short:gap-2 flex flex-col gap-4"
           onSubmit={(e) => {
             e.preventDefault()
             if (matchName.length < 5) {

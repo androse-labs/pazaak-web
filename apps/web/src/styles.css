@@ -8,6 +8,8 @@
 
 @plugin '@tailwindcss/typography';
 
+@custom-variant landscape-short (@media (orientation: landscape) and (max-height: 500px));
+
 @theme {
   --color-pzk-red: rgb(209, 38, 57);
   --color-pzk-blue: rgb(59, 130, 246);
@@ -17,19 +19,19 @@
 
   @keyframes slow-shake {
     0% {
-      transform: rotate(-1deg) translateX(-1px);
+      transform: rotate(-2deg);
     }
     25% {
-      transform: rotate(1deg) translateX(1px);
+      transform: rotate(2deg);
     }
     50% {
-      transform: rotate(-1deg) translateX(-1px);
+      transform: rotate(-2deg);
     }
     75% {
-      transform: rotate(1deg) translateX(1px);
+      transform: rotate(2deg);
     }
     100% {
-      transform: rotate(-1deg) translateX(-1px);
+      transform: rotate(-2deg);
     }
   }
 }

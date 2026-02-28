@@ -30,7 +30,7 @@ export const DeckTile = ({
   return (
     <div
       className={clsx(
-        'group relative flex flex-col items-center rounded-lg p-4 shadow-lg',
+        'group relative flex w-72 flex-col items-center rounded-lg p-4 shadow-lg lg:w-80',
         {
           'bg-base-100': selectedForPreview,
           'bg-base-300': !selectedForPreview,
@@ -61,7 +61,7 @@ export const DeckTile = ({
             </button>
           </div>
         </div>
-        <div className="relative flex h-28 w-72 items-center justify-center md:h-40 md:w-80">
+        <div className="relative flex h-28 w-full items-center justify-center lg:h-36">
           {topCards.map((card, index) => {
             const rotation =
               ((index - mid) * totalSpread) / (topCards.length - 1)

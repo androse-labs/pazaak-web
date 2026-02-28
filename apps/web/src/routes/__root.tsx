@@ -11,9 +11,11 @@ import { SettingsMenu } from '../components/SettingsMenu'
 export const Route = createRootRoute({
   component: () => (
     <>
-      <div className="flex min-h-screen flex-col">
+      <div className="flex h-dvh flex-col">
         <NavBar />
-        <Outlet />
+        <div className="flex min-h-0 flex-1 flex-col">
+          <Outlet />
+        </div>
       </div>
       <TanStackRouterDevtools />
     </>
@@ -35,6 +37,7 @@ const NavBar = () => {
       </Link>
       <Link
         to="/decks"
+        search={{ previewId: undefined }}
         className="btn btn-ghost grow-0 text-base normal-case lg:text-xl"
       >
         Decks
