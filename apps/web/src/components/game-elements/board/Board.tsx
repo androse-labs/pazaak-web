@@ -15,6 +15,7 @@ import { MobileOpponentBoardGrid } from './MobileOpponentBoardGrid'
 import { HiddenHandGrid } from './HiddenHandGrid'
 import { HandGrid } from './HandGrid'
 import { BoardGrid } from './BoardGrid'
+import { LandscapeBoard } from './LandscapeBoard'
 import { CardPresentation } from '../card/CardPresentation'
 
 type BoardProps = {
@@ -60,6 +61,7 @@ export const Board = ({
   const [draggedCard, setDraggedCard] = useState<CardValue | null>(null)
   const [isShaking, setIsShaking] = useState(false)
   const [isDesktop, setIsDesktop] = useState(false)
+  const [isLandscapeShort, setIsLandscapeShort] = useState(false)
 
   const sensors = useSensors(
     useSensor(TouchSensor, {
@@ -74,6 +76,9 @@ export const Board = ({
   useEffect(() => {
     const checkIfDesktop = () => {
       setIsDesktop(window.innerWidth >= 640)
+      setIsLandscapeShort(
+        window.innerWidth > window.innerHeight && window.innerHeight < 500,
+      )
     }
     checkIfDesktop()
     window.addEventListener('resize', checkIfDesktop)
@@ -117,7 +122,25 @@ export const Board = ({
           }
         }}
       >
-        {isDesktop ? (
+        {isLandscapeShort ? (
+          // Landscape short (mobile landscape) layout
+          <LandscapeBoard
+            yourBoard={yourBoard}
+            opponentBoard={opponentBoard}
+            yourScore={yourScore}
+            opponentScore={opponentScore}
+            yourState={yourState}
+            opponentState={opponentState}
+            yourTurn={yourTurn}
+            playerCards={playerCards}
+            opponentCardCount={opponentCardCount}
+            yourBoardCards={yourBoardCards}
+            opponentBoardCards={opponentBoardCards}
+            onEndTurn={onEndTurn}
+            onStand={onStand}
+            onMagnitudeFlip={onMagnitudeFlip}
+          />
+        ) : isDesktop ? (
           // Desktop Layout
           <div className="flex flex-col items-center justify-center">
             <div className="flex items-center justify-between gap-2">
