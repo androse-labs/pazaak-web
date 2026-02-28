@@ -30,6 +30,7 @@ const WaitingForMatchToStart = ({ matchId }: WaitingForMatchToStartProps) => {
               tooltip="Copy match URL"
               copiedTooltip="Copied!"
               className="join-item"
+              responsive={false}
             />
           </div>
         </div>

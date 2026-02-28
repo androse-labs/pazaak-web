@@ -8,7 +8,7 @@ type CopyButtonProps = {
   copiedTooltip?: string
   tooltipClassName?: string
   className?: string
-  iconSize?: number
+  responsive?: boolean
 }
 
 export const CopyButton = ({
@@ -17,6 +17,7 @@ export const CopyButton = ({
   copiedTooltip = 'Copied!',
   className = '',
   tooltipClassName = '',
+  responsive = true,
 }: CopyButtonProps) => {
   const [showCopied, setShowCopied] = useState(false)
 
@@ -33,16 +34,18 @@ export const CopyButton = ({
     >
       <button
         className={clsx(
-          'btn btn-secondary btn-square btn-sm sm:btn-md landscape-short:btn-sm',
+          responsive
+            ? 'btn btn-secondary btn-square btn-sm sm:btn-md landscape-short:btn-sm'
+            : 'btn btn-secondary btn-square btn-md',
           className,
         )}
         onClick={handleCopy}
         type="button"
       >
         {showCopied ? (
-          <Check className="size-4 sm:size-5" />
+          <Check className={responsive ? 'size-4 sm:size-5' : 'size-5'} />
         ) : (
-          <Copy className="size-4 sm:size-5" />
+          <Copy className={responsive ? 'size-4 sm:size-5' : 'size-5'} />
         )}
       </button>
     </div>
