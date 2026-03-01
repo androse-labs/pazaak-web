@@ -19,7 +19,7 @@ export const Route = createFileRoute('/')({
   component: Index,
 })
 
-type JoinableMatchesResponse = {
+export type JoinableMatchesResponse = {
   matchId: string
   matchName: string
 }[]
@@ -75,12 +75,18 @@ const JoinMatchModal = () => {
         <form className="join w-full" onSubmit={handleSubmit}>
           <input
             type="text"
+            role="textbox"
+            aria-label="Match ID"
             value={matchId}
             onChange={(e) => setMatchId(e.target.value)}
             placeholder="Enter a Match ID"
             className="input join-item input-bordered w-full"
           />
-          <button className="btn btn-primary join-item" type="submit">
+          <button
+            className="btn btn-primary join-item"
+            type="submit"
+            aria-label="Join match by ID"
+          >
             Join
           </button>
         </form>
@@ -125,7 +131,7 @@ const JoinMatchModal = () => {
   )
 }
 
-type CreateMatchResponse = {
+export type CreateMatchResponse = {
   matchId: string
   token: string
 }
@@ -204,6 +210,8 @@ function Index() {
           <div className="flex items-center gap-2">
             <input
               type="text"
+              role="textbox"
+              aria-label="Match Name"
               placeholder="Match Name"
               className="input input-bordered w-full"
               value={matchName}
@@ -255,6 +263,7 @@ function Index() {
         <div className="divider">or</div>
         <button
           className="btn btn-secondary"
+          aria-label="Open join match modal"
           onClick={() => {
             const modal = document.getElementById('join-match-modal')
             if (modal instanceof HTMLDialogElement) {

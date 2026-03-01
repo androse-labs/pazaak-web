@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { Board } from '../../../components/game-elements/board/Board'
-import useWebSocket from 'react-use-websocket'
+import { useMatchSocket } from '../../../hooks/useMatchSocket'
 import { useEffect, useRef, useState } from 'react'
 import type { MatchAction } from '../../../components/game-elements/types'
 import { api } from '../../../webClient'
@@ -117,10 +117,9 @@ function MatchPage() {
     }
   }, [notification.open, notification.persistent])
 
-  useWebSocket(
+  useMatchSocket(
     `${import.meta.env.VITE_API_SOCKET_URL}/match/${matchId}/subscribe?token=${matchConnection?.token}`,
     {
-      retryOnError: true,
       onClose: (event) => {
         if ([1404, 1401, 1400].includes(event.code)) {
           // Match not found or invalid token
