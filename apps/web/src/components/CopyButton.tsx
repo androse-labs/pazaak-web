@@ -39,6 +39,7 @@ export const CopyButton = ({
             : 'btn btn-secondary btn-square btn-md',
           className,
         )}
+        aria-label={tooltip}
         onClick={handleCopy}
         type="button"
       >

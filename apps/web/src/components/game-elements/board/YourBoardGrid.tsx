@@ -41,7 +41,10 @@ export const YourBoardGrid = ({
   }, [cards.length, play])
 
   return (
-    <div className="flex flex-row items-start justify-center gap-2">
+    <div
+      className="flex flex-row items-start justify-center gap-2"
+      aria-label="your-board"
+    >
       <div className="flex flex-col items-start justify-center gap-2">
         <div className="flex w-full justify-between">
           <div className="flex items-center gap-2">

@@ -33,7 +33,10 @@ export const OpponentBoardGrid = ({
   }, [cards.length, play])
 
   return (
-    <div className="flex flex-row items-start justify-center gap-2">
+    <div
+      className="flex flex-row items-start justify-center gap-2"
+      aria-label="opponent-board"
+    >
       <ScoreDisplay total={3} count={score} />
       <div className="flex flex-col items-end justify-end gap-2">
         <div className="flex w-full flex-row-reverse justify-between">
