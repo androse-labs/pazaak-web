@@ -1,5 +1,9 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { createMemoryHistory, createRouter, RouterProvider } from '@tanstack/react-router'
+import {
+  createMemoryHistory,
+  createRouter,
+  RouterProvider,
+} from '@tanstack/react-router'
 import { render, type RenderOptions } from '@testing-library/react'
 import React from 'react'
 import { routeTree } from './routeTree.gen'
@@ -31,11 +35,17 @@ export function renderAtRoute(initialUrl: string) {
 }
 
 /** Wraps a component with QueryClientProvider. Use for isolated component tests. */
-export function renderWithProviders(ui: React.ReactElement, options?: RenderOptions) {
+export function renderWithProviders(
+  ui: React.ReactElement,
+  options?: RenderOptions,
+) {
   const queryClient = createTestQueryClient()
 
   return {
-    ...render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>, options),
+    ...render(
+      <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>,
+      options,
+    ),
     queryClient,
   }
 }

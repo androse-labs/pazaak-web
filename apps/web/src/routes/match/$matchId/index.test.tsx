@@ -156,9 +156,12 @@ describe('Match page', () => {
     expect(endTurnButton).not.toBeDisabled()
     await userEvent.click(endTurnButton)
 
-    await waitFor(() => {
-      expect(patchSpy).toHaveBeenCalled()
-    }, { timeout: 3000 })
+    await waitFor(
+      () => {
+        expect(patchSpy).toHaveBeenCalled()
+      },
+      { timeout: 3000 },
+    )
   })
 
   it('shows a win notification when the player wins', async () => {
@@ -248,7 +251,9 @@ describe('Match page', () => {
     fireEvent.click(rematchButton)
 
     await waitFor(() => {
-      expect(screen.getByText(/waiting for opponent to accept rematch/i)).toBeInTheDocument()
+      expect(
+        screen.getByText(/waiting for opponent to accept rematch/i),
+      ).toBeInTheDocument()
     })
   })
 })
