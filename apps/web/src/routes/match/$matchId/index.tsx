@@ -95,7 +95,7 @@ function MatchPage() {
     content: null,
     persistent: false,
   })
-  const notificationTimeout = useRef<NodeJS.Timeout | null>(null)
+  const notificationTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
   const navigate = useNavigate()
 
   useEffect(() => {
