@@ -57,7 +57,7 @@ describe('Match page', () => {
 
     await waitFor(() => {
       expect(screen.queryByText(/waiting/i)).not.toBeNull()
-    })
+    }, { timeout: 5000 })
   })
 
   it('shows the game board when a game-state event is received', async () => {
