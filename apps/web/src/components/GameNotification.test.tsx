@@ -1,7 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { GameNotification } from '../components/GameNotification'
-import userEvent from '@testing-library/user-event'
 
 describe('GameNotification', () => {
   it('renders children when open', () => {
@@ -40,10 +39,5 @@ describe('GameNotification', () => {
     dialog.dispatchEvent(new Event('close'))
 
     expect(onClose).toHaveBeenCalled()
-  })
-
-  it('auto-closes non-persistent notifications after a delay', async () => {
-    // TODO: use vi.useFakeTimers() to advance the auto-close timer
-    // and assert that onClose is called
   })
 })
