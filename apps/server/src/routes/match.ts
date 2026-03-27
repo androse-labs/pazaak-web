@@ -95,8 +95,9 @@ export default (matchManager: MatchManager) => {
   match.get(
     '/match/:matchId/subscribe',
     zValidator('query', z.object({ token: z.string().min(1) })),
+    zValidator('param', z.object({ matchId: z.string().min(1) })),
     upgradeWebSocket((c) => {
-      const matchId = c.req.param('matchId')
+      const { matchId } = c.req.param()
       const playerToken = c.req.query('token')
 
       return {
