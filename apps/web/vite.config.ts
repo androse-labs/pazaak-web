@@ -13,7 +13,7 @@ export default defineConfig({
   plugins: [
     tanstackRouter({
       target: 'react',
-      autoCodeSplitting: true,
+      autoCodeSplitting: !process.env.VITEST,
       routeFileIgnorePattern: '\\.test\\.',
     }),
     react({
