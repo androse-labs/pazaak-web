@@ -16,11 +16,7 @@ export default defineConfig({
       autoCodeSplitting: !process.env.VITEST,
       routeFileIgnorePattern: '\\.test\\.',
     }),
-    react({
-      babel: {
-        plugins: ['babel-plugin-react-compiler'],
-      },
-    }),
+    react(),
     mdx(),
     tailwindcss(),
   ],
