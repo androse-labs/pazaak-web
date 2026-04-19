@@ -34,18 +34,15 @@ function MatchPage() {
   const [playerHand, setPlayerHand] = useState<Card[]>([])
   const { mutate } = useMutation({
     mutationFn: async (action: MatchAction) =>
-      api.patch(
-        `${import.meta.env.VITE_API_URL}/match/${matchId}/action`,
-        action,
-        {
-          params: {
-            token: matchConnection?.token,
-          },
-          headers: {
-            'Content-Type': 'application/json',
-          },
+      api.patch(`match/${matchId}/action`, {
+        searchParams: {
+          token: matchConnection?.token,
         },
-      ),
+        json: action,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }),
     onMutate: (action) => {
       if (action.type === 'play') {
         setPlayerHand((prevHand) =>

@@ -33,7 +33,7 @@ function useGetJoinableMatches() {
         throw new Error('Failed to fetch open matches')
       }
 
-      return response.data
+      return await response.json()
     },
   })
 
@@ -55,10 +55,12 @@ const JoinMatchModal = () => {
       throw new Error('Failed to join match')
     }
 
+    const { playerId, token } = await response.json()
+
     setMatchConnection({
       matchId: matchId,
-      playerId: response.data.playerId,
-      token: response.data.token,
+      playerId,
+      token,
     })
 
     navigate({ to: `/match/${matchId}` })
@@ -117,10 +119,12 @@ const JoinMatchModal = () => {
               throw new Error('Failed to join match')
             }
 
+            const { playerId, token } = await response.json()
+
             setMatchConnection({
               matchId,
-              playerId: response.data.playerId,
-              token: response.data.token,
+              playerId,
+              token,
             })
 
             navigate({ to: `/match/${matches?.[0]?.matchId}` })
@@ -147,14 +151,16 @@ function useCreateMatchMutation() {
     }) => {
       // drop the id from each card in the deck
       const response = await api.post<CreateMatchResponse>('/match/create', {
-        deck: data.deck,
-        matchName: data.matchName,
-        unlisted: data.unlisted,
+        json: {
+          deck: data.deck,
+          matchName: data.matchName,
+          unlisted: data.unlisted,
+        },
       })
       if (response.status !== 200) {
         throw new Error('Failed to create match')
       }
-      return response.data
+      return await response.json()
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['joinableMatches'] })

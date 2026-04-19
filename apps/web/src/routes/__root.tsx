@@ -20,6 +20,22 @@ export const Route = createRootRoute({
       <TanStackRouterDevtools />
     </>
   ),
+  errorComponent: ({ error }) => (
+    <>
+      <div className="flex h-dvh flex-col">
+        <NavBar />
+        <div className="flex min-h-0 flex-1 flex-col">
+          <div className="flex h-full items-center justify-center">
+            <div className="alert alert-error">
+              <div>
+                <span>{error.message}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  ),
 })
 
 const NavBar = () => {

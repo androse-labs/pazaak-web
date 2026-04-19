@@ -5,7 +5,9 @@ export const joinMatch = (matchId: string, deck: Card[]) => {
   return api.post<{ playerId: string; token: string }>(
     `/match/${matchId}/join`,
     {
-      deck: deck,
+      json: {
+        deck,
+      },
     },
   )
 }
@@ -15,17 +17,13 @@ export const rematch = async (
   token: string,
   action: 'accept' | 'request',
 ) => {
-  return api.patch(
-    `/match/${matchId}/rematch`,
-    {},
-    {
-      params: {
-        token,
-        action,
-      },
-      headers: {
-        'Content-Type': 'application/json',
-      },
+  return api.patch(`/match/${matchId}/rematch`, {
+    searchParams: {
+      token,
+      action,
     },
-  )
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
 }
