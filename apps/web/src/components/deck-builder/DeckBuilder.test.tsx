@@ -48,7 +48,9 @@ describe('DeckBuilder', () => {
     }))
 
     const user = userEvent.setup()
-    await renderWithProviders(<DeckBuilder initialDeck={{ name: 'Full Deck', cards }} />)
+    await renderWithProviders(
+      <DeckBuilder initialDeck={{ name: 'Full Deck', cards }} />,
+    )
 
     await user.click(screen.getByRole('button', { name: /save/i }))
 
