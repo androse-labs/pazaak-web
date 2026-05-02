@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw'
 import { describe, expect, it, vi } from 'vitest'
 import { server } from '../mocks/server'
+import { matchServer } from '../mocks/handlers'
 import { renderAtRoute } from '../test-utils'
 import type { CreateMatchResponse, JoinableMatchesResponse } from '.'
 
@@ -87,6 +88,7 @@ describe('Home page', () => {
       http.post('*/match/join', () =>
         HttpResponse.json({ playerId: 'p1', token: 'tok' }),
       ),
+      matchServer.addEventListener('connection', () => {}),
     )
 
     const user = userEvent.setup()
@@ -113,6 +115,7 @@ describe('Home page', () => {
         postSpy()
         return HttpResponse.json({ playerId: 'p1', token: 'tok' })
       }),
+      matchServer.addEventListener('connection', () => {}),
     )
 
     const user = userEvent.setup()

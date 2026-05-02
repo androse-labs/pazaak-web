@@ -1,8 +1,9 @@
 import { screen, waitFor, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { http, HttpResponse, ws } from 'msw'
+import { http, HttpResponse } from 'msw'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { server } from '../../../mocks/server'
+import { matchServer } from '../../../mocks/handlers'
 import { renderAtRoute } from '../../../test-utils'
 import { usePlayerStore } from '../../../stores/playerStore'
 import type { PazaakSocketEvent } from '@pazaak-web/shared/src/web-socket-types'
@@ -16,8 +17,6 @@ beforeEach(() => {
     },
   })
 })
-
-const matchServer = ws.link('*/match/:matchId/subscribe')
 
 describe('Match page', () => {
   it('shows the waiting lobby before the game starts', async () => {

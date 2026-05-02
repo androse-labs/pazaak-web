@@ -1,10 +1,10 @@
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, beforeEach } from 'vitest'
-import { render } from '@testing-library/react'
 import { DeckBuilder } from './DeckBuilder'
 import { useDeckStore } from '../../stores/deckStore'
 import type { Card } from '@pazaak-web/shared'
+import { renderWithProviders } from '../../test-utils'
 
 const emptyDeck = { name: 'My Deck', cards: [] }
 
@@ -13,14 +13,14 @@ describe('DeckBuilder', () => {
     useDeckStore.setState({ decks: [] })
   })
 
-  it('renders the deck name input with the initial name', () => {
-    render(<DeckBuilder initialDeck={emptyDeck} />)
+  it('renders the deck name input with the initial name', async () => {
+    await renderWithProviders(<DeckBuilder initialDeck={emptyDeck} />)
 
     expect(screen.getByPlaceholderText('Deck Name')).toHaveValue('My Deck')
   })
 
-  it('disables save when the deck has not changed', () => {
-    render(<DeckBuilder initialDeck={emptyDeck} />)
+  it('disables save when the deck has not changed', async () => {
+    await renderWithProviders(<DeckBuilder initialDeck={emptyDeck} />)
 
     expect(screen.getByRole('button', { name: /save/i })).toBeDisabled()
   })
@@ -31,7 +31,7 @@ describe('DeckBuilder', () => {
       cards: [{ id: crypto.randomUUID(), type: 'add' as const, value: 1 }],
     }
     const user = userEvent.setup()
-    render(<DeckBuilder initialDeck={partialDeck} />)
+    await renderWithProviders(<DeckBuilder initialDeck={partialDeck} />)
 
     await user.click(screen.getByRole('button', { name: /save/i }))
 
@@ -48,7 +48,7 @@ describe('DeckBuilder', () => {
     }))
 
     const user = userEvent.setup()
-    render(<DeckBuilder initialDeck={{ name: 'Full Deck', cards }} />)
+    await renderWithProviders(<DeckBuilder initialDeck={{ name: 'Full Deck', cards }} />)
 
     await user.click(screen.getByRole('button', { name: /save/i }))
 
@@ -66,7 +66,7 @@ describe('DeckBuilder', () => {
     }))
 
     const user = userEvent.setup()
-    render(
+    await renderWithProviders(
       <DeckBuilder
         initialDeck={{ name: 'Duplicate Card Deck', cards: duplicateCards }}
       />,
@@ -87,7 +87,7 @@ describe('DeckBuilder', () => {
     }))
 
     const user = userEvent.setup()
-    render(
+    await renderWithProviders(
       <DeckBuilder
         initialDeck={{ name: 'Too Many Cards Deck', cards: tooManyCards }}
       />,

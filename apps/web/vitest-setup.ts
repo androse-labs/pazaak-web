@@ -6,6 +6,12 @@ import { server } from './src/mocks/server'
 
 expect.extend(matchers)
 
+// jsdom does not implement window.scrollTo
+window.scrollTo = () => {}
+
+// jsdom does not implement HTMLMediaElement playback methods
+window.HTMLMediaElement.prototype.pause = () => {}
+
 // jsdom does not implement HTMLDialogElement.showModal / close
 if (!HTMLDialogElement.prototype.showModal) {
   HTMLDialogElement.prototype.showModal = function () {

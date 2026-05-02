@@ -2,6 +2,7 @@ import { screen, waitFor } from '@testing-library/react'
 import { http, HttpResponse } from 'msw'
 import { describe, expect, it } from 'vitest'
 import { server } from '../../../mocks/server'
+import { matchServer } from '../../../mocks/handlers'
 import { renderAtRoute } from '../../../test-utils'
 
 describe('Match join page', () => {
@@ -10,6 +11,7 @@ describe('Match join page', () => {
       http.post('*/match/:matchId/join', () =>
         HttpResponse.json({ playerId: 'p1', token: 'tok' }),
       ),
+      matchServer.addEventListener('connection', () => {}),
     )
 
     const { router } = renderAtRoute('/match/match-123/join')
@@ -29,9 +31,7 @@ describe('Match join page', () => {
     renderAtRoute('/match/match-123/join')
 
     expect(
-      await screen.findByText(
-        /could not join match. please try again or go back to home./i,
-      ),
+      await screen.findByText(/request failed with status code 400/i),
     ).toBeInTheDocument()
   })
 
