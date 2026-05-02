@@ -9,6 +9,10 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: ['./vitest-setup.ts'],
+    env: {
+      VITE_API_URL: 'http://localhost:3000',
+      VITE_API_SOCKET_URL: 'ws://localhost:3000',
+    },
   },
   plugins: [
     tanstackRouter({
