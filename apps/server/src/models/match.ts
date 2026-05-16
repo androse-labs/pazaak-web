@@ -271,7 +271,7 @@ class Match {
     const currentGame = this.getCurrentGame()
 
     const winnerIndex =
-      currentGame.determineTooManyConditionWinner() ||
+      currentGame.determineTooManyConditionWinner() ??
       currentGame.determineWinner()
 
     this.forEachPlayer((player) => {
@@ -347,7 +347,7 @@ class Match {
 
     // Determine winner of this game
     const winnerIndex =
-      currentGame.determineTooManyConditionWinner() ||
+      currentGame.determineTooManyConditionWinner() ??
       currentGame.determineWinner()
 
     console.log(`Game winner index: ${winnerIndex}`)
