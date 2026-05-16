@@ -499,21 +499,24 @@ class Match {
     }
 
     this.notifyPlayersAboutGameState()
-    this.scheduleAiTurnIfNeeded()
+    this.scheduleAiTurnIfNeeded(action.type === 'play')
 
     return { success: true }
   }
 
-  private scheduleAiTurnIfNeeded(): void {
+  private scheduleAiTurnIfNeeded(hasPlayedThisTurn = false): void {
     if (this.status !== 'in-progress') return
 
     const currentPlayer = this.players[this.playersTurn - 1]
     if (!currentPlayer?.isAi) return
 
-    setTimeout(() => this.executeAiTurn(currentPlayer.id), 800)
+    setTimeout(
+      () => this.executeAiTurn(currentPlayer.id, hasPlayedThisTurn),
+      800,
+    )
   }
 
-  private executeAiTurn(aiPlayerId: string): void {
+  private executeAiTurn(aiPlayerId: string, hasPlayedThisTurn = false): void {
     if (this.status !== 'in-progress') return
 
     const currentPlayer = this.getPlayerById(aiPlayerId)
@@ -533,7 +536,9 @@ class Match {
     const action = decideNextAction({
       myTotal,
       opponentTotal,
+      myBoard,
       hand: currentPlayer.hand,
+      hasPlayedThisTurn,
     })
 
     const result = this.performAction(aiPlayerId, action)

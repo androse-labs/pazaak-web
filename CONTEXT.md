@@ -38,6 +38,26 @@ _Avoid_: Side deck, deck (when referring to the hand)
 The shared pool of neutral cards automatically dealt to Players each turn.
 _Avoid_: Deck (ambiguous — always qualify as "game deck" or "hand")
 
+**Add Card** / **Subtract Card**:
+A Hand card that adds or subtracts a fixed value from the Board total.
+_Avoid_: Plus card, minus card
+
+**Double Card**:
+A Hand card that copies the effect of the last card already on the Board, applying an equal adjustment to the Board total.
+_Avoid_: Copy card, mirror card
+
+**Flip Card**:
+A Hand card with a fixed value and a magnitude (add or subtract). Its magnitude can be reversed by an Invert Card.
+_Avoid_: Signed card
+
+**Tiebreaker Card**:
+A Hand card that behaves like a Flip Card but additionally wins any tied Board total comparison when it is the last card on the Board.
+_Avoid_: Tie card, trump card
+
+**Invert Card**:
+A Hand card that reverses the sign of all Board cards whose values match either of the card's two target numbers, including flipping the magnitude of Flip and Tiebreaker Cards.
+_Avoid_: Flip card (ambiguous — "Flip Card" is a different type)
+
 ---
 
 ### Turn & status

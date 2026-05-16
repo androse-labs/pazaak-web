@@ -1,7 +1,11 @@
 {
   "name": "@pazaak-web/shared",
+  "version": "0.0.0",
   "module": "index.ts",
   "type": "module",
+  "dependencies": {
+    "zod": "catalog:"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },

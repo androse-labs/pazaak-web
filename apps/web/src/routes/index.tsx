@@ -301,12 +301,12 @@ function Index() {
         </button>
         <button
           className="btn btn-accent"
-          aria-label="Play vs AI"
+          aria-label="Play vs Bot"
           disabled={isVsAiPending}
           onClick={() => mutateVsAi(userDeck)}
         >
           <Bot />
-          {isVsAiPending ? 'Starting…' : 'Play vs AI'}
+          {isVsAiPending ? 'Starting…' : 'Play vs Bot'}
         </button>
         <JoinMatchModal />
       </div>

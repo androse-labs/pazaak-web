@@ -10,7 +10,14 @@ import tseslint from 'typescript-eslint'
 export default defineConfig([
   { ignores: ['dist'] },
   {
-    files: ['*.ts', '*.tsx'],
+    languageOptions: {
+      parserOptions: {
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
+  {
+    files: ['**/*.ts', '**/*.tsx'],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
