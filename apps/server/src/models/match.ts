@@ -651,7 +651,9 @@ class Match {
       opponentState: opponent ? opponent.status : 'playing',
       opponentHandSize: opponent ? opponent.hand.length : 0,
       round: this.round,
-      opponentConnected: opponent ? (opponent.isAi || opponent.wsConnected) : false,
+      opponentConnected: opponent
+        ? opponent.isAi || opponent.wsConnected
+        : false,
       score: {
         yourScore: this.score[playerIndex],
         opponentScore: this.score[opponentIndex],

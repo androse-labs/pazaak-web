@@ -88,21 +88,21 @@ function evaluateCandidates(
 
       case 'flip':
         resultTotal =
-          card.magnitude === 'add'
-            ? myTotal + card.value
-            : myTotal - card.value
+          card.magnitude === 'add' ? myTotal + card.value : myTotal - card.value
         break
 
       case 'tiebreaker':
         resultTotal =
-          card.magnitude === 'add'
-            ? myTotal + card.value
-            : myTotal - card.value
+          card.magnitude === 'add' ? myTotal + card.value : myTotal - card.value
         break
 
       case 'double': {
         const lastCard = myBoard.at(-1)
-        if (!lastCard || lastCard.type === 'double' || lastCard.type === 'invert')
+        if (
+          !lastCard ||
+          lastCard.type === 'double' ||
+          lastCard.type === 'invert'
+        )
           break
         let contribution: number
         switch (lastCard.type) {
@@ -181,7 +181,7 @@ function decideNextAction(view: AiGameView): MatchAction {
   if (myTotal > 20) {
     const fixCandidates = evaluateCandidates(hand, myBoard, myTotal)
       .filter((c) => c.resultTotal > 0 && c.resultTotal <= 20)
-      .sort((a, b) => (20 - a.resultTotal) - (20 - b.resultTotal)) // closest to 20
+      .sort((a, b) => 20 - a.resultTotal - (20 - b.resultTotal)) // closest to 20
 
     if (fixCandidates.length > 0) {
       return { type: 'play', card: fixCandidates[0]!.card }
@@ -218,7 +218,7 @@ function decideNextAction(view: AiGameView): MatchAction {
   if (closeGame) {
     const tiebreakerCandidate = validCandidates
       .filter((c) => c.isTiebreaker && 20 - c.resultTotal <= 3)
-      .sort((a, b) => (20 - a.resultTotal) - (20 - b.resultTotal))[0]
+      .sort((a, b) => 20 - a.resultTotal - (20 - b.resultTotal))[0]
 
     if (tiebreakerCandidate) {
       return { type: 'play', card: tiebreakerCandidate.card }
@@ -229,7 +229,7 @@ function decideNextAction(view: AiGameView): MatchAction {
   // Avoid burning cards for marginal gains — Hand cards must last the Match.
   const improvingCandidate = validCandidates
     .filter((c) => 20 - c.resultTotal <= 2)
-    .sort((a, b) => (20 - a.resultTotal) - (20 - b.resultTotal))[0]
+    .sort((a, b) => 20 - a.resultTotal - (20 - b.resultTotal))[0]
 
   if (improvingCandidate) {
     return { type: 'play', card: improvingCandidate.card }
@@ -245,4 +245,3 @@ function decideNextAction(view: AiGameView): MatchAction {
 }
 
 export { decideNextAction, buildAiHandDeck, randomDroidName, type AiGameView }
-

@@ -44,9 +44,11 @@ class MatchManager {
     return { matchId, playerId, token }
   }
 
-  createMatchVsAi(
-    deck: Card[],
-  ): { matchId: string; playerId: string; token: string } {
+  createMatchVsAi(deck: Card[]): {
+    matchId: string
+    playerId: string
+    token: string
+  } {
     const playerId = crypto.randomUUID()
     const matchId = crypto.randomUUID()
     const token = generateHexToken(16)
