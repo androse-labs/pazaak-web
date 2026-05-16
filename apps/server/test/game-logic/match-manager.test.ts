@@ -3,6 +3,20 @@ import { randomUUIDv7 } from 'bun'
 import { MatchManager } from '../../src/models/match-manager'
 import { createTestMatch, createTestPlayer } from './match-helper'
 
+const testDeck = [
+  { id: randomUUIDv7(), type: 'double' as const, value: 'D' as const },
+  { id: randomUUIDv7(), type: 'invert' as const, value: '2&4' as const },
+  {
+    id: randomUUIDv7(),
+    type: 'flip' as const,
+    value: 2 as const,
+    magnitude: 'subtract' as const,
+  },
+  { id: randomUUIDv7(), type: 'subtract' as const, value: 3 as const },
+]
+
+const SIX_MINUTES_AGO = Date.now() - 6 * 60 * 1000
+
 describe('Match Manager', () => {
   it('creates a match successfully', async () => {
     const matchManager = new MatchManager()
@@ -120,5 +134,69 @@ describe('Match Manager', () => {
     const result = matchManager.deleteMatch(randomUUIDv7())
 
     expect(result).toBe(false)
+  })
+})
+
+describe('cleanUpMatches', () => {
+  it('deletes inactive regular matches older than 5 minutes', () => {
+    const matchManager = new MatchManager()
+
+    const { matchId } = matchManager.createMatch('Test Match', false, testDeck)
+    const match = matchManager.getMatch(matchId)!
+    match.lastModifiedDateUtc = SIX_MINUTES_AGO
+
+    matchManager.cleanUpMatches()
+
+    expect(matchManager.getMatch(matchId)).toBeNull()
+  })
+
+  it('keeps active regular matches with connected players', () => {
+    const matchManager = new MatchManager()
+
+    const { matchId } = matchManager.createMatch('Test Match', false, testDeck)
+    const match = matchManager.getMatch(matchId)!
+    match.players[0]!.wsConnected = true
+
+    matchManager.cleanUpMatches()
+
+    expect(matchManager.getMatch(matchId)).toBeDefined()
+  })
+
+  it('deletes AI matches older than 5 minutes', () => {
+    const matchManager = new MatchManager()
+
+    const { matchId } = matchManager.createMatchVsAi(testDeck)
+    const match = matchManager.getMatch(matchId)!
+    match.lastModifiedDateUtc = SIX_MINUTES_AGO
+
+    matchManager.cleanUpMatches()
+
+    expect(matchManager.getMatch(matchId)).toBeNull()
+  })
+
+  it('deletes AI matches when the human player disconnects', () => {
+    const matchManager = new MatchManager()
+
+    const { matchId } = matchManager.createMatchVsAi(testDeck)
+    const match = matchManager.getMatch(matchId)!
+    // Simulate player connecting then disconnecting
+    match.players[0]!.wsConnected = false
+
+    matchManager.cleanUpMatches()
+
+    expect(matchManager.getMatch(matchId)).toBeNull()
+  })
+
+  it('keeps active AI matches with a connected human player', () => {
+    const matchManager = new MatchManager()
+
+    const { matchId } = matchManager.createMatchVsAi(testDeck)
+    const match = matchManager.getMatch(matchId)!
+    const humanPlayer = match.players.find((p) => !p?.isAi)!
+    humanPlayer.wsConnected = true
+
+    matchManager.cleanUpMatches()
+
+    expect(matchManager.getMatch(matchId)).toBeDefined()
   })
 })
