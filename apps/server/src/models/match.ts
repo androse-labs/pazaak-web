@@ -6,6 +6,7 @@ import { type Player } from './players'
 import { type Card, type PlayerView } from '@pazaak-web/shared'
 import { Deck } from './deck'
 import { processCardEffects } from './card'
+import { decideNextAction } from './ai-engine'
 
 type WaitingMatch = {
   status: 'waiting'
@@ -188,6 +189,14 @@ class Match {
     }
 
     this.rematchRequestedBy = playerId
+
+    const opponent = this.players.find((p) => p?.id !== playerId)
+    if (opponent?.isAi) {
+      // AI always accepts immediately
+      this.acceptRematch(opponent.id)
+      return
+    }
+
     this.notifyOpponentsAboutRematchRequest(playerId)
   }
 
@@ -246,6 +255,7 @@ class Match {
     this.startGame(0, this.players[0].id)
     this.notifyPlayersAboutRematchAcceptance()
     this.notifyPlayersAboutGameState()
+    this.scheduleAiTurnIfNeeded()
   }
 
   notifyPlayersAboutGameState(): void {
@@ -489,8 +499,47 @@ class Match {
     }
 
     this.notifyPlayersAboutGameState()
+    this.scheduleAiTurnIfNeeded()
 
     return { success: true }
+  }
+
+  private scheduleAiTurnIfNeeded(): void {
+    if (this.status !== 'in-progress') return
+
+    const currentPlayer = this.players[this.playersTurn - 1]
+    if (!currentPlayer?.isAi) return
+
+    setTimeout(() => this.executeAiTurn(currentPlayer.id), 800)
+  }
+
+  private executeAiTurn(aiPlayerId: string): void {
+    if (this.status !== 'in-progress') return
+
+    const currentPlayer = this.getPlayerById(aiPlayerId)
+    if (!currentPlayer?.isAi) return
+
+    // Only act if it's still the AI's turn
+    if (!this.isPlayerTurn(aiPlayerId)) return
+
+    const currentGame = this.getCurrentGame()
+    const myBoard = currentGame.boards[aiPlayerId] || []
+    const opponent = this.players.find((p) => p?.id !== aiPlayerId)
+    const opponentBoard = currentGame.boards[opponent?.id || ''] || []
+
+    const myTotal = currentGame.boardTotal(myBoard)
+    const opponentTotal = currentGame.boardTotal(opponentBoard)
+
+    const action = decideNextAction({
+      myTotal,
+      opponentTotal,
+      hand: currentPlayer.hand,
+    })
+
+    const result = this.performAction(aiPlayerId, action)
+    if (!result.success) {
+      console.warn(`AI action failed: ${result.reason}`)
+    }
   }
 
   isActionValid(
@@ -597,7 +646,7 @@ class Match {
       opponentState: opponent ? opponent.status : 'playing',
       opponentHandSize: opponent ? opponent.hand.length : 0,
       round: this.round,
-      opponentConnected: opponent ? opponent.wsConnected : false,
+      opponentConnected: opponent ? (opponent.isAi || opponent.wsConnected) : false,
       score: {
         yourScore: this.score[playerIndex],
         opponentScore: this.score[opponentIndex],

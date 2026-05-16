@@ -12,6 +12,15 @@ export const joinMatch = (matchId: string, deck: Card[]) => {
   )
 }
 
+export const createMatchVsAi = (deck: Card[]) => {
+  return api.post<{ matchId: string; playerId: string; token: string }>(
+    '/match/create-vs-ai',
+    {
+      json: { deck },
+    },
+  )
+}
+
 export const rematch = async (
   matchId: string,
   token: string,

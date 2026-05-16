@@ -3,6 +3,7 @@ import { generateHexToken } from '../utils'
 import { Match } from './match'
 import { Deck } from './deck'
 import { type Card } from '@pazaak-web/shared'
+import { buildAiHandDeck, randomDroidName } from './ai-engine'
 
 class MatchManager {
   private matches: Match[] = []
@@ -26,6 +27,8 @@ class MatchManager {
         matchName,
         {
           id: playerId,
+          name: 'Player',
+          isAi: false,
           wsConnected: false,
           sendEvent: () => {},
           token,
@@ -37,6 +40,52 @@ class MatchManager {
         unlisted,
       ),
     )
+
+    return { matchId, playerId, token }
+  }
+
+  createMatchVsAi(
+    deck: Card[],
+  ): { matchId: string; playerId: string; token: string } {
+    const playerId = crypto.randomUUID()
+    const matchId = crypto.randomUUID()
+    const token = generateHexToken(16)
+
+    const aiDeck = buildAiHandDeck()
+    const aiId = crypto.randomUUID()
+
+    const match = new Match(
+      matchId,
+      'vs AI',
+      {
+        id: playerId,
+        name: 'Player',
+        isAi: false,
+        wsConnected: false,
+        sendEvent: () => {},
+        token,
+        status: 'playing',
+        deck: new Deck().fillWithCustomCards(deck),
+        originalDeck: [...deck],
+        hand: [],
+      },
+      true, // always unlisted
+    )
+
+    match.startMatch({
+      id: aiId,
+      name: randomDroidName(),
+      isAi: true,
+      wsConnected: false,
+      sendEvent: () => {},
+      token: generateHexToken(16),
+      status: 'playing',
+      hand: [],
+      deck: new Deck().fillWithCustomCards(aiDeck),
+      originalDeck: [...aiDeck],
+    })
+
+    this.matches.push(match)
 
     return { matchId, playerId, token }
   }
@@ -61,6 +110,8 @@ class MatchManager {
 
     match.startMatch({
       id: playerId,
+      name: 'Player',
+      isAi: false,
       wsConnected: false,
       sendEvent: () => {},
       token,

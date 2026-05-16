@@ -10,6 +10,23 @@ export default (matchManager: MatchManager) => {
   const match = new Hono()
 
   match.post(
+    '/match/create-vs-ai',
+    zValidator(
+      'json',
+      z.object({
+        deck: z.array(cardSchema),
+      }),
+    ),
+    async (c) => {
+      const { deck } = c.req.valid('json')
+
+      const { matchId, token, playerId } = matchManager.createMatchVsAi(deck)
+
+      return c.json({ matchId, playerId, token }, 200)
+    },
+  )
+
+  match.post(
     '/match/create',
     zValidator(
       'json',

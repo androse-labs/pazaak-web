@@ -4,6 +4,8 @@ import { type PazaakSocketEvent } from '@pazaak-web/shared/src/web-socket-types'
 
 type Player = {
   id: string
+  name: string
+  isAi: boolean
   wsConnected: boolean
   sendEvent: (event: PazaakSocketEvent) => void
   token: string

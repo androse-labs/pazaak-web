@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { CirclePlus, Dices, DoorOpen, RefreshCcw } from 'lucide-react'
+import { Bot, CirclePlus, Dices, DoorOpen, RefreshCcw } from 'lucide-react'
 import { Modal } from '../components/Modal'
 import { api } from '../webClient'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -8,7 +8,7 @@ import { MatchList } from '../components/MatchList'
 import { useState } from 'react'
 import { usePlayerStore } from '../stores/playerStore'
 import { useDeckStore } from '../stores/deckStore'
-import { joinMatch } from '../api'
+import { createMatchVsAi, joinMatch } from '../api'
 import {
   uniqueNamesGenerator,
   adjectives,
@@ -180,6 +180,24 @@ function Index() {
   const navigate = useNavigate()
   const setMatchConnection = usePlayerStore((s) => s.setMatchConnection)
 
+  const { mutate: mutateVsAi, isPending: isVsAiPending } = useMutation({
+    mutationFn: async (deck: Card[]) => {
+      const response = await createMatchVsAi(deck)
+      if (response.status !== 200) {
+        throw new Error('Failed to create AI match')
+      }
+      return await response.json()
+    },
+    onSuccess: (data) => {
+      setMatchConnection({
+        matchId: data.matchId,
+        playerId: data.playerId,
+        token: data.token,
+      })
+      navigate({ to: `/match/${data.matchId}` })
+    },
+  })
+
   return (
     <div className="landscape-short:gap-6 flex flex-1 flex-col items-center justify-center gap-24">
       <h1 className="landscape-short:text-4xl font-mono text-5xl font-semibold uppercase md:text-6xl">
@@ -280,6 +298,15 @@ function Index() {
         >
           <DoorOpen />
           Join Match
+        </button>
+        <button
+          className="btn btn-accent"
+          aria-label="Play vs AI"
+          disabled={isVsAiPending}
+          onClick={() => mutateVsAi(userDeck)}
+        >
+          <Bot />
+          {isVsAiPending ? 'Starting…' : 'Play vs AI'}
         </button>
         <JoinMatchModal />
       </div>
