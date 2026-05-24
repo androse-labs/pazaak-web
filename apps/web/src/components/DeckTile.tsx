@@ -30,9 +30,11 @@ export const DeckTile = ({
   return (
     <div
       className={clsx(
-        'group relative flex w-72 flex-col items-center rounded-lg p-4 shadow-lg lg:w-80',
+        'group relative flex w-72 flex-col items-center rounded-lg border-4 p-4 shadow-lg lg:w-80',
         {
-          'bg-base-100': selectedForPreview,
+          'border-transparent': !selectedForPreview && !selectedForPlay,
+          'bg-base-100 border-gray-700': selectedForPreview && !selectedForPlay,
+          'border-green-400': selectedForPlay,
           'bg-base-300': !selectedForPreview,
         },
       )}
