@@ -60,9 +60,7 @@ export const Board = ({
 }: BoardProps) => {
   const [draggedCard, setDraggedCard] = useState<CardValue | null>(null)
   const [isShaking, setIsShaking] = useState(false)
-  const [isDesktop, setIsDesktop] = useState(
-    () => window.innerWidth >= 640,
-  )
+  const [isDesktop, setIsDesktop] = useState(() => window.innerWidth >= 640)
   const [isLandscapeShort, setIsLandscapeShort] = useState(
     () => window.innerWidth > window.innerHeight && window.innerHeight < 500,
   )
