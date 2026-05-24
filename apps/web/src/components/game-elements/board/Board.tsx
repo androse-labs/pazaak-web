@@ -60,8 +60,12 @@ export const Board = ({
 }: BoardProps) => {
   const [draggedCard, setDraggedCard] = useState<CardValue | null>(null)
   const [isShaking, setIsShaking] = useState(false)
-  const [isDesktop, setIsDesktop] = useState(false)
-  const [isLandscapeShort, setIsLandscapeShort] = useState(false)
+  const [isDesktop, setIsDesktop] = useState(
+    () => window.innerWidth >= 640,
+  )
+  const [isLandscapeShort, setIsLandscapeShort] = useState(
+    () => window.innerWidth > window.innerHeight && window.innerHeight < 500,
+  )
 
   const sensors = useSensors(
     useSensor(TouchSensor, {
